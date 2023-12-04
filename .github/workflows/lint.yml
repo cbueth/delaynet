@@ -21,7 +21,7 @@ jobs:
       - name: Run Black
         uses: psf/black@stable
         with:
-          src: './delaynet ./tests ./scripts'
+          src: './delaynet ./tests'
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:

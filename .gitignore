@@ -1,0 +1,25 @@
+# Ignore IDE
+.idea/*
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Development
+*.egg-info
+.coverage
+docs/api/*
+!docs/api/index.rst
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# outputs - add manually
+data/*
+results/*
+jupyter_execute/*
+# logs
+*.log
+# plots
+*.pdf

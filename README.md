@@ -2,6 +2,8 @@
 
 [//]: # ([![Dev]&#40;https://img.shields.io/badge/docs-dev-blue.svg&#41;]&#40;https://cbueth.github.io/DelayDynamics/&#41;)
 [//]: # ([![codecov]&#40;https://codecov.io/gh/cbueth/DelayDynamics/branch/main/graph/badge.svg?token=AS72IFT2Q4&#41;]&#40;https://codecov.io/gh/cbueth/DelayDynamics&#41;)
+[![Tests](https://github.com/cbueth/delaynet/actions/workflows/test.yml/badge.svg)](https://github.com/cbueth/delaynet/actions/workflows/test.yml)
+[![Lint](https://github.com/cbueth/delaynet/actions/workflows/lint.yml/badge.svg)](https://github.com/cbueth/delaynet/actions/workflows/lint.yml)
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/PyCQA/pylint)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 

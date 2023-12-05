@@ -3,6 +3,9 @@ from os.path import dirname, join
 import logging.config
 from ._version import __version__
 
+# Set package attributes
+__author__ = "Carlson Büth"
+
 # Logging configuration using the setup.cfg file
 logging.config.fileConfig(join(dirname(__file__), "..", "setup.cfg"))
 # Get the logger for this module

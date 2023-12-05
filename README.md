@@ -1,4 +1,4 @@
-# `delaynet` — Delay Propagation in Transportation Networks
+# `DelayNet` — Delay Propagation in Transportation Networks
 
 [//]: # ([![Dev]&#40;https://img.shields.io/badge/docs-dev-blue.svg&#41;]&#40;https://cbueth.github.io/DelayDynamics/&#41;)
 [//]: # ([![codecov]&#40;https://codecov.io/gh/cbueth/DelayDynamics/branch/main/graph/badge.svg?token=AS72IFT2Q4&#41;]&#40;https://codecov.io/gh/cbueth/DelayDynamics&#41;)

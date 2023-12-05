@@ -1,4 +1,4 @@
-"""delaynet init."""
+"""DelayNet init."""
 from os.path import dirname, join
 import logging.config
 from ._version import __version__
@@ -10,4 +10,4 @@ logger = logging.getLogger("delaynet")
 # numba_logger = logging.getLogger("numba")
 # numba_logger.setLevel(logging.WARNING)
 
-logger.info("delaynet version %s", __version__)
+logger.info("DelayNet version %s", __version__)

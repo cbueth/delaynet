@@ -2,6 +2,6 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="delaynet",
+    name="DelayNet",
     packages=find_packages(),
 )

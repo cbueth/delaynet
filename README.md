@@ -22,9 +22,9 @@ mamba env create --file=environment.yml
 
 This initializes a conda environment by the name `delay_net`, which can be
 activated using `mamba activate delay_net`.
-If you want to use `conda` or `micromamba`, just replace 
+If you want to use `conda` or `micromamba`, just replace
 `mamba` with the respective. For `micromamba`:
-    
+
 ```bash
 micromamba env create --file=environment.yml
 ```
@@ -33,7 +33,7 @@ Alternatively a version-less setup can be done by executing the following
 
 ```bash
 mamba create -n delay_net -c conda-forge python=3.11 --file requirements.txt
-mamba activate sb_env
+mamba activate delay_net
 mamba env export | grep -v "^prefix: " > environment.yml
 ```
 

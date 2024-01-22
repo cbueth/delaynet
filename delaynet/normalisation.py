@@ -8,12 +8,19 @@ from .norms.norm import norm as norm_decorator
 
 
 def normalise(
-    ts: ndarray, norm: str | Callable[[ndarray, ...], ndarray], **kwargs
+    ts: ndarray,
+    norm: str | Callable[[ndarray, ...], ndarray],
+    *args,
+    **kwargs,
 ) -> ndarray:
     """
     Normalise a time series using a given norm.
 
     Keyword arguments are forwarded to the norm function.
+
+    If `check_kwargs` is passed in kwargs with value `False`, the kwargs are not
+    checked for availability. This is useful if you want to pass unused values in
+    generic functions.
 
     The norms can be either a string or a function, implementing a norm.
     The following norms are available (case-insensitive):
@@ -32,8 +39,12 @@ def normalise(
     :type ts: ndarray
     :param norm: Norm to use.
     :type norm: str or Callable
+    :param args: Positional arguments forwarded to the norm function, see documentation
+                 of the norms.
+    :type args: tuple
     :param kwargs: Keyword arguments forwarded to the norm function, see documentation
                    of the norms.
+    :type kwargs: dict
     :return: Normalised time series.
     :rtype: ndarray
     :raises ValueError: If the norm is unknown. Given as string.
@@ -49,7 +60,7 @@ def normalise(
         if norm not in __all_norms_names__:
             raise ValueError(f"Unknown norm: {norm}")
 
-        return __all_norms_names__[norm](ts, **kwargs)
+        return __all_norms_names__[norm](ts, *args, **kwargs)
 
     if not callable(norm):
         raise ValueError(
@@ -57,4 +68,4 @@ def normalise(
         )
 
     # norm is callable, add decorator to assure correct kwargs, type and shape
-    return norm_decorator(norm)(ts, **kwargs)
+    return norm_decorator(norm)(ts, *args, **kwargs)

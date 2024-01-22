@@ -50,6 +50,20 @@ def test_norm_decorator_kwargs_unknown():
         simple_norm(array([1, 2, 3]), b=2)
 
 
+def test_norm_decorator_kwargs_unknown_ignored():
+    """Test the norm decorator by designing a simple norm with unknown kwargs
+    and kwarg checker off."""
+
+    @norm
+    def simple_norm(ts: ndarray, a: int = 1) -> ndarray:
+        """Increment all values by one."""
+        return ts + a
+
+    assert array_equal(
+        simple_norm(array([1, 2, 3]), check_kwargs=False, b=2), array([2, 3, 4])
+    )
+
+
 def test_norm_decorator_required_kwonly():
     """Test the norm decorator by designing a
     norm with required keyword-only arguments."""
@@ -62,7 +76,8 @@ def test_norm_decorator_required_kwonly():
     assert array_equal(simple_norm(array([1, 2, 3]), a=2), array([3, 4, 5]))
 
 
-def test_norm_decorator_mixed_args():
+@pytest.mark.parametrize("check_kwargs", [True, False])
+def test_norm_decorator_mixed_args(check_kwargs):
     """Test the norm decorator with a function that has mixed arguments."""
 
     @norm
@@ -78,8 +93,18 @@ def test_norm_decorator_mixed_args():
         mixed_args_norm(array([1, 2, 3]), 2)
 
     # Test with unknown keyword argument
-    with pytest.raises(TypeError, match="got an unexpected keyword argument 'c'"):
-        mixed_args_norm(array([1, 2, 3]), 2, b=3, c=4)
+    if check_kwargs:
+        with pytest.raises(TypeError, match="got an unexpected keyword argument 'c'"):
+            mixed_args_norm(array([1, 2, 3]), 2, b=3, c=4)
+    else:
+        assert array_equal(
+            mixed_args_norm(array([1, 2, 3]), 2, check_kwargs=check_kwargs, b=3, c=4),
+            array([6, 7, 8]),
+        )
+        assert array_equal(
+            mixed_args_norm(array([1, 2, 3]), 2, b=3, c=4, check_kwargs=check_kwargs),
+            array([6, 7, 8]),
+        )
 
 
 def test_norm_decorator_faulty_input_type():

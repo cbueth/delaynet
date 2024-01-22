@@ -6,10 +6,10 @@ from collections.abc import Callable
 
 from numpy import ndarray
 
+Norm = Callable[[ndarray, ...], ndarray]
 
-def norm(
-    norm_func: Callable[[ndarray, ...], ndarray]
-) -> Callable[[ndarray, ...], ndarray]:
+
+def norm(norm_func: Norm) -> Norm:
     """Decorator for the norm functions.
 
     As the norms take different arguments, this decorator is used to make sure that
@@ -37,6 +37,9 @@ def norm(
     def wrapper(ts: ndarray, *args, **kwargs) -> ndarray:
         """Wrapper for the norm functions.
 
+        If kwargs have a key `check_kwargs` with value `False`, the kwargs are not
+        checked for availability. This is useful if you want to pass unused keyword.
+
         :param ts: The time series to normalise.
         :type ts: ndarray
         :param args: The args to pass to the norm function.
@@ -59,8 +62,17 @@ def norm(
         # Bind the arguments to the parameters
         # This will automatically raise a TypeError if a required argument is missing
         # or an unknown argument is passed
+
+        if "check_kwargs" in kwargs:
+            if not kwargs["check_kwargs"]:
+                # Filter out kwargs that are not in the function's signature
+                kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
+            else:
+                kwargs.pop("check_kwargs")
+
         bound_args = sig.bind(ts, *args, **kwargs)
         bound_args.apply_defaults()
+
         # Get the shape of the input time series
         shape = ts.shape
         # Call the norm function with the bound arguments

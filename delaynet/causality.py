@@ -6,11 +6,13 @@ from numpy import ndarray
 
 from .causalities import __all_causality_metrics_names__
 
+Metric = str | Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
+
 
 def causality(
     ts1: ndarray,
     ts2: ndarray,
-    metric: str | Callable[[ndarray, ndarray, ...], float | tuple[float, int]],
+    metric: Metric,
     **kwargs,
 ) -> float | tuple[float, int]:
     """

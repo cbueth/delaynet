@@ -4,6 +4,7 @@
 from .continuous_ordinal_patterns import random_patterns
 from .granger import gt_multi_lag, gt_bi_multi_lag
 from .gravity import gravity
+from .linear_correlation import linear_correlation
 from .mutual_information import mutual_information
 from .ordinal_synchronisation import ordinal_synchronisation
 from .rank_correlation import rank_correlation
@@ -20,6 +21,8 @@ __all_connectivity_metrics_names__ = {
     "gc_bi": gt_bi_multi_lag,
     "gravity": gravity,
     "gv": gravity,
+    "linear correlation": linear_correlation,
+    "lc": linear_correlation,
     "mutual information": mutual_information,
     "mi": mutual_information,
     "ordinal synchronisation": ordinal_synchronisation,

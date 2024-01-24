@@ -7,11 +7,7 @@ from .mutual_information import mutual_information
 from .gravity import gravity
 from .ordinal_synchronisation import ordinal_synchronisation
 from .rank_correlation import rank_correlation
-from .transfer_entropy import (
-    transfer_entropy,
-    transfer_entropy_pyif,
-    transfer_entropy_2,
-)
+from .transfer_entropy import transfer_entropy
 
 from ..utils.dict_lookup import dict_lookup
 
@@ -30,9 +26,6 @@ __all_connectivity_metrics_names__ = {
     "rc": rank_correlation,
     "transfer entropy": transfer_entropy,
     "te": transfer_entropy,
-    "te_pyif": transfer_entropy_pyif,
-    "te_2": transfer_entropy_2,
-    "te_ka": transfer_entropy,
     "gravity": gravity,
     "gv": gravity,
 }

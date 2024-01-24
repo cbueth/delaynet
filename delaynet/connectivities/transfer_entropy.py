@@ -34,19 +34,20 @@ def transfer_entropy(ts1, ts2):
     # ts1 = np.array( ts1 > np.median( ts1 ), dtype = int )
     # ts2 = np.array( ts2 > np.median( ts2 ), dtype = int )
 
-    te_effective_1_2 = np.zeros((6))
+    # te_effective_1_2 = np.zeros((6))  # TODO: implement max_lag_steps=5 ?
 
     te_o_1_2 = compute_transfer_entropy(ts1, ts2, 2, 1, 0)
     te_p_1_2 = compute_transfer_entropy(np.random.permutation(ts1), ts2, 2, 1, 0)
-    te_effective_1 = te_o_1_2 - te_p_1_2
+    # te_effective_1 = te_o_1_2 - te_p_1_2
 
     te_o_2_1 = compute_transfer_entropy(ts2, ts1, 2, 1, 0)
     te_p_2_1 = compute_transfer_entropy(np.random.permutation(ts2), ts1, 2, 1, 0)
-    te_effective_2 = te_o_2_1 - te_p_2_1
+    # te_effective_2 = te_o_2_1 - te_p_2_1
 
-    te_effective_1_2[0] = te_effective_1 - te_effective_2
+    # te_effective_1_2[0] = te_effective_1 - te_effective_2# TODO: only one element used
 
-    return -np.max(te_effective_1_2)
+    # return -np.max(te_effective_1_2)
+    return -np.max(te_o_1_2 - te_p_1_2 - te_o_2_1 + te_p_2_1)
 
 
 def compute_transfer_entropy(source, dest, k, l, delay):
@@ -117,14 +118,14 @@ def count_tuples(source, dest, k, l, delay):
     observations = 0
 
     # Initialize past states
-    past_state_dest = dest[:k]
-    past_state_source = source[:l]
+    past_state_dest = dest[:k]  # TODO: unused variable
+    past_state_source = source[:l]  # TODO: unused variable
 
     for t in range(max(k, l + delay), len(dest)):
         # Next state for the destination variable
         next_state_dest = dest[t]
 
-        # State for the source variable
+        # State for the source variable  # TODO: unused variable
         state_source = source[t - delay - l + 1 : t - delay + 1]
 
         # Update past states

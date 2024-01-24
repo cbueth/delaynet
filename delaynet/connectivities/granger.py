@@ -5,7 +5,10 @@ from statsmodels.regression.linear_model import OLS
 from statsmodels.tools.tools import add_constant
 import numpy as np
 
+from .connectivity import connectivity
 
+
+@connectivity
 def gt_single_lag(ts1, ts2, max_lag):  # TODO: unused function
     full_ts = np.array([ts2, ts1]).T
 

@@ -3,7 +3,10 @@
 from scipy.stats import spearmanr
 from numpy import zeros, argmin, min as npmin
 
+from .connectivity import connectivity
 
+
+@connectivity
 def rank_correlation(ts1, ts2):
     all_c = zeros(6)
 

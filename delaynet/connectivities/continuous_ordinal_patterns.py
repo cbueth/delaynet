@@ -5,7 +5,10 @@ from numba import jit
 
 from .granger import gt_multi_lag
 
+from .connectivity import connectivity
 
+
+@connectivity
 def random_patterns(ts1, ts2, max_lag=5, p_size=5, num_rnd_patterns=50, linear=True):
     best_pv = 1.0
     best_lag = 0

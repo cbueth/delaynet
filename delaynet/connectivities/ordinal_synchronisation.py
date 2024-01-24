@@ -2,7 +2,10 @@
 
 import numpy as np
 
+from .connectivity import connectivity
 
+
+@connectivity
 def ordinal_synchronisation(ts1, ts2):
     os = np.zeros(6)
 

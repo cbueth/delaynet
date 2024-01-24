@@ -29,22 +29,11 @@
 
 from numpy import zeros, log2
 
-from ..utils.multiple_coeff_binning import MultipleCoefficientBinning
+from .connectivity import connectivity
 
 
+@connectivity(mcb_kwargs={"n_bins": 3, "alphabet": "ordinal", "strategy": "quantile"})
 def mutual_information(ts1, ts2):
-    transformer = MultipleCoefficientBinning(
-        n_bins=3, alphabet="ordinal", strategy="quantile"
-    )
-    transformer.fit(ts1.reshape(-1, 1))
-    ts1 = transformer.transform(ts1.reshape(-1, 1))[:, 0]
-
-    transformer = MultipleCoefficientBinning(
-        n_bins=3, alphabet="ordinal", strategy="quantile"
-    )
-    transformer.fit(ts2.reshape(-1, 1))
-    ts2 = transformer.transform(ts2.reshape(-1, 1))[:, 0]
-
     # ts1 = array( ts1 > median( ts1 ), dtype = int )
     # ts2 = array( ts2 > median( ts2 ), dtype = int )
 

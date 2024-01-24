@@ -1,10 +1,11 @@
 """Decorator for the norm functions."""
 
 from functools import wraps
-from inspect import signature
 from collections.abc import Callable
 
 from numpy import ndarray
+
+from delaynet.utils.bind_args import bind_args
 
 Norm = Callable[[ndarray, ...], ndarray]
 
@@ -27,17 +28,13 @@ def norm(norm_func: Norm) -> Norm:
     :type norm_func: Callable
     :return: The decorated function.
     :rtype: Callable
-    :raises ValueError: If an argument is missing.
-    :raises TypeError: If an unknown kwarg is passed.
-    :raises ValueError: If the shape of the norm output is not equal to the shape of
-                        the input time series.
     """
 
     @wraps(norm_func)
     def wrapper(ts: ndarray, *args, **kwargs) -> ndarray:
         """Wrapper for the norm functions.
 
-        If kwargs have a key `check_kwargs` with value `False`, the kwargs are not
+        If kwargs have a key ``check_kwargs`` with value ``False``, the kwargs are not
         checked for availability. This is useful if you want to pass unused keyword.
 
         :param ts: The time series to normalise.
@@ -57,26 +54,13 @@ def norm(norm_func: Norm) -> Norm:
         # Check if ts is an ndarray
         if not isinstance(ts, ndarray):
             raise TypeError(f"ts must be of type ndarray, not {type(ts)}.")
-        # Get the signature of the norm function
-        sig = signature(norm_func)
-        # Bind the arguments to the parameters
-        # This will automatically raise a TypeError if a required argument is missing
-        # or an unknown argument is passed
 
-        if "check_kwargs" in kwargs:
-            if not kwargs["check_kwargs"]:
-                # Filter out kwargs that are not in the function's signature
-                kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
-            else:
-                kwargs.pop("check_kwargs")
-
-        bound_args = sig.bind(ts, *args, **kwargs)
-        bound_args.apply_defaults()
+        bound_args = bind_args(norm_func, [ts, *args], kwargs)
+        # Call the norm function with the bound arguments
+        normed_ts = norm_func(*bound_args.args, **bound_args.kwargs)
 
         # Get the shape of the input time series
         shape = ts.shape
-        # Call the norm function with the bound arguments
-        normed_ts = norm_func(*bound_args.args, **bound_args.kwargs)
         # Check output type
         if not isinstance(normed_ts, ndarray):
             raise ValueError(

@@ -3,8 +3,8 @@
 # Import all connectivity metrics
 from .continuous_ordinal_patterns import random_patterns
 from .granger import gt_multi_lag, gt_bi_multi_lag
-from .mutual_information import mutual_information
 from .gravity import gravity
+from .mutual_information import mutual_information
 from .ordinal_synchronisation import ordinal_synchronisation
 from .rank_correlation import rank_correlation
 from .transfer_entropy import transfer_entropy
@@ -18,6 +18,8 @@ __all_connectivity_metrics_names__ = {
     "granger causality": gt_multi_lag,
     "gc": gt_multi_lag,
     "gc_bi": gt_bi_multi_lag,
+    "gravity": gravity,
+    "gv": gravity,
     "mutual information": mutual_information,
     "mi": mutual_information,
     "ordinal synchronisation": ordinal_synchronisation,
@@ -26,8 +28,6 @@ __all_connectivity_metrics_names__ = {
     "rc": rank_correlation,
     "transfer entropy": transfer_entropy,
     "te": transfer_entropy,
-    "gravity": gravity,
-    "gv": gravity,
 }
 
 # List of all available metrics

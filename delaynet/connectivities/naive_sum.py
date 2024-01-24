@@ -1,4 +1,4 @@
-"""Naive sum causality metric."""
+"""Naive sum connectivity metric."""
 
 from numpy import sum as npsum, exp
 

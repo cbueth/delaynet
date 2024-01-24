@@ -1,4 +1,4 @@
-"""Continuous Ordinal Patterns (COP) causality metric."""
+"""Continuous Ordinal Patterns (COP) connectivity metric."""
 
 import numpy as np
 from numba import jit

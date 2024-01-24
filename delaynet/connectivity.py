@@ -1,26 +1,27 @@
-"""Module to provide a unified interface for all causality metrics."""
+"""Module to provide a unified interface for all connectivity metrics."""
 from collections.abc import Callable
 
 from numpy import ndarray
 
 
-from .causalities import __all_causality_metrics_names__
+from .connectivities import __all_connectivity_metrics_names__
 
 Metric = str | Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
 
 
-def causality(
+def connectivity(
     ts1: ndarray,
     ts2: ndarray,
     metric: Metric,
     **kwargs,
 ) -> float | tuple[float, int]:
     """
-    Calculate causality between two time series using a given metric.
+    Calculate connectivity between two time series using a given metric.
 
     Keyword arguments are forwarded to the metric function.
 
-    The metrics can be either a string or a function, implementing a causality metric.
+    The metrics can be either a string or a function, implementing a connectivity
+    metric.
     The following metrics are available (case-insensitive):
         - COP: Continuous Ordinal Patterns
         - GC: Granger Causality
@@ -31,8 +32,8 @@ def causality(
         - OS: Ordinal Synchronisation
         - Naive: Sum
 
-    (Find all in submodule `delaynet.causalities`, names are stored in
-    `delaynet.causalities.__all_causality_metrics__`)
+    (Find all in submodule `delaynet.connectivities`, names are stored in
+    `delaynet.connectivities.__all_connectivity_metrics__`)
 
     If a `callable` is given, it should take two time series as input and return a
     `float`, or a `tuple` of `float` and `int`.
@@ -45,7 +46,7 @@ def causality(
     :type metric: str or Callable
     :param kwargs: Keyword arguments forwarded to the metric function, see documentation
                    of the metrics.
-    :return: Causality value and lag (if applicable).
+    :return: Connectivity value and lag (if applicable).
     :rtype: float or tuple of float and int
     :raises ValueError: If the metric is unknown. Given as string.
     :raises ValueError: If the metric returns an invalid value. Given a Callable.
@@ -55,10 +56,10 @@ def causality(
     if isinstance(metric, str):
         metric = metric.lower()
 
-        if metric not in __all_causality_metrics_names__:
+        if metric not in __all_connectivity_metrics_names__:
             raise ValueError(f"Unknown metric: {metric}")
 
-        return __all_causality_metrics_names__[metric](ts1, ts2, **kwargs)
+        return __all_connectivity_metrics_names__[metric](ts1, ts2, **kwargs)
 
     if not callable(metric):
         raise ValueError("Invalid metric. Must be string or callable.")

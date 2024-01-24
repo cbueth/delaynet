@@ -1,4 +1,4 @@
-"""Transfer Entropy (TE) causality metric."""
+"""Transfer Entropy (TE) connectivity metric."""
 from itertools import product
 
 # # Transfer Entropy for Discrete variables

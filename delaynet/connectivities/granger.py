@@ -1,4 +1,4 @@
-"""Granger Causality (GC) causality metric."""
+"""Granger Causality (GC) connectivity metric."""
 
 from statsmodels.tsa.tsatools import lagmat2ds
 from statsmodels.regression.linear_model import OLS

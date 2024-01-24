@@ -4,8 +4,8 @@ import logging.config
 from ._version import __version__
 
 # Expose most common functions
-from .causality import causality
-from .causalities import __all_causality_metrics_names_simple__
+from .connectivity import connectivity
+from .connectivities import __all_connectivity_metrics_names_simple__
 from .normalisation import normalise
 from .norms import __all_norms_names_simple__
 

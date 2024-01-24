@@ -1,4 +1,4 @@
-"""Rank correlation (RC) causality metric."""
+"""Rank correlation (RC) connectivity metric."""
 
 from scipy.stats import spearmanr
 from numpy import zeros, argmin, min as npmin

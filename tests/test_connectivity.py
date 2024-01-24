@@ -1,7 +1,7 @@
-"""Tests for the causality function."""
+"""Tests for the connectivity function."""
 import pytest
 from numpy import array, corrcoef
-from delaynet.causality import causality
+from delaynet.connectivity import connectivity
 
 
 @pytest.fixture
@@ -11,9 +11,9 @@ def time_series():
     return ts1, ts2
 
 
-def test_causality_with_string_metric(time_series):
+def test_connectivity_with_string_metric(time_series):
     ts1, ts2 = time_series
-    result = causality(ts1, ts2, "gc")
+    result = connectivity(ts1, ts2, "gc")
     assert isinstance(result, (float, tuple))
 
 
@@ -25,9 +25,9 @@ def test_causality_with_string_metric(time_series):
         lambda ts1, ts2: (1.0, 1),
     ],
 )
-def test_causality_with_valid_metric(time_series, metric):
+def test_connectivity_with_valid_metric(time_series, metric):
     ts1, ts2 = time_series
-    result = causality(ts1, ts2, metric)
+    result = connectivity(ts1, ts2, metric)
     assert isinstance(result, (float, tuple))
 
 
@@ -49,8 +49,8 @@ def test_causality_with_valid_metric(time_series, metric):
         None,
     ],
 )
-def test_causality_with_invalid_metric(time_series, invalid_metric):
+def test_connectivity_with_invalid_metric(time_series, invalid_metric):
     ts1, ts2 = time_series
 
     with pytest.raises(ValueError):
-        causality(ts1, ts2, invalid_metric)
+        connectivity(ts1, ts2, invalid_metric)

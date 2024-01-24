@@ -1,13 +1,13 @@
 """Example script to show the direct usage of the norms and casuality metrics.
 
-Vary the norms and causality metrics and see how the results change.
+Vary the norms and connectivity metrics and see how the results change.
 """
 from itertools import product
 from sys import argv
 
 from numpy import zeros, save
 
-from delaynet import normalise, causality
+from delaynet import normalise, connectivity
 from delaynet.evaluation import roc_auc_rank_c
 from delaynet.preparation import gen_rand_data
 
@@ -26,7 +26,7 @@ def test_all_metrics(n_nodes: int = 15, l_dens: float = 0.5, ts_len: int = 1000)
     :type ts_len: int
     """
 
-    # Norms and causality metrics to use
+    # Norms and connectivity metrics to use
     norms = ["Identity", "Delta", "Second Difference", "Z-Score"]
     metrics = ["COP", "GC", "GC_Bi", "MI", "OS", "RC", "TE", "TE_pyif", "TE_2", "Naive"]
 
@@ -42,14 +42,14 @@ def test_all_metrics(n_nodes: int = 15, l_dens: float = 0.5, ts_len: int = 1000)
             for n1 in range(n_nodes)
         ]
 
-        # use causality function directly
+        # use connectivity function directly
         rec_net = zeros((n_nodes, n_nodes))
         rec_lag = zeros((n_nodes, n_nodes))
         for n1 in range(n_nodes):
             for n2 in range(n_nodes):
                 if n1 == n2:
                     continue
-                result = causality(ts1=norm_ts[n1], ts2=norm_ts[n2], metric=metric)
+                result = connectivity(ts1=norm_ts[n1], ts2=norm_ts[n2], metric=metric)
                 if isinstance(result, float):
                     rec_net[n1, n2] = result
                 elif isinstance(result, tuple) and len(result) == 2:
@@ -57,8 +57,8 @@ def test_all_metrics(n_nodes: int = 15, l_dens: float = 0.5, ts_len: int = 1000)
                     rec_lag[n1, n2] = result[1]
 
         # TODO: use numpy array broadcasting to calculate all at once
-        # `rec_net, rec_lag = causality(norm_ts, metric)`
-        # For this the causality function needs a mode where instead of being passed
+        # `rec_net, rec_lag = connectivity(norm_ts, metric)`
+        # For this the connectivity function needs a mode where instead of being passed
         # two time series, it is passed all time series and the indices at once.
 
         _, auc, rank_c = roc_auc_rank_c(am.astype(int), wm, rec_net)

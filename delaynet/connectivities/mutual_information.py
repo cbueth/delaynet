@@ -1,4 +1,4 @@
-"""Mutual information (MI) causality metric."""
+"""Mutual information (MI) connectivity metric."""
 
 
 # # Mutual Information calculator for discrete data

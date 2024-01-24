@@ -1,4 +1,4 @@
-"""Ordinal Synchronisation (OS) causality metric."""
+"""Ordinal Synchronisation (OS) connectivity metric."""
 
 import numpy as np
 

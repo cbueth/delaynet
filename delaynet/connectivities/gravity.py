@@ -1,9 +1,9 @@
-"""Naive sum connectivity metric."""
+"""Gravity connectivity metric."""
 
 from numpy import sum as npsum, exp
 
 
-def naive_sum(ts1, ts2):
+def gravity(ts1, ts2):
     q1 = npsum(exp(ts1))
     q2 = npsum(exp(ts2))
 

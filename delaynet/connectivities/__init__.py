@@ -4,7 +4,7 @@
 from .continuous_ordinal_patterns import random_patterns
 from .granger import gt_multi_lag, gt_bi_multi_lag
 from .mutual_information import mutual_information
-from .naive_sum import naive_sum
+from .gravity import gravity
 from .ordinal_synchronisation import ordinal_synchronisation
 from .rank_correlation import rank_correlation
 from .transfer_entropy import (
@@ -33,8 +33,8 @@ __all_connectivity_metrics_names__ = {
     "te_pyif": transfer_entropy_pyif,
     "te_2": transfer_entropy_2,
     "te_ka": transfer_entropy,
-    "sum": naive_sum,
-    "naive": naive_sum,
+    "gravity": gravity,
+    "gv": gravity,
 }
 
 # List of all available metrics

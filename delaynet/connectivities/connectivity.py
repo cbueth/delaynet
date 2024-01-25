@@ -4,7 +4,7 @@ from functools import wraps
 from collections.abc import Callable
 from inspect import signature
 
-from numpy import ndarray
+from numpy import ndarray, floating, integer
 
 from ..utils.bind_args import bind_args
 from ..utils.multiple_coeff_binning import MultipleCoefficientBinning
@@ -53,8 +53,9 @@ def connectivity(
         ) -> float | tuple[float, int]:
             """Wrapper for the connectivity functions.
 
-            If kwargs have a key ``check_kwargs`` with value ``False``, the kwargs are not
-            checked for availability. This is useful if you want to pass unused keyword.
+            If kwargs have a key ``check_kwargs`` with value ``False``, the kwargs are
+            not checked for availability.
+            This is useful if you want to pass unused keyword.
 
             ``max_lag_steps`` will explicitly be checked, if not ``None``.
 
@@ -104,10 +105,12 @@ def connectivity(
             # Call the norm function with the bound arguments
             conn_value = connectivity_func(*bound_args.args, **bound_args.kwargs)
 
-            if isinstance(conn_value, float):
+            if isinstance(conn_value, (float, floating)):
                 return conn_value
             if isinstance(conn_value, tuple) and len(conn_value) == 2:
-                if isinstance(conn_value[0], float) and isinstance(conn_value[1], int):
+                if isinstance(conn_value[0], (float, floating)) and isinstance(
+                    conn_value[1], (int, integer)
+                ):
                     return conn_value[0], conn_value[1]
                 raise ValueError(
                     "Invalid return value of connectivity function. "
@@ -142,7 +145,6 @@ def connectivity(
 
     # Usage without parentheses
     if args and callable(args[0]):
-        connectivity_func = args[0]
-        return connectivity_outer(connectivity_func)
+        return connectivity_outer(args[0])
     # Usage with parentheses
     return connectivity_outer

@@ -5,7 +5,7 @@ Vary the norms and connectivity metrics and see how the results change.
 from itertools import product
 from sys import argv
 
-from numpy import zeros, save
+from numpy import zeros, save, floating
 
 from delaynet import normalise, connectivity
 from delaynet.evaluation import roc_auc_rank_c
@@ -50,7 +50,7 @@ def test_all_metrics(n_nodes: int = 15, l_dens: float = 0.5, ts_len: int = 1000)
                 if n1 == n2:
                     continue
                 result = connectivity(ts1=norm_ts[n1], ts2=norm_ts[n2], metric=metric)
-                if isinstance(result, float):
+                if isinstance(result, (float, floating)):
                     rec_net[n1, n2] = result
                 elif isinstance(result, tuple) and len(result) == 2:
                     rec_net[n1, n2] = result[0]

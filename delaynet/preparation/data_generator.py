@@ -1,6 +1,6 @@
 """Generate example data for DelayNet."""
 
-from numpy import random, zeros, ndarray
+from numpy import random, zeros, ndarray, integer, floating
 
 
 def gen_rand_data(
@@ -37,7 +37,7 @@ def gen_rand_data(
     # Set random number generator
     if rng is None:
         rng = random.default_rng()
-    elif isinstance(rng, int):
+    elif isinstance(rng, (int, integer)):
         rng = random.default_rng(rng)
     elif not isinstance(rng, random.Generator):
         raise TypeError(
@@ -46,17 +46,17 @@ def gen_rand_data(
         )
 
     # Check input
-    if not isinstance(n_nodes, int) or n_nodes < 1:
+    if not isinstance(n_nodes, (int, integer)) or n_nodes < 1:
         raise ValueError(f"n_nodes must be a positive integer, but is {n_nodes}.")
-    if not isinstance(ts_len, int) or ts_len < 1:
+    if not isinstance(ts_len, (int, integer)) or ts_len < 1:
         raise ValueError(f"ts_len must be a positive integer, but is {ts_len}.")
-    if not isinstance(l_dens, float) or not 0.0 <= l_dens <= 1.0:
+    if not isinstance(l_dens, (float, floating)) or not 0.0 <= l_dens <= 1.0:
         raise ValueError(f"l_dens must be a float in [0, 1], but is {l_dens}.")
     if not (
         isinstance(wm_min_max, tuple)
         and len(wm_min_max) == 2
-        and isinstance(wm_min_max[0], float)
-        and isinstance(wm_min_max[1], float)
+        and isinstance(wm_min_max[0], (float, floating))
+        and isinstance(wm_min_max[1], (float, floating))
         and wm_min_max[0] <= wm_min_max[1]
     ):
         raise ValueError(

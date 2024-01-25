@@ -1,16 +1,19 @@
 """Second difference (2diff) norm."""
-from numpy import hstack, empty, copy, ravel
+from numpy import ravel
 
 from .norm import norm
 
 
 @norm
-def second_difference(vol_data):
-    norm_ts1 = empty(0)
+def second_difference(ts):
+    """Second difference (2diff) norm.
 
-    t_ts = ravel(vol_data)
+    :param ts: Time series to normalize.
+    :type ts: ndarray
+    :return: Normalized time series.
+    :rtype: ndarray
+    """
+    t_ts = ravel(ts)
     t_ts = t_ts[1:] - t_ts[:-1]
     t_ts = t_ts[1:] - t_ts[:-1]
-    norm_ts1 = hstack((norm_ts1, copy(t_ts)))
-
-    return norm_ts1
+    return t_ts

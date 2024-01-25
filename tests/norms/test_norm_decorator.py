@@ -1,7 +1,7 @@
 """Test the norm decorator."""
 
 import pytest
-from numpy import ndarray, array, array_equal, hstack
+from numpy import ndarray, array, array_equal, hstack, nan, inf, isnan, isinf
 
 from delaynet.norms.norm import norm
 
@@ -149,3 +149,69 @@ def test_norm_decorator_shape_mismatch(faulty_norm):
     """Test the norm decorator by designing a norm with a shape mismatch."""
     with pytest.raises(ValueError, match="Shape of normalised time series"):
         norm(faulty_norm)(array([1, 2, 3]))
+
+
+@pytest.mark.parametrize("check_nan", [True, False])
+@pytest.mark.parametrize("check_inf", [True, False])
+@pytest.mark.parametrize("replace", [nan, inf, -inf])
+@pytest.mark.parametrize(
+    "test_ts",
+    [
+        array([1, 2, 3]),
+        array([nan, 2, 3]),
+        array([-inf, 2, 3]),
+        array([inf, 2, nan]),
+    ],
+)
+def test_norm_decorator_check_nans(test_ts, check_nan, check_inf, replace):
+    """Test the norm decorator by designing a norm introducing a NaN."""
+
+    @norm(check_nan=check_nan, check_inf=check_inf)
+    def norm_with_nans(ts: ndarray) -> ndarray:
+        """Assign the second value NaN."""
+        # make array allow NaNs
+        ts = ts.astype(float)
+        ts[1] = replace
+        return ts
+
+    if (check_nan and (isnan(replace) or isnan(test_ts).any())) or (
+        check_inf and (isinf(replace) or isinf(test_ts).any())
+    ):
+        with pytest.raises(
+            ValueError,
+            match="Normalised time series contains "
+            + (
+                ", ".join(
+                    msg
+                    for msg, check in zip(
+                        ["NaNs", "Infs"],
+                        [
+                            check_nan and (isnan(replace) or isnan(test_ts).any()),
+                            check_inf and (isinf(replace) or isinf(test_ts).any()),
+                        ],
+                    )
+                    if check
+                )
+            )
+            # match any normed_ts
+            + ": .*"
+            + (
+                "Input time series contained "
+                + (
+                    ", ".join(
+                        msg
+                        for msg, check in zip(
+                            ["NaNs", "Infs"],
+                            [
+                                check_nan and isnan(test_ts).any(),
+                                check_inf and isinf(test_ts).any(),
+                            ],
+                        )
+                        if check
+                    )
+                )
+            ),
+        ):
+            norm_with_nans(test_ts)
+    else:
+        assert norm_with_nans(test_ts) is not None

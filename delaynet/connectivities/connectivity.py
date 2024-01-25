@@ -13,6 +13,7 @@ Connectivity = Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
 
 
 def connectivity(
+    *args,
     mcb_kwargs: dict | None = None,
 ):
     """Decorator for the connectivity functions.
@@ -28,6 +29,7 @@ def connectivity(
     arguments are passed.
 
     Shape of the input time series must be equal.
+
     :param mcb_kwargs: Keyword arguments for the :class:`MultipleCoefficientBinning`
                        transformer. If ``None``, no binning is applied.
     :type mcb_kwargs: dict | None
@@ -109,7 +111,8 @@ def connectivity(
                     return conn_value[0], conn_value[1]
                 raise ValueError(
                     "Invalid return value of connectivity function. "
-                    "First value of tuple must be float, second must be int."
+                    "First value of tuple must be float, second must be int. "
+                    f"Got {type(conn_value[0])} and {type(conn_value[1])}."
                 )
             raise ValueError(
                 "Metric function must return float or tuple of float and int."
@@ -137,4 +140,9 @@ def connectivity(
 
         return wrapper
 
+    # Usage without parentheses
+    if args and callable(args[0]):
+        connectivity_func = args[0]
+        return connectivity_outer(connectivity_func)
+    # Usage with parentheses
     return connectivity_outer

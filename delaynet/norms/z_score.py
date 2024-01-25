@@ -1,30 +1,59 @@
 """Z-Score (ZS) normalization."""
 
-from numpy import copy, empty, hstack, mean, mod, ravel, size, std
+from numpy import copy, mean as npmean, mod, size, std, ndarray, arange
 from .norm import norm
 
 
 @norm
-def z_score(vol_data, airport, phase=0):
-    norm_ts1 = empty((0))
+def z_score(ts: ndarray, periodicity: int) -> ndarray:
+    """Z-Score (ZS) normalization.
 
-    for year in range(5):
-        for month in range(12):
-            num_days = 31
-            if (month + 1) in [4, 6, 9, 11]:
-                num_days = 30
-            if (month + 1) == 2:
-                num_days = 28
+    :param ts: Time series to normalize.
+    :type ts: ndarray
+    :param periodicity: Periodicity of the time series - reoccurrence of the same
+                        pattern.
+    :type periodicity: int
+    :return: Normalized time series.
+    :rtype: ndarray
+    """
+    ts2 = copy(ts)
+    for k in range(size(ts)):
+        in_offset = mod(k, periodicity)
+        sub_ts = ts[in_offset::periodicity]
+        st_dev = std(sub_ts)
+        if st_dev > 0:
+            ts2[k] = (ts[k] - npmean(sub_ts)) / st_dev
+    return ts2
 
-            t_ts = ravel(vol_data[year, month, :num_days, airport, :, phase])
-            t_ts2 = copy(t_ts)
-            for k in range(size(t_ts)):
-                in_offset = mod(k, 7 * 24)
-                sub_ts = t_ts[in_offset :: 7 * 24]
-                st_dev = std(sub_ts)
 
-                if st_dev > 0:
-                    t_ts2[k] = (t_ts[k] - mean(sub_ts)) / st_dev
-            norm_ts1 = hstack((norm_ts1, copy(t_ts2)))
+@norm
+def z_score_vectorized(ts: ndarray, periodicity: int) -> ndarray:
+    """Z-Score (ZS) normalization.
 
-    return norm_ts1
+    This version is optimized to avoid the for loop in the original version.
+    Using reshape and mean/std on the reshaped array, we can compute the mean and
+    standard deviation for each periodicity at once.
+
+    :param ts: Time series to normalize.
+    :type ts: ndarray
+    :param periodicity: Periodicity of the time series - reoccurrence of the same
+                        pattern.
+    :type periodicity: int
+    :return: Normalized time series.
+    :rtype: ndarray
+    """
+    # Create an array of indices for each periodicity
+    indices = arange(len(ts)).reshape(-1, periodicity)
+
+    # Use these indices to create a 2D array
+    ts2 = ts[indices]
+
+    # Compute the mean and standard deviation for each periodicity
+    mean = npmean(ts2, axis=0)
+    std_dev = std(ts2, axis=0)
+
+    # Normalize
+    ts2 = (ts2 - mean) / std_dev
+
+    # Flatten the 2D array back into a 1D array
+    return ts2.ravel()

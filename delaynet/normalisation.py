@@ -18,7 +18,7 @@ def normalise(
 
     Keyword arguments are forwarded to the norm function.
 
-    If `check_kwargs` is passed in kwargs with value `False`, the kwargs are not
+    If ``check_kwargs`` is passed in kwargs with value ``False``, the kwargs are not
     checked for availability. This is useful if you want to pass unused values in
     generic functions.
 
@@ -29,10 +29,10 @@ def normalise(
         - 2DT: Second Difference
         - ID: Identity
 
-    (Find all in submodule `delaynet.norms`, names are stored in
-    `delaynet.norms.__all_norms__`)
+    (Find all in submodule :mod:`delaynet.norms`, names are stored in
+    :attr:`delaynet.norms.__all_norms__`)
 
-    If a `callable` is given, it should take a time series as input and return
+    If a ``callable`` is given, it should take a time series as input and return
     the normalised time series.
 
     :param ts: Time series to normalise.
@@ -41,7 +41,7 @@ def normalise(
     :type norm: str or Callable
     :param args: Positional arguments forwarded to the norm function, see documentation
                  of the norms.
-    :type args: tuple
+    :type args: list
     :param kwargs: Keyword arguments forwarded to the norm function, see documentation
                    of the norms.
     :type kwargs: dict

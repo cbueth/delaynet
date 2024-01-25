@@ -5,6 +5,7 @@ from numpy import ndarray
 
 
 from .connectivities import __all_connectivity_metrics_names__
+from .connectivities.connectivity import connectivity as connectivity_decorator
 
 Metric = str | Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
 
@@ -13,6 +14,7 @@ def connectivity(
     ts1: ndarray,
     ts2: ndarray,
     metric: Metric,
+    *args,
     **kwargs,
 ) -> float | tuple[float, int]:
     """
@@ -32,8 +34,8 @@ def connectivity(
         - OS: Ordinal Synchronisation
         - Naive: Sum
 
-    (Find all in submodule `delaynet.connectivities`, names are stored in
-    `delaynet.connectivities.__all_connectivity_metrics__`)
+    (Find all in submodule :mod:`delaynet.connectivities`, names are stored in
+    :attr:`delaynet.connectivities.__all_connectivity_metrics__`)
 
     If a `callable` is given, it should take two time series as input and return a
     `float`, or a `tuple` of `float` and `int`.
@@ -44,8 +46,11 @@ def connectivity(
     :type ts2: ndarray
     :param metric: Metric to use.
     :type metric: str or Callable
-    :param kwargs: Keyword arguments forwarded to the metric function, see documentation
-                   of the metrics.
+    :param args: Positional arguments forwarded to the connectivity function, see
+                 documentation.
+    :type args: list
+    :param kwargs: Keyword arguments forwarded to the connectivity function, see
+                   documentation.
     :return: Connectivity value and lag (if applicable).
     :rtype: float or tuple of float and int
     :raises ValueError: If the metric is unknown. Given as string.
@@ -62,16 +67,13 @@ def connectivity(
         return __all_connectivity_metrics_names__[metric](ts1, ts2, **kwargs)
 
     if not callable(metric):
-        raise ValueError("Invalid metric. Must be string or callable.")
-
-    result = metric(ts1, ts2, **kwargs)
-    if isinstance(result, float):
-        return result
-    if isinstance(result, tuple) and len(result) == 2:
-        if isinstance(result[0], float) and isinstance(result[1], int):
-            return result[0], result[1]
         raise ValueError(
-            "Invalid return value of metric function. "
-            "First value of tuple must be float, second must be int."
+            f"Invalid connectivity metric: {metric}. Must be string or callable."
         )
-    raise ValueError("Metric function must return float or tuple of float and int.")
+
+    # connectivity metric is a callable,
+    # add decorator to assure correct kwargs, type and shape
+    mcb_kwargs = kwargs.pop("mcb_kwargs", None)
+    return connectivity_decorator(mcb_kwargs=mcb_kwargs)(metric)(
+        ts1, ts2, *args, **kwargs
+    )

@@ -29,36 +29,50 @@
 
 from numpy import zeros, log2
 
-from ..utils.multiple_coeff_binning import MultipleCoefficientBinning
+from .connectivity import connectivity
 
 
-def mutual_information(ts1, ts2):
-    transformer = MultipleCoefficientBinning(
-        n_bins=3, alphabet="ordinal", strategy="quantile"
-    )
-    transformer.fit(ts1.reshape(-1, 1))
-    ts1 = transformer.transform(ts1.reshape(-1, 1))[:, 0]
+@connectivity(mcb_kwargs={"n_bins": 3, "alphabet": "ordinal", "strategy": "quantile"})
+def mutual_information(
+    ts1, ts2, base1: int = 3, base2: int = 3, max_lag_steps: int = 5
+):
+    """Mutual Information (MI) connectivity metric.
 
-    transformer = MultipleCoefficientBinning(
-        n_bins=3, alphabet="ordinal", strategy="quantile"
-    )
-    transformer.fit(ts2.reshape(-1, 1))
-    ts2 = transformer.transform(ts2.reshape(-1, 1))[:, 0]
-
+    :param ts1: First time series.
+    :type ts1: ndarray
+    :param ts2: Second time series.
+    :type ts2: ndarray
+    :param base1: Number of states for first time series.
+    :type base1: int
+    :param base2: Number of states for second time series.
+    :type base2: int
+    :param max_lag_steps: Maximum time lag to consider.
+    :type max_lag_steps: int
+    :return: Mutual information value and time lag.
+    :rtype: tuple[float, int]
+    """
+    # TODO: needed? for pre-processing?
     # ts1 = array( ts1 > median( ts1 ), dtype = int )
     # ts2 = array( ts2 > median( ts2 ), dtype = int )
 
-    pValue = zeros((6))
-    for t in range(0, 6):
-        if t == 0:
-            pValue[t] = compute_average_mi(ts1, ts2, 3, 3)
-        else:
-            pValue[t] = compute_average_mi(ts1[:(-t)], ts2[t:], 3, 3)
+    # pValue = zeros((6))
+    # for t in range(0, 6):
+    #     if t == 0:
+    #         pValue[t] = compute_average_mi(ts1, ts2, 3, 3)
+    #     else:
+    #         pValue[t] = compute_average_mi(ts1[:(-t)], ts2[t:], 3, 3)
+    #
+    # return -max(pValue)  # TODO: looping over time lags but not returning best lag?
 
-    return -max(pValue)
+    p_values = [  # suggestion
+        compute_average_mi(ts1[:(-t)], ts2[t:], base1, base2)
+        for t in range(0, max_lag_steps + 1)
+    ]
+    idx_max = max(range(len(p_values)), key=p_values.__getitem__)
+    return -p_values[idx_max], idx_max
 
 
-def compute_average_mi(var1, var2, base1, base2, timeDiff=0):
+def compute_average_mi(var1, var2, base1, base2, time_diff=0):
     """
     Compute the average mutual information between two variables.
 
@@ -70,14 +84,14 @@ def compute_average_mi(var1, var2, base1, base2, timeDiff=0):
     Returns:
     - mi: Average mutual information.
     """
-    observations = len(var1) - timeDiff  # Adjust for time difference
+    observations = len(var1) - time_diff  # Adjust for time difference
     joint_count = zeros((base1, base2), dtype=int)
     i_count = zeros(base1, dtype=int)
     j_count = zeros(base2, dtype=int)
 
     # Count occurrences with time difference
-    for t in range(timeDiff, len(var1)):
-        i = var1[t - timeDiff]
+    for t in range(time_diff, len(var1)):
+        i = var1[t - time_diff]
         j = var2[t]
         joint_count[i][j] += 1
         i_count[i] += 1

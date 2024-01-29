@@ -2,7 +2,10 @@
 
 from numpy import copy, ravel, size, mean
 
+from .norm import norm
 
+
+@norm
 def delta(ts, window_size: int = 10):
     """Delta norm.
 

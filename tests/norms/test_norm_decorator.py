@@ -215,3 +215,47 @@ def test_norm_decorator_check_nans(test_ts, check_nan, check_inf, replace):
             norm_with_nans(test_ts)
     else:
         assert norm_with_nans(test_ts) is not None
+
+
+@pytest.mark.parametrize("check_shape", [True, False])
+@pytest.mark.parametrize(
+    "test_norm, shortening",
+    [
+        (lambda ts: ts, False),  # identity
+        (lambda ts: ts[1:], True),  # remove first value
+        (lambda ts: ts[:-1], True),  # remove last value
+        (lambda ts: ts[1:-1], True),  # remove first and last value
+    ],
+)
+def test_norm_decorator_check_shape(time_series, test_norm, shortening, check_shape):
+    """Test the norm decorator by designing a norm that shortens the time series."""
+
+    @norm(check_shape=check_shape)
+    def norm_shortening(ts: ndarray) -> ndarray:
+        """Shorten the time series."""
+        return test_norm(ts)
+
+    if shortening and check_shape:
+        with pytest.raises(
+            ValueError,
+            match="Shape of normalised time series",
+        ):
+            norm_shortening(time_series)
+    else:
+        assert norm_shortening(time_series) is not None
+
+
+@pytest.mark.parametrize("dim_diff", [1, 2])
+def test_norm_decorator_check_shape_dimensionality(time_series, dim_diff):
+    """Test the norm decorator by designing a norm that changes the dimensionality."""
+
+    @norm(check_shape=False)
+    def add_dimensions(ts: ndarray) -> ndarray:
+        """Add dimensions to the time series."""
+        return ts.reshape(ts.shape + (1,) * dim_diff)
+
+    with pytest.raises(
+        ValueError,
+        match="Dimensionality of normalised time series",
+    ):
+        add_dimensions(time_series)

@@ -28,7 +28,7 @@ def test_all_metrics(n_nodes: int = 15, l_dens: float = 0.5, ts_len: int = 1000)
 
     # Norms and connectivity metrics to use
     norms = ["Identity", "Delta", "Second Difference", "Z-Score"]
-    metrics = ["COP", "GC", "GC_Bi", "MI", "OS", "RC", "TE", "TE_pyif", "TE_2", "Naive"]
+    metrics = ["COP", "GC", "GC_Bi", "GV", "MI", "OS", "RC", "TE"]
 
     # Testing all combination on the same random data
     am, wm, all_ts = gen_rand_data(n_nodes, ts_len, l_dens, (0.5, 1.5), 0)

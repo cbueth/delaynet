@@ -14,7 +14,7 @@ def normalise(
     **kwargs,
 ) -> ndarray:
     """
-    Normalise a time series using a given norm.
+    Normalise time series using a given norm.
 
     Keyword arguments are forwarded to the norm function.
 
@@ -35,8 +35,8 @@ def normalise(
     If a ``callable`` is given, it should take a time series as input and return
     the normalised time series.
 
-    :param ts: Time series to normalise.
-    :type ts: ndarray
+    :param ts: Time series to normalise. 1D or 2D.
+    :type ts: ndarray, shape (n,) or (m, n)
     :param norm: Norm to use.
     :type norm: str or Callable
     :param args: Positional arguments forwarded to the norm function, see documentation

@@ -4,11 +4,6 @@ from numpy import array, array_equal, ndarray
 from delaynet.normalisation import normalise
 
 
-@pytest.fixture
-def time_series():
-    return array([1, 2, 3, 4, 5])
-
-
 def test_normalise_with_string_metric(time_series):
     assert array_equal(normalise(time_series, norm="id"), time_series)
 
@@ -47,3 +42,31 @@ def test_normalise_with_invalid_norm_type(time_series, invalid_norm):
 def test_normalise_kwargs_unknown(time_series):
     with pytest.raises(TypeError, match="got an unexpected keyword argument 'b'"):
         normalise(time_series, norm="id", b=2)
+
+
+@pytest.mark.parametrize(
+    "invalid_time_series",
+    [
+        123,  # not an ndarray
+        None,  # not an ndarray
+        array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]]),  # 3D
+        array([]),  # 1D empty
+        array([[]]),  # 2D empty
+    ],
+)
+def test_normalise_invalid_time_series(invalid_time_series):
+    with pytest.raises(TypeError):
+        normalise(invalid_time_series, norm="id")
+
+
+@pytest.mark.parametrize(
+    "empty_time_series_array",
+    [
+        array([]),  # 1D empty
+        array([[]]),  # 2D empty
+        array([[], []]),  # 2D empty
+    ],
+)
+def test_normalise_empty_time_series(empty_time_series_array):
+    with pytest.raises(ValueError):
+        normalise(empty_time_series_array, norm="id")

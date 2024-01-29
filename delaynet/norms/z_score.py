@@ -1,7 +1,8 @@
 """Z-Score (ZS) normalization."""
 
-from numpy import copy, mean as npmean, mod, size, std, ndarray, arange
+from numpy import copy, mean as npmean, mod, size, std, ndarray, arange, integer
 from .norm import norm
+from ..utils.logging import logger
 
 
 @norm
@@ -12,10 +13,20 @@ def z_score(ts: ndarray, periodicity: int) -> ndarray:
     :type ts: ndarray
     :param periodicity: Periodicity of the time series - reoccurrence of the same
                         pattern.
-    :type periodicity: int
+    :type periodicity: int > 0
     :return: Normalized time series.
     :rtype: ndarray
+    :raises ValueError: If the periodicity is not a positive integer.
     """
+    if isinstance(periodicity, (int, integer)) or periodicity <= 0:
+        raise ValueError(f"periodicity must be a positive integer, not {periodicity}.")
+    # Warn if periodicity >= len(ts)
+    if periodicity >= ts.size:
+        logger.warning(
+            f"For periodicity ({periodicity}) >= len(ts) ({ts.size}), "
+            f"Z-Score normalization is equivalent to Identity function."
+        )
+
     ts2 = copy(ts)
     for k in range(size(ts)):
         in_offset = mod(k, periodicity)

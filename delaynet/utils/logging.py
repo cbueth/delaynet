@@ -1,11 +1,8 @@
 """Logging configuration for DelayNet."""
+import logging
 
-import logging.config
-from os.path import dirname, join
-
-# Logging configuration using the setup.cfg file
-logging.config.fileConfig(join(dirname(__file__), "..", "..", "setup.cfg"))
-# Get the logger for this module
-logger = logging.getLogger("delaynet")
-# numba_logger = logging.getLogger("numba")
-# numba_logger.setLevel(logging.WARNING)
+# Get the logger for this module with NullHandler
+logging.getLogger(__name__).addHandler(logging.NullHandler())
+logging.basicConfig(
+    format="%(asctime)s | %(levelname)8s | %(filename)s:%(lineno)d | %(message)s",
+)

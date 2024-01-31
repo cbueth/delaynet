@@ -1,7 +1,7 @@
 """Identity / Normalization."""
+import logging
 
 from .norm import norm
-from ..utils.logging import logger
 
 
 @norm
@@ -13,5 +13,5 @@ def identity(ts):
     :return: 'Normalized' time series.
     :rtype: ndarray
     """
-    logger.warning("Identity norm is not a normalization. Only use for testing.")
+    logging.warning("Identity norm is not a normalization. Only use for testing.")
     return ts

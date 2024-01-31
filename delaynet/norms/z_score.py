@@ -1,8 +1,8 @@
 """Z-Score (ZS) normalization."""
+import logging
 
 from numpy import copy, mean as npmean, mod, size, std, ndarray, arange, integer
 from .norm import norm
-from ..utils.logging import logger
 
 
 @norm
@@ -22,7 +22,7 @@ def z_score(ts: ndarray, periodicity: int) -> ndarray:
         raise ValueError(f"periodicity must be a positive integer, not {periodicity}.")
     # Warn if periodicity >= len(ts)
     if periodicity >= ts.size:
-        logger.warning(
+        logging.warning(
             f"For periodicity ({periodicity}) >= len(ts) ({ts.size}), "
             f"Z-Score normalization is equivalent to Identity function."
         )

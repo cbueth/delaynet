@@ -19,7 +19,7 @@ def z_score(ts: ndarray, periodicity: int) -> ndarray:
     :rtype: ndarray
     :raises ValueError: If the periodicity is not a positive integer.
     """
-    if isinstance(periodicity, (int, integer)) or periodicity <= 0:
+    if not isinstance(periodicity, (int, integer)) or periodicity <= 0:
         raise ValueError(f"periodicity must be a positive integer, not {periodicity}.")
     # Warn if periodicity >= len(ts)
     if periodicity >= ts.size:

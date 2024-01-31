@@ -1,6 +1,6 @@
 """DelayNet init."""
-import logging
 from ._version import __version__
+from .utils.logging import logging
 
 # Expose most common functions
 from .connectivity import connectivity

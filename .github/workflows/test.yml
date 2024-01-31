@@ -110,7 +110,7 @@ jobs:
 
       - name: "Run tests ${{ matrix.submodule.name }} with coverage"
         run: |
-          pytest ${{ matrix.submodule.pytest_args }}
+          pytest ${{ matrix.submodule.pytest_args }} --cov=delaynet
         env:
           COVERAGE_FILE: ".coverage.${{ matrix.submodule.name }}"
 

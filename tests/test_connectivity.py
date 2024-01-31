@@ -13,7 +13,7 @@ def time_series():
 
 def test_connectivity_with_string_metric(time_series):
     ts1, ts2 = time_series
-    result = connectivity(ts1, ts2, "gc")
+    result = connectivity(ts1, ts2, "lc")
     assert isinstance(result, (float, tuple))
 
 

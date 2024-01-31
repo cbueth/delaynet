@@ -83,9 +83,10 @@ max-line-length = 88
 # --------------------------------------------------------------------------------------
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-ra --cov=delaynet"
+addopts = "-ra"
 testpaths = ["tests"]
 
 [tool.coverage.run]
+branch = true
 source = ["delaynet"]
 relative_files = true

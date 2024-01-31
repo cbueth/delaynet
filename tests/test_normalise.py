@@ -50,12 +50,22 @@ def test_normalise_kwargs_unknown(time_series):
         123,  # not an ndarray
         None,  # not an ndarray
         array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]]),  # 3D
+    ],
+)
+def test_normalise_invalid_time_series(invalid_time_series):
+    with pytest.raises(TypeError):
+        normalise(invalid_time_series, norm="id")
+
+
+@pytest.mark.parametrize(
+    "invalid_time_series",
+    [
         array([]),  # 1D empty
         array([[]]),  # 2D empty
     ],
 )
 def test_normalise_invalid_time_series(invalid_time_series):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         normalise(invalid_time_series, norm="id")
 
 

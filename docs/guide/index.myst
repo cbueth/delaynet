@@ -1,0 +1,13 @@
+# Reference Guide
+-----------------
+
+Example reference to the
+[Winkler et al. (2015)](https://doi.org/10.48550/arXiv.1509.07636) paper.
+
+```{eval-rst}
+.. toctree::
+   :maxdepth: 2
+
+   20_norm
+   30_connectivity
+```

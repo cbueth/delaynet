@@ -1,9 +1,10 @@
 """Module to provide unified interface for all norms."""
+
 from collections.abc import Callable
 
 from numpy import ndarray
 
-from .norms import __all_norms_names__
+from .norms import __all_norms_names__, __all_norms_names_simple__
 from .norms.norm import norm as norm_decorator
 
 
@@ -23,11 +24,7 @@ def normalise(
     generic functions.
 
     The norms can be either a string or a function, implementing a norm.
-    The following norms are available (case-insensitive):
-        - ZS: Z-Score
-        - DT: Delta
-        - 2DT: Second Difference
-        - ID: Identity
+    Find the norms string specifier using :func:`show_norms`.
 
     (Find all in submodule :mod:`delaynet.norms`, names are stored in
     :attr:`delaynet.norms.__all_norms__`)
@@ -69,3 +66,13 @@ def normalise(
 
     # norm is callable, add decorator to assure correct kwargs, type and shape
     return norm_decorator(norm)(ts, *args, **kwargs)
+
+
+def show_norms():
+    """Pretty print all available norms."""
+    print("Available norms:")
+    for norm, aliases in __all_norms_names_simple__.items():
+        print(f"\nNorm: {norm}")
+        print("Aliases:")
+        for alias in aliases:
+            print(f" - {alias}")

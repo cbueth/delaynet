@@ -12,3 +12,7 @@ pylint
 pytest
 pytest-cov
 coverage
+# Documentation
+sphinx
+myst-nb
+sphinx-book-theme

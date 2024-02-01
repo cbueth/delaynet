@@ -1,10 +1,14 @@
 """Module to provide a unified interface for all connectivity metrics."""
+
 from collections.abc import Callable
 
 from numpy import ndarray
 
 
-from .connectivities import __all_connectivity_metrics_names__
+from .connectivities import (
+    __all_connectivity_metrics_names__,
+    __all_connectivity_metrics_names_simple__,
+)
 from .connectivities.connectivity import connectivity as connectivity_decorator
 
 Metric = str | Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
@@ -24,15 +28,7 @@ def connectivity(
 
     The metrics can be either a string or a function, implementing a connectivity
     metric.
-    The following metrics are available (case-insensitive):
-        - COP: Continuous Ordinal Patterns
-        - GC: Granger Causality
-        - GC_Bi: Bi-directional Granger Causality
-        - TE: Transfer Entropy
-        - MI_KA: Mutual Information
-        - RC: Rank Correlation
-        - OS: Ordinal Synchronisation
-        - Naive: Sum
+    Find the metric string specifier using :func:`show_connectivity_metrics`.
 
     (Find all in submodule :mod:`delaynet.connectivities`, names are stored in
     :attr:`delaynet.connectivities.__all_connectivity_metrics__`)
@@ -77,3 +73,13 @@ def connectivity(
     return connectivity_decorator(mcb_kwargs=mcb_kwargs)(metric)(
         ts1, ts2, *args, **kwargs
     )
+
+
+def show_connectivity_metrics():
+    """Pretty print all available connectivity metrics."""
+    print("Available connectivity metrics:")
+    for metric, aliases in __all_connectivity_metrics_names_simple__.items():
+        print(f"\nMetric: {metric}")
+        print("Aliases:")
+        for alias in aliases:
+            print(f" - {alias}")

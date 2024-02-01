@@ -41,6 +41,7 @@ Changelog = "https://cbueth.de/delaynet/changelog"
 [project.optional-dependencies]
 dev = ["black", "isort", "pylint"]
 test = ["pytest", "pytest-cov", "coverage"]
+doc = ["sphinx", "myst-nb", "sphinx-book-theme"]
 
 [tool.setuptools.packages.find]
 exclude = [

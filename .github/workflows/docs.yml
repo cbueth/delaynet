@@ -1,0 +1,88 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'delaynet/**'
+      - 'docs/**'
+      - 'setup.cfg'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  generate-deploy-docs:
+    name: Generate documentation
+    runs-on: ubuntu-latest
+    environment:
+      name: Deploy to github pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Setup Mambaforge
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: delay_net
+          use-mamba: true
+
+      - name: Use cache for ${{ matrix.submodule.name }}
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CONDA }}/envs
+          key:
+            conda-${{ runner.os }}--${{ runner.arch }}--${{
+            hashFiles('environment.yml') }}-${{ env.CACHE_NUMBER }}
+        env:
+          # Increase this value to reset cache if etc/example-environment.yml has not changed
+          CACHE_NUMBER: 0
+        id: cache
+
+      - name: Update environment
+        run: # Install if cache not found
+          mamba env update -n delay_net -f environment.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Show environment info
+        run: |
+          conda info
+          conda list
+          conda config --show
+
+      - name: Add Notebook Kernel
+        run: python -m ipykernel install --user --name sb_env --display-name "Python (sb_env)"
+
+      - name: Generating .rst files
+        run: sphinx-apidoc -o docs/api/ superblockify/
+      - name: Generating html
+        run: sphinx-build docs public -b dirhtml
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          # Upload generated html
+          path: 'public/'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1

@@ -60,7 +60,30 @@ def gt_multi_lag(ts1, ts2, max_lag_steps: int = 5):
     ]
     idx_min = min(range(len(all_p_values)), key=all_p_values.__getitem__)
     return np.min(all_p_values), idx_min
-    # TODO: or should statsmodels.tsa.stattools.grangercausalitytests be used?
+
+
+def gt_multi_lag_statsmodels(ts1, ts2, max_lag_steps: int = 5):
+    """Granger Causality (GC) connectivity metric with variable time lag.
+
+    Uses :func:`grangercausalitytests` from statsmodels.
+
+    :param ts1: First time series.
+    :type ts1: ndarray
+    :param ts2: Second time series.
+    :type ts2: ndarray
+    :param max_lag_steps: Maximum time lag to consider.
+    :type max_lag_steps: int
+    :return: Mutual information value and time lag.
+    :rtype: tuple[float, int]
+    """
+    all_p_values = [
+        grangercausalitytests(np.array([ts2, ts1]).T, [lag_step], verbose=False)[
+            lag_step
+        ][0]["ssr_ftest"][1]
+        for lag_step in range(1, max_lag_steps + 1)
+    ]
+    idx_min = min(range(len(all_p_values)), key=all_p_values.__getitem__)
+    return np.min(all_p_values), idx_min
 
 
 def gt_bi_multi_lag(ts1, ts2, max_lag_steps: int = 5):

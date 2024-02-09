@@ -21,4 +21,12 @@ def random_data():
     ],
 )
 def time_series(request):
+    """Return a time series of different shapes. 1D and 2D."""
     return request.param
+
+
+def two_time_series():
+    """Return two time series."""
+    ts1 = array([1, 2, 3, 4, 5])
+    ts2 = array([5, 4, 3, 2, 1])
+    return ts1, ts2

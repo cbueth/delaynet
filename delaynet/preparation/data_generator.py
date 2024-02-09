@@ -22,22 +22,21 @@ def gen_rand_data(
     :type l_dens: float
     :param wm_min_max: Minimum and maximum of the weight matrix.
     :type wm_min_max: tuple[float, float]
-    :param rng: Random number generator, seed or None. When `None`, the default
+    :param rng: Random number generator, seed or None. When ``None``, the default
                 numpy random number generator is used.
     :return: Adjacency matrix, weight matrix, time series.
     :rtype: tuple[ndarray[bool], ndarray[float], ndarray[float]]
 
-    :raises ValueError: When `n_nodes` is not a positive integer.
-    :raises ValueError: When `ts_len` is not a positive integer.
-    :raises ValueError: When `l_dens` is not in [0, 1].
-    :raises ValueError: When `wm_min_max` is not a tuple of floats with length 2 and
-                        `wm_min_max[0] <= wm_min_max[1]`.
-    :raises TypeError: When `rng` is not `None`, an `int` or a `numpy.random.Generator`.
+    :raises ValueError: When ``n_nodes`` is not a positive integer.
+    :raises ValueError: When ``ts_len`` is not a positive integer.
+    :raises ValueError: When ``l_dens`` is not in [0, 1].
+    :raises ValueError: When ``wm_min_max`` is not a tuple of floats with length 2 and
+                        ``wm_min_max[0] <= wm_min_max[1]``.
+    :raises TypeError: When ``rng`` is not ``None``, an ``int`` or
+                       a :class:``random.Generator``.
     """
     # Set random number generator
-    if rng is None:
-        rng = random.default_rng()
-    elif isinstance(rng, (int, integer)):
+    if isinstance(rng, (int, integer, type(None))):
         rng = random.default_rng(rng)
     elif not isinstance(rng, random.Generator):
         raise TypeError(

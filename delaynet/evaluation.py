@@ -40,24 +40,16 @@ def roc_auc_rank_c(
             f"{orig_net.shape}, {weight_mat.shape} and {rec_net.shape}."
         )
 
-    n_nodes = np.size(orig_net, 0)
-
-    # if causMetric == 5:
-    #     recNet = np.max( recNet ) - recNet
-    #     recNet = recNet / np.max( recNet )
-    # if causMetric == 4:
-    #     recNet = - recNet
-
     m_v = np.max(rec_net) + 1
-    for k in range(n_nodes):
+    for k in range(np.size(orig_net, 0)):
         rec_net[k, k] = m_v
 
     all_pv = []
     all_pv.append(np.min(rec_net))
     all_pv.append(np.max(rec_net))
 
-    for a1 in range(n_nodes):
-        for a2 in range(n_nodes):
+    for a1 in range(np.size(orig_net, 0)):
+        for a2 in range(np.size(orig_net, 0)):
             if a1 == a2:
                 continue
 
@@ -79,8 +71,8 @@ def roc_auc_rank_c(
         roc.append((fpr, tpr))
     roc = np.array(roc)
 
-    auc = skauc(roc[:, 0], roc[:, 1])
-
-    rank_c = np.abs(spearmanr(np.ravel(weight_mat), np.ravel(rec_net)))[0]
-
-    return roc, auc, rank_c
+    return (
+        roc,
+        skauc(roc[:, 0], roc[:, 1]),
+        np.abs(spearmanr(np.ravel(weight_mat), np.ravel(rec_net)))[0],
+    )

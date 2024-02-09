@@ -47,8 +47,8 @@ jobs:
         run: pip install pylint
 
       - name: Lint Source Code
-        run: pylint -d E0401 delaynet/
+        run: pylint delaynet/
         # ignore import-errors first, analyze later with tests in anaconda environment
 
       - name: Lint Tests
-        run: pylint -d E0401 tests/
+        run: pylint tests/

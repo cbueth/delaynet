@@ -23,13 +23,6 @@ def ordinal_synchronisation(ts1, ts2, d: int = 3, tau: int = 1, max_lag_steps: i
     :return: Mutual information value and time lag.
     :rtype: tuple[float, int]
     """
-    # os = np.zeros(6)
-    #
-    # for k in range(1, 6):  # TODO: before, 0 lag was not considered, it seems
-    #     os[k] = os_metric(ts1[:(-k)], ts2[k:], N=np.size(ts1) - k, D=3, tau=1)
-    #
-    # return 1.0 / np.max(np.abs(os)), np.argmax(np.abs(os))
-
     os = [
         os_metric(ts1[: -k or None], ts2[k:], n=np.size(ts1) - k, d=d, tau=tau)
         for k in range(max_lag_steps + 1)

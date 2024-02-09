@@ -2,6 +2,7 @@
 
 Vary the norms and connectivity metrics and see how the results change.
 """
+
 from itertools import product
 from sys import argv
 
@@ -56,10 +57,10 @@ def test_all_metrics(n_nodes: int = 15, l_dens: float = 0.5, ts_len: int = 1000)
                     rec_net[n1, n2] = result[0]
                     rec_lag[n1, n2] = result[1]
 
-        # TODO: use numpy array broadcasting to calculate all at once
         # `rec_net, rec_lag = connectivity(norm_ts, metric)`
         # For this the connectivity function needs a mode where instead of being passed
         # two time series, it is passed all time series and the indices at once.
+        # TODO: compare the results of the two methods with test data
 
         _, auc, rank_c = roc_auc_rank_c(am.astype(int), wm, rec_net)
 

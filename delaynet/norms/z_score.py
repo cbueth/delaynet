@@ -1,4 +1,5 @@
 """Z-Score (ZS) normalization."""
+
 import logging
 
 from numpy import copy, mean as npmean, mod, size, std, ndarray, arange, integer
@@ -23,8 +24,9 @@ def z_score(ts: ndarray, periodicity: int) -> ndarray:
     # Warn if periodicity >= len(ts)
     if periodicity >= ts.size:
         logging.warning(
-            f"For periodicity ({periodicity}) >= len(ts) ({ts.size}), "
-            f"Z-Score normalization is equivalent to Identity function."
+            "For %s >= %s, Z-Score normalization is equivalent to Identity function.",
+            periodicity,
+            ts.size,
         )
 
     ts2 = copy(ts)

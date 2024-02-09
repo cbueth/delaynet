@@ -79,6 +79,10 @@ good-names = ["i", "j", "k", "_"]
 # Maximum number of characters on a single line.
 max-line-length = 88
 
+[tool.pylint.design]
+# Maximum number of arguments for function / method.
+max-args = 6
+
 # --------------------------------------------------------------------------------------
 # Testing
 # --------------------------------------------------------------------------------------

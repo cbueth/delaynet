@@ -1,5 +1,6 @@
 """Test the norm decorator."""
 
+# pylint: disable=unexpected-keyword-arg
 import pytest
 from numpy import ndarray, array, array_equal, hstack, nan, inf, isnan, isinf
 
@@ -90,7 +91,7 @@ def test_norm_decorator_mixed_args(check_kwargs):
 
     # Test with missing required keyword argument
     with pytest.raises(TypeError, match="missing a required argument: 'b'"):
-        mixed_args_norm(array([1, 2, 3]), 2)
+        mixed_args_norm(array([1, 2, 3]), 2)  # pylint: disable=missing-kwoa
 
     # Test with unknown keyword argument
     if check_kwargs:
@@ -174,9 +175,9 @@ def test_norm_decorator_check_nans(test_ts, check_nan, check_inf, replace):
         ts[1] = replace
         return ts
 
-    if (check_nan and (isnan(replace) or isnan(test_ts).any())) or (
-        check_inf and (isinf(replace) or isinf(test_ts).any())
-    ):
+    nan_condition = check_nan and (isnan(replace) or isnan(test_ts).any())
+    inf_condition = check_inf and (isinf(replace) or isinf(test_ts).any())
+    if nan_condition or inf_condition:
         with pytest.raises(
             ValueError,
             match="Normalised time series contains "
@@ -185,10 +186,7 @@ def test_norm_decorator_check_nans(test_ts, check_nan, check_inf, replace):
                     msg
                     for msg, check in zip(
                         ["NaNs", "Infs"],
-                        [
-                            check_nan and (isnan(replace) or isnan(test_ts).any()),
-                            check_inf and (isinf(replace) or isinf(test_ts).any()),
-                        ],
+                        [nan_condition, inf_condition],
                     )
                     if check
                 )

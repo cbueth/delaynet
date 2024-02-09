@@ -1,4 +1,5 @@
 """Granger Causality (GC) connectivity metric."""
+
 from contextlib import redirect_stdout
 
 from statsmodels.tsa.stattools import grangercausalitytests
@@ -11,7 +12,7 @@ from .connectivity import connectivity
 
 
 @connectivity
-def gt_single_lag(ts1, ts2, lag_step: int = 5):  # TODO: unused function
+def gt_single_lag(ts1, ts2, lag_step: int = 5):
     """Granger Causality (GC) connectivity metric with fixed time lag.
 
     :param ts1: First time series.
@@ -25,19 +26,11 @@ def gt_single_lag(ts1, ts2, lag_step: int = 5):  # TODO: unused function
     """
     full_ts = np.array([ts2, ts1]).T
 
-    # TODO: Repeated code block
     dta = lagmat2ds(full_ts, lag_step, trim="both", dropex=1)
     dtajoint = add_constant(dta[:, 1:], prepend=False)
 
     res2djoint = OLS(dta[:, 0], dtajoint).fit()
 
-    rconstr = np.column_stack(  # TODO: unused statement
-        (
-            np.zeros((lag_step - 1, lag_step - 1)),
-            np.eye(lag_step - 1, lag_step - 1),
-            np.zeros((lag_step - 1, 1)),
-        )
-    )
     rconstr = np.column_stack(
         (
             np.zeros((lag_step, lag_step)),
@@ -62,37 +55,7 @@ def gt_multi_lag(ts1, ts2, max_lag_steps: int = 5):
     :return: Mutual information value and time lag.
     :rtype: tuple[float, int]
     """
-    # full_ts = np.array([ts2, ts1]).T
-    #
-    # all_p_values = np.zeros((max_lag_steps, 1))
-    #
-    # for lag_step in range(1, max_lag_steps + 1):
-    #     # TODO: Use gt_single_lag here
-    #     dta = lagmat2ds(full_ts, lag_step, trim="both", dropex=1)
-    #     dtajoint = add_constant(dta[:, 1:], prepend=False)
-    #
-    #     res2djoint = OLS(dta[:, 0], dtajoint).fit()
-    #
-    #     rconstr = np.column_stack(  # TODO: unused statement
-    #         (
-    #             np.zeros((lag_step - 1, lag_step - 1)),
-    #             np.eye(lag_step - 1, lag_step - 1),
-    #             np.zeros((lag_step - 1, 1)),
-    #         )
-    #     )
-    #     rconstr = np.column_stack(
-    #         (
-    #             np.zeros((lag_step, lag_step)),
-    #             np.eye(lag_step, lag_step),
-    #             np.zeros((lag_step, 1)),
-    #         )
-    #     )
-    #     ftres = res2djoint.f_test(rconstr)
-    #     all_p_values[lag_step - 1] = np.squeeze(ftres.pvalue)[()]
-    # TODO: it returned all_p_values, not the best lag
-    # return np.min(all_p_values), all_p_values
-
-    all_p_values = [  # suggestion
+    all_p_values = [
         gt_single_lag(ts1, ts2, lag_step) for lag_step in range(1, max_lag_steps + 1)
     ]
     idx_min = min(range(len(all_p_values)), key=all_p_values.__getitem__)
@@ -120,7 +83,7 @@ def gt_bi_multi_lag(ts1, ts2, max_lag_steps: int = 5):
     all_p_values = np.zeros((max_lag_steps, 1))
 
     for lag_step in range(1, max_lag_steps + 1):
-        with redirect_stdout(None):  # TODO: reactivate in logger - setup.cfg
+        with redirect_stdout(None):
             gc_res = grangercausalitytests(full_ts, [lag_step])
         v1 = np.log(gc_res[lag_step][1][0].ssr / gc_res[lag_step][1][1].ssr)
 

@@ -58,6 +58,7 @@ def random_patterns(
 
 @jit(cache=True, nopython=True, nogil=True)
 def norm_window(ts):
+    """Normalize a window to values between -1 and 1."""
     new_ts = np.copy(ts)
     new_ts -= np.min(new_ts)
     new_ts /= np.max(new_ts)
@@ -70,6 +71,7 @@ def norm_window(ts):
 
 @jit(cache=True, nopython=True, nogil=True)
 def tranf_ts(ts, patt):
+    """Transform a time series using a pattern."""
     ts_l = ts.shape[0]
     w = np.zeros((ts_l - patt.shape[0] + 1))
 

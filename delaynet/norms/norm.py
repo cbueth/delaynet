@@ -149,14 +149,13 @@ def norm(
                     for key, val in all_checks.items()
                     if val["check"]
                 }
+                norm_val = (val["msg"] for val in checks.values() if val["result"])
+                input_val = (val["msg"] for val in all_checks.values() if val["result"])
                 raise ValueError(
                     f"Normalised time series contains "
-                    f"{', '.join(val['msg'] for val in checks.values() if val['result'])}: "
-                    f"{normed_ts}. "
-                    + (
-                        f"Input time series contained "
-                        f"{', '.join(val['msg'] for val in all_checks.values() if val['result'])}."
-                    )
+                    f"{', '.join(norm_val)}: "
+                    f"{normed_ts}. " + f"Input time series contained "
+                    f"{', '.join(input_val)}."
                 )
             return normed_ts
 

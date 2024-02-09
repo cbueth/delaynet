@@ -1,18 +1,16 @@
 """Tests for the connectivity function."""
+
 import pytest
-from numpy import array, corrcoef
+from numpy import corrcoef
 from delaynet.connectivity import connectivity
 
 
-@pytest.fixture
-def time_series():
-    ts1 = array([1, 2, 3, 4, 5])
-    ts2 = array([5, 4, 3, 2, 1])
-    return ts1, ts2
-
-
-def test_connectivity_with_string_metric(time_series):
-    ts1, ts2 = time_series
+def test_connectivity_with_string_metric(two_time_series):
+    """Test connectivity with string metric.
+    All metrics are programmatically tested in
+    connectivities/test_all_connectivities.py.
+    """
+    ts1, ts2 = two_time_series
     result = connectivity(ts1, ts2, "lc")
     assert isinstance(result, (float, tuple))
 
@@ -25,8 +23,9 @@ def test_connectivity_with_string_metric(time_series):
         lambda ts1, ts2: (1.0, 1),
     ],
 )
-def test_connectivity_with_valid_metric(time_series, metric):
-    ts1, ts2 = time_series
+def test_connectivity_with_valid_metric(two_time_series, metric):
+    """Test connectivity and pass metric as function."""
+    ts1, ts2 = two_time_series
     result = connectivity(ts1, ts2, metric)
     assert isinstance(result, (float, tuple))
 
@@ -49,8 +48,9 @@ def test_connectivity_with_valid_metric(time_series, metric):
         None,
     ],
 )
-def test_connectivity_with_invalid_metric(time_series, invalid_metric):
-    ts1, ts2 = time_series
+def test_connectivity_with_invalid_metric(two_time_series, invalid_metric):
+    """Test connectivity and pass invalid metric."""
+    ts1, ts2 = two_time_series
 
     with pytest.raises(ValueError):
         connectivity(ts1, ts2, invalid_metric)

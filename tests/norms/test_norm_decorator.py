@@ -4,7 +4,7 @@
 import pytest
 from numpy import ndarray, array, array_equal, hstack, nan, inf, isnan, isinf
 
-from delaynet.norms.norm import norm
+from delaynet.decorators import norm
 
 
 def test_norm_decorator_simple():

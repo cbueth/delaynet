@@ -2,7 +2,7 @@
 
 from numpy import sum as npsum, exp, argmin, array
 
-from .connectivity import connectivity
+from ..decorators import connectivity
 
 
 @connectivity

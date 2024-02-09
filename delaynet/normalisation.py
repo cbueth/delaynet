@@ -5,7 +5,7 @@ from collections.abc import Callable
 from numpy import ndarray
 
 from .norms import __all_norms_names__, __all_norms_names_simple__
-from .norms.norm import norm as norm_decorator
+from .decorators import norm as norm_decorator
 
 
 def normalise(
@@ -76,3 +76,4 @@ def show_norms():
         print("Aliases:")
         for alias in aliases:
             print(f" - {alias}")
+    print("\n")

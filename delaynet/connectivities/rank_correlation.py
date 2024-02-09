@@ -3,7 +3,7 @@
 from scipy.stats import spearmanr
 from numpy import argmin
 
-from .connectivity import connectivity
+from ..decorators import connectivity
 
 
 @connectivity

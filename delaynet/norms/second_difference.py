@@ -1,7 +1,8 @@
 """Second difference (2diff) norm."""
+
 from numpy import ravel
 
-from .norm import norm
+from ..decorators import norm
 
 
 @norm(check_shape=False)

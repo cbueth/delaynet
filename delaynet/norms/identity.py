@@ -1,7 +1,8 @@
 """Identity / Normalization."""
+
 import logging
 
-from .norm import norm
+from ..decorators import norm
 
 
 @norm

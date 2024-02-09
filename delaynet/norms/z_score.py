@@ -3,7 +3,7 @@
 import logging
 
 from numpy import copy, mean as npmean, mod, size, std, ndarray, arange, integer
-from .norm import norm
+from ..decorators import norm
 
 
 @norm

@@ -8,7 +8,7 @@ from statsmodels.regression.linear_model import OLS
 from statsmodels.tools.tools import add_constant
 import numpy as np
 
-from .connectivity import connectivity
+from ..decorators import connectivity
 
 
 @connectivity
@@ -65,7 +65,7 @@ def gt_multi_lag(ts1, ts2, max_lag_steps: int = 5):
 def gt_multi_lag_statsmodels(ts1, ts2, max_lag_steps: int = 5):
     """Granger Causality (GC) connectivity metric with variable time lag.
 
-    Uses :func:`grangercausalitytests` from statsmodels.
+    Uses :func:`statsmodels.tsa.stattools.grangercausalitytests` from statsmodels.
 
     :param ts1: First time series.
     :type ts1: ndarray
@@ -89,7 +89,7 @@ def gt_multi_lag_statsmodels(ts1, ts2, max_lag_steps: int = 5):
 def gt_bi_multi_lag(ts1, ts2, max_lag_steps: int = 5):
     """Bidirectional Granger Causality (GC) connectivity metric with variable time lag.
 
-    Uses :func:`grangercausalitytests` from statsmodels.
+    Uses :func:`statsmodels.tsa.stattools.grangercausalitytests` from statsmodels.
 
     :param ts1: First time series.
     :type ts1: ndarray

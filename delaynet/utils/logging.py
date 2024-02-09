@@ -1,4 +1,5 @@
 """Logging configuration for DelayNet."""
+
 import logging
 
 # Get the logger for this module with NullHandler

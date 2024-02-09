@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from .connectivity import connectivity
+from ..decorators import connectivity
 
 
 @connectivity(mcb_kwargs={"n_bins": 2, "alphabet": "ordinal", "strategy": "quantile"})
@@ -29,11 +29,11 @@ def transfer_entropy(ts1, ts2):
     - :math:`d_{t}`: Destination state at time :math:`t`
     - :math:`d_{t-k}`: Past state of the destination at time :math:`t-k`
     - :math:`p(s_{t-l}, d_{t}, d_{t-k})`: Joint probability of
-                                          :math:`s_{t-l`, :math:`d_{t}`, :math:`d_{t-k}`
+      :math:`s_{t-l}`, :math:`d_{t}`, :math:`d_{t-k}`
     - :math:`p(d_{t} | s_{t-l}, d_{t-k})`: Conditional probability of :math:`d_{t}`
-                                           given :math:`s_{t-l`, :math:`d_{t-k}`
+      given :math:`s_{t-l}`, :math:`d_{t-k}`
     - :math:`p(d_{t} | d_{t-k})`: Conditional probability of :math:`d_{t}`
-                                  given :math:`d_{t-k}`
+      given :math:`d_{t-k}`
 
     :param ts1: First time series.
     :type ts1: ndarray
@@ -62,6 +62,7 @@ def compute_transfer_entropy(  # pylint: disable=too-many-locals
     Compute Transfer Entropy from source to destination.
 
     Transfer Entropy formula used:
+
     .. math::
 
         TE = \sum p(s_{t-l}, d_{t}, d_{t-k}) \log \left(
@@ -123,11 +124,12 @@ def count_tuples(source, dest, k, l, delay):  # pylint: disable=too-many-locals
     :param delay: Time delay between source and destination.
     :type delay: int
     :return: Several counts for Transfer Entropy computation.
-             - source_next_past_count: Count for source, next state of destination,
-                                       and past state of destination.
-             - source_past_count: Count for source and past state of destination.
-             - next_past_count: Count for next state and past state of destination.
-             - past_count: Count for past state of destination.
+
+      - ``source_next_past_count``: Count for source, next state of destination,
+        and past state of destination.
+      - ``source_past_count``: Count for source and past state of destination.
+      - ``next_past_count``: Count for next state and past state of destination.
+      - ``past_count``: Count for past state of destination.
     :rtype: tuple[dict, dict, dict, dict, int]
     """
     source_next_past_count = {}

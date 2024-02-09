@@ -2,7 +2,7 @@
 
 from numpy import copy, ravel, size, mean
 
-from .norm import norm
+from ..decorators import norm
 
 
 @norm

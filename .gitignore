@@ -19,6 +19,7 @@ docs/api/*
 data/*
 results/*
 jupyter_execute/*
+public/*
 # logs
 *.log
 # plots

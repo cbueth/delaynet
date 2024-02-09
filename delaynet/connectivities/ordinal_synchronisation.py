@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from .connectivity import connectivity
+from ..decorators import connectivity
 
 
 @connectivity

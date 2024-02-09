@@ -3,7 +3,7 @@
 from numpy import argmax, abs as np_abs
 from scipy.stats import pearsonr
 
-from .connectivity import connectivity
+from ..decorators import connectivity
 
 
 @connectivity

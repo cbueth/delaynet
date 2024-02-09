@@ -5,7 +5,7 @@ from numba import jit
 
 from .granger import gt_multi_lag
 
-from .connectivity import connectivity
+from ..decorators import connectivity
 
 
 @connectivity

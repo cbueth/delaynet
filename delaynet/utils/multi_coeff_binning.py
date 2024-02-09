@@ -52,6 +52,12 @@ def _digitize(x, bins):
 class MultipleCoefficientBinning:
     """Bin continuous data into intervals column-wise.
 
+    Uses the approach of the Symbolic Fourier Approximation (SFA) to bin
+    continuous data into intervals. The bin edges are computed using different
+    strategies: 'uniform', 'quantile', 'normal' or 'entropy'. The alphabet
+    can be either the first `n_bins` letters of the Latin alphabet, integers
+    or a custom alphabet. [1]_
+
     Parameters
     ----------
     n_bins : int (default = 4)
@@ -74,7 +80,7 @@ class MultipleCoefficientBinning:
 
     Attributes
     ----------
-    bin_edges_ : array, shape = (n_bins - 1,) or (n_timestamps, n_bins - 1)
+    bin_edges : array, shape = (n_bins - 1,) or (n_timestamps, n_bins - 1)
         Bin edges with shape = (n_bins - 1,) if ``strategy='normal'`` or
         (n_timestamps, n_bins - 1) otherwise.
 
@@ -107,19 +113,17 @@ class MultipleCoefficientBinning:
         self.alphabet = alphabet
         self._n_timestamps_fit = None
         self._alphabet = None
-        self.bin_edges_ = None
+        self.bin_edges = None
 
     def fit(self, x, y=None):
         """Compute the bin edges for each feature.
 
-        Parameters
-        ----------
-        x : array-like, shape = (n_samples, n_timestamps)
-            Data to transform.
-
-        y : None or array-like, shape = (n_samples,)
-            Class labels for each sample. Only used if ``strategy='entropy'``.
-
+        :param x: Data to transform.
+        :type x: array-like, shape = (n_samples, n_timestamps)
+        :param y: Class labels for each sample. Only used if ``strategy='entropy'``.
+        :type y: None or array-like, shape = (n_samples,)
+        :return: self
+        :rtype: object
         """
         if self.strategy == "entropy":
             if y is None:
@@ -132,7 +136,7 @@ class MultipleCoefficientBinning:
         self._n_timestamps_fit = n_timestamps
         self._alphabet = self._check_params(n_samples)
         self._check_constant(x)
-        self.bin_edges_ = self._compute_bins(
+        self.bin_edges = self._compute_bins(
             x, y, n_timestamps, self.n_bins, self.strategy
         )
         return self
@@ -140,21 +144,16 @@ class MultipleCoefficientBinning:
     def transform(self, x):
         """Bin the data.
 
-        Parameters
-        ----------
-        x : array-like, shape = (n_samples, n_timestamps)
-            Data to transform.
-
-        Returns
-        -------
-        x_new : array, shape = (n_samples, n_timestamps)
-            Binned data.
-
+        :param x: Data to transform.
+        :type x: array-like, shape = (n_samples, n_timestamps)
+        :return: Binned data.
+        :rtype: array, shape = (n_samples, n_timestamps)
         """
-        check_is_fitted(self, "bin_edges_")
+
+        check_is_fitted(self, "bin_edges")
         x = check_array(x, dtype="float64")
         self._check_consistent_lengths(x)
-        indices = _digitize(x, self.bin_edges_)
+        indices = _digitize(x, self.bin_edges)
         if isinstance(self._alphabet, str):
             return indices
         return self._alphabet[indices]

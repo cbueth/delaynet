@@ -36,8 +36,8 @@ pip install delaynet
 ## Usage
 
 The package can be used as a library. The most common functions are exposed in the
-top-level namespace, e.g. {py:func}`delaynet.normalisation.normalise` and
-{py:func}`delaynet.connectivity.connectivity`. For example:
+top-level namespace, e.g. {py:func}`~delaynet.normalisation.normalise` and
+{py:func}`~delaynet.connectivity.connectivity`. For example:
 
 ```python
 import delaynet as dn
@@ -52,8 +52,8 @@ import delaynet as dn
 ```
 
 To quickly find the string specifiers for these functions, use the
-{py:func}`delaynet.normalisation.show_norms` and
-{py:func}`delaynet.connectivity.show_connectivity_metrics` functions.
+{py:func}`~delaynet.normalisation.show_norms` and
+{py:func}`~delaynet.connectivity.show_connectivity_metrics` functions.
 These are case-insensitive.
 Each documentation of these methods can be found in a respective submodule,
 {py:mod}`delaynet.norms` or {py:mod}`delaynet.connectivities`.

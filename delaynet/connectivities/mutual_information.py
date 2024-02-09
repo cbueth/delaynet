@@ -2,7 +2,7 @@
 
 from numpy import zeros, log2, ndarray
 
-from .connectivity import connectivity
+from ..decorators import connectivity
 
 
 @connectivity(mcb_kwargs={"n_bins": 3, "alphabet": "ordinal", "strategy": "quantile"})
@@ -45,7 +45,7 @@ def mutual_information(
 
     Here :math:`(p(i[t-\text{timeDiff}], j[t]))` is the joint probability
     of observing :math:`(i)` at time :math:`(t - \text{timeDiff})`
-             and :math:`(j)` at time :math:`(t)`.
+    and :math:`(j)` at time :math:`(t)`.
 
 
     :param ts1: First time series.

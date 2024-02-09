@@ -25,6 +25,7 @@ def time_series(request):
     return request.param
 
 
+@pytest.fixture(scope="module")
 def two_time_series():
     """Return two time series."""
     ts1 = array([1, 2, 3, 4, 5])

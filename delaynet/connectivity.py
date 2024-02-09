@@ -9,7 +9,8 @@ from .connectivities import (
     __all_connectivity_metrics_names__,
     __all_connectivity_metrics_names_simple__,
 )
-from .connectivities.connectivity import connectivity as connectivity_decorator
+from .decorators import connectivity as connectivity_decorator
+
 
 Metric = str | Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
 
@@ -83,3 +84,4 @@ def show_connectivity_metrics():
         print("Aliases:")
         for alias in aliases:
             print(f" - {alias}")
+    print("\n")

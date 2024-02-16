@@ -90,41 +90,61 @@ def os_metric(x1, x2, n, d, tau):
     return np.mean(os_aux)
 
 
-# def os_metric(x1, x2, d, tau):
-#     """
-#     Ordinal synchronisation metric, helper function.
-#
-#     :param x1: First time series.
-#     :type x1: ndarray
-#     :param x2: Second time series.
-#     :type x2: ndarray
-#     :param d: Embedding dimension / delay dimension.
-#     :type d: int
-#     :param tau: Time delay.
-#     :type tau: int
-#     :return: Ordinal synchronisation metric.
-#     :rtype: float
-#     """
-#     v0 = np.arange(0, d)
-#     norm = np.sqrt(np.dot(v0, v0))
-#     min_val = np.dot(np.arange(0, d), np.flip(np.arange(0, d))) / np.dot(
-#         np.arange(0, d), np.arange(0, d)
-#     )
-#
-#     x11 = x1[:(d - 1) * tau + 1:tau]
-#     x22 = x2[:(d - 1) * tau + 1:tau]
-#     x11 = x11[: len(x11) // d * d].reshape(-1, d)
-#     x22 = x22[: len(x22) // d * d].reshape(-1, d)
-#
-#     os_aux = [compute_os_aux(i, x11, x22, norm, min_val) for i in range((d - 1) * tau + 1)]
-#     return np.mean(os_aux)
-#
-#
-# def compute_os_aux(i, x11, x22, norm, min_val):
-#     v0 = x11[i]
-#     w0 = x22[i]
-#     iv = np.argsort(v0) / norm
-#     iw = np.argsort(w0) / norm
-#
-#     ios = 2 * ((np.dot(iv, iw) - min_val) / (1 - min_val) - 0.5)
-#     return np.mean(ios)
+def os_metric_vectorized(x1, x2, d, tau):
+    """
+    Ordinal synchronisation metric, helper function.
+
+    :param x1: First time series.
+    :type x1: ndarray
+    :param x2: Second time series.
+    :type x2: ndarray
+    :param d: Embedding dimension / delay dimension.
+    :type d: int
+    :param tau: Time delay.
+    :type tau: int
+    :return: Ordinal synchronisation metric.
+    :rtype: float
+    """
+    v0 = np.arange(0, d)
+    norm = np.sqrt(np.dot(v0, v0))
+    min_val = np.dot(np.arange(0, d), np.flip(np.arange(0, d))) / np.dot(
+        np.arange(0, d), np.arange(0, d)
+    )
+
+    x11 = x1[: (d - 1) * tau + 1 : tau]
+    x22 = x2[: (d - 1) * tau + 1 : tau]
+    x11 = x11[: len(x11) // d * d].reshape(-1, d)
+    x22 = x22[: len(x22) // d * d].reshape(-1, d)
+
+    os_aux = [
+        compute_os_aux(i, x11, x22, norm, min_val) for i in range((d - 1) * tau + 1)
+    ]
+    return np.mean(os_aux)
+
+
+def compute_os_aux(
+    i: int, x11: np.ndarray, x22: np.ndarray, norm: float, min_val: float
+) -> float:
+    """
+    Compute the OS auxiliary metric.
+
+    :param i: Row index.
+    :type i: int
+    :param x11: Reshaped first time series.
+    :type x11: ndarray
+    :param x22: Reshaped second time series.
+    :type x22: ndarray
+    :param norm: Normalisation factor.
+    :type norm: float
+    :param min_val: Minimum value.
+    :type min_val: float
+    :return: OS auxiliary metric.
+    :rtype: float
+    """
+    v0 = x11[i]
+    w0 = x22[i]
+    iv = np.argsort(v0) / norm
+    iw = np.argsort(w0) / norm
+
+    ios = 2 * ((np.dot(iv, iw) - min_val) / (1 - min_val) - 0.5)
+    return np.mean(ios)

@@ -2,7 +2,7 @@
 Changelog
 *********
 
-Version 0.1.0 (2024-02-01)
+Version 0.1.0 (2024-02-16)
 **************************
 
 * 🏗 Setup main functionality

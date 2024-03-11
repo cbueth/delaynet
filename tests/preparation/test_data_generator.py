@@ -13,7 +13,7 @@ from delaynet.preparation.data_generator import gen_rand_data
 @pytest.mark.parametrize("rng", [None, 0, default_rng(0)])
 def test_gen_rand_data(n_nodes, ts_len, l_dens, wm_min_max: tuple[float, float], rng):
     """Test the gen_rand_data function."""
-    am, wm, ts = gen_rand_data(n_nodes, ts_len, l_dens, wm_min_max, rng)
+    am, wm, ts = gen_rand_data(ts_len, n_nodes, l_dens, wm_min_max, rng)
     assert am.shape == (n_nodes, n_nodes)
     assert wm.shape == (n_nodes, n_nodes)
     assert ts.shape == (n_nodes, ts_len)
@@ -42,4 +42,4 @@ def test_gen_rand_data(n_nodes, ts_len, l_dens, wm_min_max: tuple[float, float],
 def test_gen_rand_data_invalid_inputs(n_nodes, ts_len, l_dens, wm_min_max, rng, error):
     """Test the gen_rand_data function with invalid inputs."""
     with pytest.raises(error):
-        gen_rand_data(n_nodes, ts_len, l_dens, wm_min_max, rng)
+        gen_rand_data(ts_len, n_nodes, l_dens, wm_min_max, rng)

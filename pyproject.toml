@@ -85,7 +85,7 @@ max-line-length = 88
 
 [tool.pylint.design]
 # Maximum number of arguments for function / method.
-max-args = 6
+max-args = 8
 
 # --------------------------------------------------------------------------------------
 # Testing

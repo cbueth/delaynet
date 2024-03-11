@@ -45,6 +45,7 @@ Changelog = "https://cbueth.de/delaynet/changelog"
 dev = ["black", "isort", "pylint"]
 test = ["pytest", "pytest-cov", "coverage"]
 doc = ["sphinx", "myst-nb", "sphinx-book-theme"]
+all = ["delaynet[dev,test,doc]"]
 
 [tool.setuptools.packages.find]
 exclude = [
@@ -57,7 +58,7 @@ namespaces = false
 
 [tool.setuptools.dynamic]
 readme = { file = ["README.md", "LICENSE.txt"] }
-version = { attr = "delaynet.__version__" }
+version = { attr = "delaynet._version.__version__" }
 
 # --------------------------------------------------------------------------------------
 # Linting

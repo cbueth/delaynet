@@ -20,7 +20,7 @@ the [Documentation](https://cbueth.github.io/delaynet/).
 This package can be installed from PyPI using pip:
 
 ```bash
-pip install delaynet
+pip install delaynet  # when public on PyPI
 ```
 
 This will automatically install all the necessary dependencies as specified in the
@@ -30,30 +30,36 @@ This will automatically install all the necessary dependencies as specified in t
 ```bash
 micromamba create -n delay_net -c conda-forge python=3.11
 micromamba activate delay_net
-pip install delaynet
+pip install delaynet  # or `micromamba install delaynet` when on conda-forge
 ```
 
 ## Development Setup
 
 For development, we recommend using `micromamba` to create a virtual
-environment. The `environment.yml` file can be used to quickly set up a virtual
-environment with all the necessary dependencies, like so:
+environment and installing the package in editable mode.
+After cloning the repository, navigate to the root folder and
+create the environment with the wished python version and the dependencies.
 
 ```bash
-mamba env create --file=environment.yml
+micromamba create -n delay_net -c conda-forge python=3.11
+micromamba activate delay_net
 ```
-
-If you want to solve the dependencies yourself, use the `requirements.txt`
-file
+Using `pip` to install the package in editable mode will also install the
+development dependencies.
 
 ```bash
-mamba create -n delay_net -c conda-forge python=3.11 --file requirements.txt
-mamba activate delay_net
-mamba env export | grep -v "^prefix: " > environment.yml
+pip install -e ".[all]"
 ```
 
-which does not have explicit versions, but might resolve dependency issues. Using
-`git diff environment.yml` the changes can be inspected.
+To let `micromamba` handle the dependencies, use the `requirements.txt` file
+
+```bash
+micromamba install --file requirements.txt
+pip install --no-build-isolation --no-deps -e .
+```
+
+Now, the package can be imported and used in the python environment, from anywhere on
+the system, if the environment is activated.
 
 ### Testing
 

@@ -69,28 +69,35 @@ or the [API Reference](api/index.rst).
 
 ## Development Setup
 
-For development, we recommend
-using [`micromamba`](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html)
-to create a virtual environment. The
-[`environment.yml`](https://github.com/cbueth/delaynet/blob/main/environment.yml)
-file can be used to quickly set up a virtual
-environment with all the necessary dependencies, like so:
+For development, we recommend using
+[`micromamba`](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html)
+to create a virtual environment and installing the package in editable mode.
+After cloning the repository, navigate to the root folder and
+create the environment with the wished python version and the dependencies.
 
 ```bash
-micromamba env create --file=environment.yml
-```
-
-If you want to solve the dependencies yourself, use the
-[`requirements.txt`](https://github.com/cbueth/delaynet/blob/main/requirements.txt) file
-
-```bash
-micromamba create -n delay_net -c conda-forge python=3.11 --file requirements.txt
+micromamba create -n delay_net -c conda-forge python=3.11
 micromamba activate delay_net
-micromamba env export | grep -v "^prefix: " > environment.yml
 ```
 
-which does not have explicit versions, but might resolve dependency issues. Using
-`git diff environment.yml` the changes can be inspected.
+Either way, install the package directly with pip in editable mode, including all
+development dependencies, like so:
+
+```bash
+pip install -e ".[all]"
+```
+
+Or, to let `micromamba` handle the dependencies, use the
+[`requirements.txt`](https://github.com/cbueth/delaynet/blob/main/requirements.txt)
+file
+
+```bash
+micromamba install --file requirements.txt
+pip install --no-build-isolation --no-deps -e .
+```
+
+Now, the package can be imported and used in the python environment, from anywhere on
+the system, if the environment is activated.
 
 ### Testing
 

@@ -18,6 +18,7 @@ Metric = str | Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
 def connectivity(
     ts1: ndarray,
     ts2: ndarray,
+    /,
     metric: Metric,
     *args,
     **kwargs,
@@ -37,9 +38,9 @@ def connectivity(
     If a `callable` is given, it should take two time series as input and return a
     `float`, or a `tuple` of `float` and `int`.
 
-    :param ts1: First time series.
+    :param ts1: First time series. Positional only.
     :type ts1: ndarray
-    :param ts2: Second time series.
+    :param ts2: Second time series. Positional only.
     :type ts2: ndarray
     :param metric: Metric to use.
     :type metric: str or Callable

@@ -51,6 +51,15 @@ def test_normalise_kwargs_unknown(time_series):
         normalise(time_series, norm="id", b=2)
 
 
+def test_normalise_ts_positional_only(time_series):
+    """Test normalise with time series as keyword argument."""
+    # pylint: disable = kwarg-superseded-by-positional-arg, no-value-for-parameter
+    with pytest.raises(TypeError, match="missing 1 required positional argument: 'ts'"):
+        normalise(ts=time_series, norm="id")
+    with pytest.raises(TypeError, match="missing 1 required positional argument: 'ts'"):
+        normalise(norm="id", ts=time_series)
+
+
 @pytest.mark.parametrize(
     "invalid_time_series",
     [

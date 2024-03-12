@@ -40,12 +40,13 @@ def norm(request):
 def two_random_time_series():
     """Return two random time series."""
     _, _, ts = gen_rand_data(ts_len=1000, n_nodes=2, l_dens=0.5, wm_min_max=(0.5, 1.5))
-    return ts[:, 0], ts[:, 1]
+    return ts[0, :], ts[1, :]
 
 
 @pytest.fixture(scope="session")
 def random_time_series(two_random_time_series):
     """Return random time series."""
+    # pylint: disable = redefined-outer-name
     return two_random_time_series[0]
 
 
@@ -70,6 +71,7 @@ def two_fmri_time_series():
 @pytest.fixture(scope="session")
 def fmri_time_series(two_fmri_time_series):
     """Return fMRI time series."""
+    # pylint: disable = redefined-outer-name
     return two_fmri_time_series[0]
 
 

@@ -45,7 +45,8 @@ Changelog = "https://cbueth.de/delaynet/changelog"
 dev = ["black", "isort", "pylint"]
 test = ["pytest", "pytest-cov", "coverage"]
 doc = ["sphinx", "myst-nb", "sphinx-book-theme"]
-all = ["delaynet[dev,test,doc]"]
+plot = ["matplotlib"]
+all = ["delaynet[dev,test,doc,plot]"]
 
 [tool.setuptools.packages.find]
 exclude = [

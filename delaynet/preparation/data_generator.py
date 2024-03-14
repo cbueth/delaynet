@@ -28,7 +28,7 @@ def gen_data(
 
     Supported generation methods:
     - 'rand': Random time series. :func:`gen_rand_data`
-    - 'frmi': fMRI time series. :func:`gen_frmi`
+    - 'fmri': fMRI time series. :func:`gen_fmri`
 
     :param generation_method: Type of time series to generate.
     :type generation_method: str
@@ -44,10 +44,10 @@ def gen_data(
     """
     if generation_method.lower() == "rand":
         return gen_rand_data(ts_len, n_nodes, **kwargs)
-    if generation_method.lower() == "frmi":
+    if generation_method.lower() == "fmri":
         if n_nodes == 1:
-            return gen_frmi(ts_len, **kwargs)
-        return gen_frmi_multiple(ts_len, n_nodes, **kwargs)
+            return gen_fmri(ts_len, **kwargs)
+        return gen_fmri_multiple(ts_len, n_nodes, **kwargs)
     raise ValueError(f"Unknown generation method: {generation_method}.")
 
 
@@ -131,7 +131,7 @@ def gen_rand_data(
     return am, wm, all_ts
 
 
-def gen_frmi(
+def gen_fmri(
     ts_len: int = 1000,
     downsampling_factor: int = 2,
     time_resolution: float = 0.2,
@@ -193,7 +193,7 @@ def gen_frmi(
     return ts_convolve
 
 
-def gen_frmi_multiple(
+def gen_fmri_multiple(
     ts_len: int = 1000,
     n_nodes: int = 2,
     downsampling_factor: int = 2,
@@ -206,7 +206,7 @@ def gen_frmi_multiple(
     """
     Generate fMRI time series for multiple nodes.
 
-    This function works similarly to :func:`gen_frmi`,
+    This function works similarly to :func:`gen_fmri`,
     but generates multiple time series at once.
 
     :param ts_len: Length of the time series.

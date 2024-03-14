@@ -3,7 +3,7 @@
 import pytest
 from numpy import array
 
-from delaynet.preparation.data_generator import gen_rand_data, gen_frmi
+from delaynet.preparation.data_generator import gen_rand_data, gen_fmri
 from delaynet.connectivities import __all_connectivity_metrics__
 from delaynet.norms import __all_norms__
 
@@ -55,7 +55,7 @@ def two_fmri_time_series():
     """Return two random fMRI time series."""
     lin_coupl = 1.0
     coupling = 1.0
-    ts = gen_frmi(
+    ts = gen_fmri(
         ts_len=10000,
         downsampling_factor=10,
         time_resolution=0.2,

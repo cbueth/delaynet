@@ -6,7 +6,7 @@ from .granger import gt_multi_lag, gt_bi_multi_lag
 from .gravity import gravity
 from .linear_correlation import linear_correlation
 from .mutual_information import mutual_information
-from .ordinal_synchronisation import ordinal_synchronisation
+from .ordinal_synchronization import ordinal_synchronization
 from .rank_correlation import rank_correlation
 from .transfer_entropy import transfer_entropy
 
@@ -25,8 +25,9 @@ __all_connectivity_metrics_names__ = {
     "lc": linear_correlation,
     "mutual information": mutual_information,
     "mi": mutual_information,
-    "ordinal synchronisation": ordinal_synchronisation,
-    "os": ordinal_synchronisation,
+    "ordinal synchronization": ordinal_synchronization,
+    "ordinal synchronisation": ordinal_synchronization,
+    "os": ordinal_synchronization,
     "rank correlation": rank_correlation,
     "rc": rank_correlation,
     "transfer entropy": transfer_entropy,

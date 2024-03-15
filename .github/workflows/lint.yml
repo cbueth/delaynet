@@ -30,6 +30,10 @@ jobs:
           commit_user_email: ${{ github.actor }}@users.noreply.github.com
 
   run-pylint:
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+        os: [ubuntu-latest]
     name: Run Pylint code analyzer
     needs: run-black
     runs-on: ubuntu-latest
@@ -41,7 +45,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python-version }}
 
       - name: Install pylint
         run: pip install pylint

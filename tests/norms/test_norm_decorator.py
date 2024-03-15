@@ -1,5 +1,7 @@
 """Test the norm decorator."""
 
+from sys import version_info
+
 # pylint: disable=unexpected-keyword-arg
 import pytest
 from numpy import ndarray, array, array_equal, hstack, nan, inf, isnan, isinf
@@ -89,8 +91,14 @@ def test_norm_decorator_mixed_args(check_kwargs):
     # Test with positional and keyword arguments
     assert array_equal(mixed_args_norm(array([1, 2, 3]), 2, b=3), array([6, 7, 8]))
 
+    error_msg = (
+        "missing a required argument: 'b'"
+        if version_info[:2] < (3, 12)
+        else "missing a required keyword-only argument: 'b'"
+    )
+
     # Test with missing required keyword argument
-    with pytest.raises(TypeError, match="missing a required argument: 'b'"):
+    with pytest.raises(TypeError, match=error_msg):
         mixed_args_norm(array([1, 2, 3]), 2)  # pylint: disable=missing-kwoa
 
     # Test with unknown keyword argument

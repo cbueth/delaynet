@@ -10,6 +10,7 @@ from .decorators import norm as norm_decorator
 
 def normalise(
     ts: ndarray,
+    /,
     norm: str | Callable[[ndarray, ...], ndarray],
     *args,
     **kwargs,
@@ -32,7 +33,7 @@ def normalise(
     If a ``callable`` is given, it should take a time series as input and return
     the normalised time series.
 
-    :param ts: Time series to normalise. 1D or 2D.
+    :param ts: Time series to normalise. 1D or 2D. Positional only.
     :type ts: ndarray, shape (n,) or (m, n)
     :param norm: Norm to use.
     :type norm: str or Callable

@@ -11,6 +11,7 @@ __pycache__/
 .coverage
 docs/api/*
 !docs/api/index.rst
+build/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -24,3 +25,4 @@ public/*
 *.log
 # plots
 *.pdf
+*.png

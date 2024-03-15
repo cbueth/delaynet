@@ -1,6 +1,7 @@
 """Test example data generator for preparation module."""
 
 import pytest
+from numpy import array_equal
 from numpy.random import default_rng
 
 from delaynet.preparation.data_generator import gen_rand_data
@@ -13,7 +14,7 @@ from delaynet.preparation.data_generator import gen_rand_data
 @pytest.mark.parametrize("rng", [None, 0, default_rng(0)])
 def test_gen_rand_data(n_nodes, ts_len, l_dens, wm_min_max: tuple[float, float], rng):
     """Test the gen_rand_data function."""
-    am, wm, ts = gen_rand_data(n_nodes, ts_len, l_dens, wm_min_max, rng)
+    am, wm, ts = gen_rand_data(ts_len, n_nodes, l_dens, wm_min_max, rng)
     assert am.shape == (n_nodes, n_nodes)
     assert wm.shape == (n_nodes, n_nodes)
     assert ts.shape == (n_nodes, ts_len)
@@ -23,6 +24,25 @@ def test_gen_rand_data(n_nodes, ts_len, l_dens, wm_min_max: tuple[float, float],
     assert am.sum() <= n_nodes**2 - n_nodes
     assert 0 <= wm.sum() <= (n_nodes**2 - n_nodes) * wm_min_max[1]
     assert ts.sum() >= 0.0
+
+
+@pytest.mark.parametrize(
+    "rng, is_stable", [(None, False), (0, True), (default_rng(0), False)]
+)
+def test_gen_rand_data_stability(rng, is_stable):
+    """Test if the gen_rand_data function is stable.
+    This is, if the same random seed is used, the output should be the same.
+    But using the same random generator twice should not produce the same output.
+    """
+    n_nodes = 10
+    ts_len = 10
+    l_dens = 0.5
+    wm_min_max = (0.5, 1.5)
+    am1, wm1, ts1 = gen_rand_data(ts_len, n_nodes, l_dens, wm_min_max, rng)
+    am2, wm2, ts2 = gen_rand_data(ts_len, n_nodes, l_dens, wm_min_max, rng)
+    assert array_equal(am1, am2) == is_stable
+    assert array_equal(wm1, wm2) == is_stable
+    assert array_equal(ts1, ts2) == is_stable
 
 
 @pytest.mark.parametrize(
@@ -42,4 +62,4 @@ def test_gen_rand_data(n_nodes, ts_len, l_dens, wm_min_max: tuple[float, float],
 def test_gen_rand_data_invalid_inputs(n_nodes, ts_len, l_dens, wm_min_max, rng, error):
     """Test the gen_rand_data function with invalid inputs."""
     with pytest.raises(error):
-        gen_rand_data(n_nodes, ts_len, l_dens, wm_min_max, rng)
+        gen_rand_data(ts_len, n_nodes, l_dens, wm_min_max, rng)

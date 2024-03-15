@@ -1,4 +1,4 @@
-"""Ordinal Synchronisation (OS) connectivity metric."""
+"""Ordinal Synchronization (OS) connectivity metric."""
 
 import numpy as np
 
@@ -6,9 +6,9 @@ from ..decorators import connectivity
 
 
 @connectivity
-def ordinal_synchronisation(ts1, ts2, d: int = 3, tau: int = 1, max_lag_steps: int = 0):
+def ordinal_synchronization(ts1, ts2, d: int = 3, tau: int = 1, max_lag_steps: int = 0):
     """
-    Ordinal synchronisation (OS) connectivity metric.
+    Ordinal synchronization (OS) connectivity metric.
 
     :param ts1: First time series.
     :type ts1: ndarray
@@ -34,7 +34,7 @@ def ordinal_synchronisation(ts1, ts2, d: int = 3, tau: int = 1, max_lag_steps: i
 # pylint: disable=too-many-locals
 def os_metric(x1, x2, n, d, tau):
     """
-    Ordinal synchronisation metric, helper function.
+    Ordinal synchronization metric, helper function.
 
     :param x1: First time series.
     :type x1: ndarray
@@ -46,7 +46,7 @@ def os_metric(x1, x2, n, d, tau):
     :type d: int
     :param tau: Time delay.
     :type tau: int
-    :return: Ordinal synchronisation metric.
+    :return: Ordinal synchronization metric.
     :rtype: float
     """
     v0 = np.arange(0, d)
@@ -54,13 +54,12 @@ def os_metric(x1, x2, n, d, tau):
     min_val = np.dot(np.arange(0, d), np.flip(np.arange(0, d))) / np.dot(
         np.arange(0, d), np.arange(0, d)
     )
-
     os_aux = np.zeros(((d - 1) * tau + 1, 1))
     ios = np.zeros((n // d, 1))
 
     for i in range((d - 1) * tau + 1):
-        x11 = x1[i:i:tau]
-        x22 = x2[i:i:tau]
+        x11 = x1[i:n:tau]
+        x22 = x2[i:n:tau]
         x11 = x11[: len(x11) // d * d]
         v0 = np.vstack(np.hsplit(x11, len(x11) // d))
         x22 = x22[: len(x22) // d * d]
@@ -80,7 +79,7 @@ def os_metric(x1, x2, n, d, tau):
 
     # TODO: Optimise this
     # - Precompute x11, x22
-    # - Replace hsplit and vstack with reshape
+    # - Replace hsplit and vstack with a single reshape
     #   - To split x11 and x22 into chunks of size d and stack them vertically
     # - Calculate ios mean with np.mean(ios, axis=1) - outside the loop
     # - Use list comprehension instead of for loop
@@ -92,7 +91,7 @@ def os_metric(x1, x2, n, d, tau):
 
 def os_metric_vectorized(x1, x2, d, tau):
     """
-    Ordinal synchronisation metric, helper function.
+    Ordinal synchronization metric, helper function.
 
     :param x1: First time series.
     :type x1: ndarray
@@ -102,20 +101,23 @@ def os_metric_vectorized(x1, x2, d, tau):
     :type d: int
     :param tau: Time delay.
     :type tau: int
-    :return: Ordinal synchronisation metric.
+    :return: Ordinal synchronization metric.
     :rtype: float
     """
+    # Precompute v0 and norm
     v0 = np.arange(0, d)
     norm = np.sqrt(np.dot(v0, v0))
     min_val = np.dot(np.arange(0, d), np.flip(np.arange(0, d))) / np.dot(
         np.arange(0, d), np.arange(0, d)
     )
 
+    # Precompute x11 and x22
     x11 = x1[: (d - 1) * tau + 1 : tau]
     x22 = x2[: (d - 1) * tau + 1 : tau]
     x11 = x11[: len(x11) // d * d].reshape(-1, d)
     x22 = x22[: len(x22) // d * d].reshape(-1, d)
 
+    # Use list comprehension instead of for loop
     os_aux = [
         compute_os_aux(i, x11, x22, norm, min_val) for i in range((d - 1) * tau + 1)
     ]
@@ -138,7 +140,7 @@ def compute_os_aux(
     :type norm: float
     :param min_val: Minimum value.
     :type min_val: float
-    :return: OS auxiliary metric.
+    :return: Auxiliary OS metric for the given index.
     :rtype: float
     """
     v0 = x11[i]

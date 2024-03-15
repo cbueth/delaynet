@@ -22,3 +22,4 @@ Furthermore, you can also find the `API documentation <api/index.html>`__.
    guide/index
    api/index
    changelog
+   bibliography

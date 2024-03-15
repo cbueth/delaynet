@@ -16,13 +16,16 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Mathematics",
     "Topic :: Scientific/Engineering :: Information Analysis",
     "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
     "Natural Language :: English",
     "Private :: Do Not Upload", # Remove this line to upload to PyPI
 ]
 dynamic = ["readme", "version"]
-requires-python = "~=3.11"
+requires-python = ">=3.10"
 dependencies = [
     "numpy",
     "scipy",
@@ -41,7 +44,9 @@ Changelog = "https://cbueth.de/delaynet/changelog"
 [project.optional-dependencies]
 dev = ["black", "isort", "pylint"]
 test = ["pytest", "pytest-cov", "coverage"]
-doc = ["sphinx", "myst-nb", "sphinx-book-theme"]
+doc = ["sphinx", "myst-nb", "sphinx-book-theme", "sphinxcontrib-bibtex"]
+plot = ["matplotlib"]
+all = ["delaynet[dev,test,doc,plot]"]
 
 [tool.setuptools.packages.find]
 exclude = [
@@ -54,7 +59,7 @@ namespaces = false
 
 [tool.setuptools.dynamic]
 readme = { file = ["README.md", "LICENSE.txt"] }
-version = { attr = "delaynet.__version__" }
+version = { attr = "delaynet._version.__version__" }
 
 # --------------------------------------------------------------------------------------
 # Linting
@@ -81,7 +86,7 @@ max-line-length = 88
 
 [tool.pylint.design]
 # Maximum number of arguments for function / method.
-max-args = 6
+max-args = 8
 
 # --------------------------------------------------------------------------------------
 # Testing

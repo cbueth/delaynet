@@ -54,3 +54,26 @@ def test_connectivity_with_invalid_metric(two_time_series, invalid_metric):
 
     with pytest.raises(ValueError):
         connectivity(ts1, ts2, invalid_metric)
+
+
+def test_connectivity_ts_positional_only(two_time_series):
+    """Test connectivity with time series as keyword arguments."""
+    # pylint: disable = kwarg-superseded-by-positional-arg, no-value-for-parameter
+    ts1, ts2 = two_time_series
+
+    with pytest.raises(
+        TypeError, match="missing 1 required positional argument: 'ts2'"
+    ):
+        connectivity(ts1, ts2=ts2, metric="lc")
+    with pytest.raises(
+        TypeError, match="missing 1 required positional argument: 'ts2'"
+    ):
+        connectivity(ts2, ts1=ts1, metric="lc")
+    with pytest.raises(
+        TypeError, match="missing 2 required positional arguments: 'ts1' and 'ts2'"
+    ):
+        connectivity(metric="lc")
+    with pytest.raises(
+        TypeError, match="missing 2 required positional arguments: 'ts1' and 'ts2'"
+    ):
+        connectivity(metric="lc", ts1=ts1, ts2=ts2)

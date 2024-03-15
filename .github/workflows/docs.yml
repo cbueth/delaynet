@@ -25,6 +25,10 @@ concurrency:
 
 jobs:
   generate-deploy-docs:
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+        os: [ubuntu-latest]
     name: Generate documentation
     runs-on: ubuntu-latest
     environment:
@@ -34,42 +38,24 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Mambaforge
-        uses: conda-incubator/setup-miniconda@v3
+      - name: Get week number
+        id: week
+        run: echo "WEEK=$(date +'%V')" >> $GITHUB_ENV
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: mamba-org/setup-micromamba@v1
         with:
-          miniforge-variant: Mambaforge
-          miniforge-version: latest
-          activate-environment: delay_net
-          use-mamba: true
-
-      - name: Use cache for ${{ matrix.submodule.name }}
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CONDA }}/envs
-          key:
-            conda-${{ runner.os }}--${{ runner.arch }}--${{
-            hashFiles('environment.yml') }}-${{ env.CACHE_NUMBER }}
-        env:
-          # Increase this value to reset cache if etc/example-environment.yml has not changed
-          CACHE_NUMBER: 0
-        id: cache
-
-      - name: Update environment
-        run: # Install if cache not found
-          mamba env update -n delay_net -f environment.yml
-        if: steps.cache.outputs.cache-hit != 'true'
-
-      - name: Show environment info
-        run: |
-          conda info
-          conda list
-          conda config --show
+          environment-name: delay_net
+          create-args: >-
+            python=${{ matrix.python-version }}
+            --file requirements.txt
+          cache-environment: true
+          cache-environment-key: py${{ matrix.python-version }}-${{ runner.os }}-W${{ env.WEEK }}-${{ hashFiles('requirements.txt') }}
 
       - name: Add Notebook Kernel
-        run: python -m ipykernel install --user --name sb_env --display-name "Python (sb_env)"
+        run: python -m ipykernel install --user --name delay_net --display-name "Python (delay_net)"
 
       - name: Generating .rst files
         run: sphinx-apidoc -o docs/api/ delaynet/

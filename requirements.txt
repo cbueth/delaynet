@@ -16,5 +16,6 @@ coverage
 sphinx
 myst-nb
 sphinx-book-theme
+sphinxcontrib-bibtex
 # Plotting
 matplotlib

@@ -1,7 +1,6 @@
 """Generate example data for DelayNet."""
 
 from numpy import (
-    random,
     zeros,
     ndarray,
     integer,
@@ -13,7 +12,7 @@ from numpy import (
     size,
     fill_diagonal,
 )
-from numpy.random import default_rng
+from numpy.random import default_rng, Generator
 from scipy.stats import gamma
 from numba import jit
 
@@ -111,7 +110,7 @@ def gen_rand_data(
     wm *= am  # set weights of non-edges to 0
 
     # Generate lag matrix
-    lag = random.randint(1, 5, (n_nodes, n_nodes))
+    lag = rng.integers(1, 5, (n_nodes, n_nodes))
 
     # Generate time series
     all_ts = zeros((n_nodes, ts_len))
@@ -259,7 +258,7 @@ def __initial_ts(
     ts_len: int,
     noise: float,
     coupling_matrix: ndarray[float],
-    rng: random.Generator,
+    rng: Generator,
 ):
     """
     Generate initial time series.
@@ -297,7 +296,7 @@ def __initial_ts(
     return ts
 
 
-def __hrf(times: ndarray[float], rng: random.Generator = None) -> ndarray[float]:
+def __hrf(times: ndarray[float], rng: Generator = None) -> ndarray[float]:
     """
     Hemodynamic Response Function (HRF).
 
@@ -322,7 +321,7 @@ def __initial_ts_var_num_nodes(
     num_ts: int,
     noise: float,
     coupling_matrix: ndarray[float],
-    rng: random.Generator,
+    rng: Generator,
 ):
     """
     Generate initial time series for multiple nodes.
@@ -335,7 +334,7 @@ def __initial_ts_var_num_nodes(
     :param coupling_matrix: Coupling matrix.
     :type coupling_matrix: ndarray[float], shape = (num_ts, num_ts)
     :param rng: Random number generator.
-    :type rng: random.Generator
+    :type rng: Generator
     :return: Time series.
     :rtype: ndarray[float], shape = (ts_len, num_ts)
     """

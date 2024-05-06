@@ -1,5 +1,6 @@
 """Test the connectivity decorator."""
 
+# pylint: disable=unexpected-keyword-arg
 import pytest
 from numpy import array, sum as np_sum
 
@@ -68,3 +69,56 @@ def test_connectivity_decorator_kwargs_unknown_ignored():
         )
         == 21.0
     )
+
+
+@pytest.mark.parametrize(
+    "array1, array2, check_symbolic, expected, ",
+    [
+        ([1, 2, 3], [4, 5, 6], True, 21.0),
+        ([1, 2, 3], [4, 5, 6], 6, 21.0),
+        ([1, 2, 3], [4, 5, 6], 0, 21.0),  # 0 is treated as False
+        ([1.0, 2.0, 3.0], [4.0, 5.0, 6.0], False, 21.0),
+    ],
+)
+def test_connectivity_decorator_symbolic(array1, array2, check_symbolic, expected):
+    """Test the connectivity decorator by designing a simple symbolic connectivity
+    metric."""
+
+    @connectivity(check_symbolic=check_symbolic)
+    def simple_connectivity(ts1, ts2):
+        """Return the sum of the two time series."""
+        return float(np_sum(ts1) + np_sum(ts2))
+
+    assert simple_connectivity(array(array1), array(array2)) == expected
+
+
+@pytest.mark.parametrize(
+    "array1, array2, check_symbolic, match",
+    [
+        ([1, 2, 3], [4, 5, 6], 5, "have more than 5 unique symbols"),
+        (
+            [1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0],
+            None,
+            "Input arrays cannot be of float type.",
+        ),
+        ([-1, -2, -3], [1, 2, 3], 5, "have more than 5 unique symbols"),
+        ([1, "a", 3], [4, 5, 6], None, "Input arrays must be of integer type."),
+        (
+            [1.0, 2.0, 3.0],
+            [4.0, 5.0, 6.0],
+            None,
+            "Input arrays cannot be of float type.",
+        ),
+    ],
+)
+def test_connectivity_decorator_symbolic_raises(array1, array2, check_symbolic, match):
+    """Test the connectivity decorator with invalid input."""
+
+    @connectivity(check_symbolic=check_symbolic)
+    def simple_connectivity(ts1, ts2):
+        """Return the sum of the two time series."""
+        return float(np_sum(ts1) + np_sum(ts2))
+
+    with pytest.raises(ValueError, match=match):
+        simple_connectivity(array(array1), array(array2))

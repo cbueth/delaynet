@@ -8,7 +8,7 @@ from numpy import ndarray, isnan, isinf, apply_along_axis, floating, integer
 
 from .utils.bind_args import bind_args
 from .utils.multi_coeff_binning import MultipleCoefficientBinning
-
+from .utils.symbolic import check_symbolic_pairwise
 
 Connectivity = Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
 Norm = Callable[[ndarray, ...], ndarray]
@@ -16,6 +16,7 @@ Norm = Callable[[ndarray, ...], ndarray]
 
 def connectivity(
     *args,
+    check_symbolic: bool | int | None = False,
     mcb_kwargs: dict | None = None,
 ):
     """Decorator for the connectivity functions.
@@ -32,6 +33,11 @@ def connectivity(
 
     Shape of the input time series must be equal.
 
+    :param check_symbolic: If ``True``, check if the connectivity values are symbolic.
+                           A specific number of unique symbols can be set (``None`` for
+                           no limit).
+                           Necessary for entropy-based connectivities.
+    :type check_symbolic: bool | int
     :param mcb_kwargs: Keyword arguments for the :py:class:`MultipleCoefficientBinning`
                        transformer. If ``None``, no binning is applied.
     :type mcb_kwargs: dict | None
@@ -88,6 +94,15 @@ def connectivity(
                 raise ValueError(
                     "`ts1` and `ts2` must have the same shape, "
                     f"but have shapes {ts1.shape} and {ts2.shape}."
+                )
+
+            # Check if the time series are symbolic
+            if check_symbolic or check_symbolic is None:
+                check_symbolic_pairwise(
+                    ts1,
+                    ts2,
+                    max_symbols=None if check_symbolic is True else check_symbolic,
+                    # if check_symbolic is True, no limit is set
                 )
 
             # Multiple Coefficient Binning (MCB)

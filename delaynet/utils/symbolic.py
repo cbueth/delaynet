@@ -1,11 +1,12 @@
 """Function to check if numpy array(s) are symbolic.
 Used for entropy-based connectivity metrics.
 """
+
 from numpy import unique, concatenate, ndarray
 
 
 def check_symbolic_pairwise(
-        array1: ndarray, array2: ndarray, max_symbols: int | None = None
+    array1: ndarray, array2: ndarray, max_symbols: int | None = None
 ) -> None:
     """
     Check if two numpy arrays are symbolic.
@@ -25,9 +26,9 @@ def check_symbolic_pairwise(
     :raises ValueError: If the arrays have more than ``max_symbols`` unique symbols.
 
     """
-    if array1.dtype.kind == 'f' or array2.dtype.kind == 'f':
+    if array1.dtype.kind == "f" or array2.dtype.kind == "f":
         raise ValueError("Input arrays cannot be of float type.")
-    if array1.dtype.kind in 'iu' and array2.dtype.kind in 'iu':
+    if array1.dtype.kind in "iu" and array2.dtype.kind in "iu":
         if max_symbols is None:
             return  # If no limit is set, return
         if max_symbols <= 0:

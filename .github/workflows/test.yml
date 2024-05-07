@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
 
     name: Cache for ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -47,7 +47,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         submodule:
           - { name: "All Tests", pytest_args: "tests/" }
       fail-fast: false

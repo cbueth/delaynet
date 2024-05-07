@@ -32,7 +32,6 @@ dependencies = [
     "statsmodels",
     "scikit-learn",
     "numba",
-    "mkl",
 ]
 
 [project.urls]

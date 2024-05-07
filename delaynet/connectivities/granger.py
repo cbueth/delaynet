@@ -66,6 +66,7 @@ def gt_single_lag(ts1, ts2, lag_step: int = 5):
     return np.squeeze(ftres.pvalue)[()]
 
 
+@connectivity
 def gt_multi_lag(ts1, ts2, max_lag_steps: int = 5):
     """Granger Causality (GC) connectivity metric with variable time lag.
 
@@ -84,9 +85,10 @@ def gt_multi_lag(ts1, ts2, max_lag_steps: int = 5):
         gt_single_lag(ts1, ts2, lag_step) for lag_step in range(1, max_lag_steps + 1)
     ]
     idx_min = min(range(len(all_p_values)), key=all_p_values.__getitem__)
-    return np.min(all_p_values), idx_min
+    return all_p_values[idx_min], idx_min
 
 
+@connectivity
 def gt_multi_lag_statsmodels(ts1, ts2, max_lag_steps: int = 5):
     """Granger Causality (GC) connectivity metric with variable time lag.
 
@@ -108,9 +110,10 @@ def gt_multi_lag_statsmodels(ts1, ts2, max_lag_steps: int = 5):
         for lag_step in range(1, max_lag_steps + 1)
     ]
     idx_min = min(range(len(all_p_values)), key=all_p_values.__getitem__)
-    return np.min(all_p_values), idx_min
+    return all_p_values[idx_min], idx_min
 
 
+@connectivity
 def gt_bi_multi_lag(ts1, ts2, max_lag_steps: int = 5):
     """Bidirectional Granger Causality (GC) connectivity metric with variable time lag.
 
@@ -156,4 +159,6 @@ def gt_bi_multi_lag(ts1, ts2, max_lag_steps: int = 5):
 
         all_p_values[lag_step - 1] = (ft_xy - ft_yx) - (f_xy - f_yx)
 
-    return np.max(all_p_values), all_p_values
+    # Determine the maximal difference between the two directions, i.e. a->b and b->a
+    idx_max = max(range(len(all_p_values)), key=all_p_values.__getitem__)
+    return all_p_values[idx_max][0], idx_max

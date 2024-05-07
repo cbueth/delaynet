@@ -5,7 +5,11 @@ from numpy import zeros, log2, ndarray
 from ..decorators import connectivity
 
 
-@connectivity(mcb_kwargs={"n_bins": 3, "alphabet": "ordinal", "strategy": "quantile"})
+@connectivity(
+    check_symbolic=True,
+    entropy_like=True,
+    mcb_kwargs={"n_bins": 3, "alphabet": "ordinal", "strategy": "quantile"},
+)
 def mutual_information(
     ts1, ts2, base1: int = 3, base2: int = 3, max_lag_steps: int = 5
 ):

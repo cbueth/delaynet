@@ -8,7 +8,7 @@ from numpy import ndarray, isnan, isinf, apply_along_axis, floating, integer
 
 from .utils.bind_args import bind_args
 from .utils.multi_coeff_binning import MultipleCoefficientBinning
-from .utils.symbolic import check_symbolic_pairwise
+from .utils.symbolic import check_symbolic_pairwise, to_symbolic
 
 Connectivity = Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
 Norm = Callable[[ndarray, ...], ndarray]
@@ -16,7 +16,9 @@ Norm = Callable[[ndarray, ...], ndarray]
 
 def connectivity(
     *args,
+    entropy_like: bool = False,
     check_symbolic: bool | int | None = False,
+    default_to_symbolic: bool | int | None = False,
     mcb_kwargs: dict | None = None,
 ):
     """Decorator for the connectivity functions.
@@ -33,11 +35,16 @@ def connectivity(
 
     Shape of the input time series must be equal.
 
+    :param entropy_like: If ``True``, mark the connectivity as entropy-like.
+    :type entropy_like: bool
     :param check_symbolic: If ``True``, check if the connectivity values are symbolic.
                            A specific number of unique symbols can be set (``None`` for
                            no limit).
                            Necessary for entropy-based connectivities.
     :type check_symbolic: bool | int
+    :param default_to_symbolic: If ``True``, arrays were checked and not symbolic,
+                                they are converted to symbolic. Otherwise, an error is
+                                raised.
     :param mcb_kwargs: Keyword arguments for the :py:class:`MultipleCoefficientBinning`
                        transformer. If ``None``, no binning is applied.
     :type mcb_kwargs: dict | None
@@ -57,7 +64,11 @@ def connectivity(
 
         @wraps(connectivity_func)
         def wrapper(
-            ts1: ndarray, ts2: ndarray, *args, **kwargs
+            ts1: ndarray,
+            ts2: ndarray,
+            *args,
+            symbolic_bins: bool | int | None = False,
+            **kwargs,
         ) -> float | tuple[float, int]:
             """Wrapper for the connectivity functions.
 
@@ -73,6 +84,12 @@ def connectivity(
             :type ts2: ndarray
             :param args: The args to pass to the connectivity function.
             :type args: list
+            :param symbolic_bins: ``True``, ``Ǹone`` or an integer, the arrays ar
+                                  converted to symbolic. If ``True`` or ``None``, no
+                                  limit is set.
+                                  If an integer, the arrays are digitized into
+                                  ``max_symbols`` bins on [0, max_symbols-1].
+            :type symbolic_bins: bool | int | None
             :param kwargs: The kwargs to pass to the connectivity function.
             :type kwargs: dict
             :return: Connectivity value and lag (if applicable).
@@ -94,6 +111,30 @@ def connectivity(
                 raise ValueError(
                     "`ts1` and `ts2` must have the same shape, "
                     f"but have shapes {ts1.shape} and {ts2.shape}."
+                )
+
+            # Convert to symbolic if necessary
+            conversion_condition = (
+                check_symbolic
+                and (ts1.dtype.kind in "f" or ts2.dtype.kind in "f")
+                and (default_to_symbolic or default_to_symbolic is None)
+            )
+            if conversion_condition or (symbolic_bins or symbolic_bins is None):
+                ts1 = to_symbolic(
+                    ts1,
+                    max_symbols=(
+                        symbolic_bins
+                        if (symbolic_bins or symbolic_bins is None)
+                        else default_to_symbolic
+                    ),
+                )
+                ts2 = to_symbolic(
+                    ts2,
+                    max_symbols=(
+                        symbolic_bins
+                        if (symbolic_bins or symbolic_bins is None)
+                        else default_to_symbolic
+                    ),
                 )
 
             # Check if the time series are symbolic
@@ -157,6 +198,9 @@ def connectivity(
             transformer.fit(ts.reshape(-1, 1))
             ts = transformer.transform(ts.reshape(-1, 1))[:, 0]
             return ts
+
+        # Mark connectivity as entropy-likeness
+        wrapper.is_entropy_like = entropy_like
 
         return wrapper
 

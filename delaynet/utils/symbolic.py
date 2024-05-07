@@ -4,6 +4,8 @@ Used for entropy-based connectivity metrics.
 
 from numpy import unique, concatenate, ndarray
 
+from ..utils.logging import logging
+
 
 def check_symbolic_pairwise(
     array1: ndarray, array2: ndarray, max_symbols: int | None = None
@@ -27,6 +29,9 @@ def check_symbolic_pairwise(
 
     """
     if array1.dtype.kind == "f" or array2.dtype.kind == "f":
+        logging.error(
+            "Set `symbolic_bins` in connectivity() to explicitly convert to symbolic."
+        )
         raise ValueError("Input arrays cannot be of float type.")
     if array1.dtype.kind in "iu" and array2.dtype.kind in "iu":
         if max_symbols is None:
@@ -40,3 +45,38 @@ def check_symbolic_pairwise(
             )
     else:
         raise ValueError("Input arrays must be of integer type.")
+
+
+def to_symbolic(array: ndarray[float], max_symbols: int | None = None) -> ndarray[int]:
+    """
+    Convert a numpy array to symbolic. (float to int)
+
+    Converts float arrays to integer arrays.
+    Either rounding to the next integer, or when ``max_symbols`` is set,
+    digitizing the array into ``max_symbols`` bins on [0, max_symbols-1].
+
+    :param array: The numpy array to convert.
+    :type array: ndarray
+    :param max_symbols: The maximum number of unique symbols allowed.
+                        Default is None, which means no limit.
+    :type max_symbols: int | None
+    :return: The symbolic numpy array.
+    :rtype: ndarray
+    :raises ValueError: If ``max_symbols`` is <= 0.
+    :raises ValueError: If the array is not of float type.
+    """
+    if max_symbols is not None and max_symbols <= 0:
+        raise ValueError("max_symbols must be greater than 0.")
+    if array.dtype.kind == "f":
+        if max_symbols is None:
+            logging.warning("Converting to symbolic, only rounding to integer.")
+            return array.round().astype(int)
+        logging.warning(f"Converting to symbolic with max_symbols={max_symbols}.")
+        return (
+            (  # Stretch the array linearly to [0, max_symbols-1]
+                (array - array.min()) / (array.max() - array.min()) * (max_symbols - 1)
+            )
+            .round()
+            .astype(int)
+        )
+    raise ValueError("Input array must be of float type to convert.")

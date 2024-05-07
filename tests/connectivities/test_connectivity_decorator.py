@@ -122,3 +122,16 @@ def test_connectivity_decorator_symbolic_raises(array1, array2, check_symbolic, 
 
     with pytest.raises(ValueError, match=match):
         simple_connectivity(array(array1), array(array2))
+
+
+@pytest.mark.parametrize("entropy_like", [True, False])
+def test_connectivity_decorator_entropy_like(entropy_like):
+    """Test the connectivity decorator by designing a simple entropy-like connectivity
+    metric."""
+
+    @connectivity(entropy_like=entropy_like)
+    def simple_connectivity(ts1, ts2):
+        """Return the sum of the two time series."""
+        return float(np_sum(ts1) + np_sum(ts2))
+
+    assert simple_connectivity.is_entropy_like == entropy_like

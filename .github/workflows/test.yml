@@ -97,11 +97,7 @@ jobs:
   coverage:
     name: Merge Coverage
     needs: run-tests
-    strategy:
-      matrix:
-        python-version: ["3.12"]
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -el {0}

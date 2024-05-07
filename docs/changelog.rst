@@ -2,6 +2,15 @@
 Changelog
 *********
 
+Version 0.2.1 (2024-0X-XX)
+**************************
+
+* `PR 22 <https://github.com/cbueth/delaynet/pull/22>`_: Enhancements and Fixes for Entropy-based Connectivities
+
+  - **Added**: Conversion `to_symbolic` for connectivities, function attribute `entropy_like`, check for symbolic time series connectivities, and connectivity decorator tests.
+  - **Changed**: CI now includes windows and mac test runners, scheduled tests, coverage combine, and updated artifact action.
+  - **Fixed**: Issue with `gt_bi_multi_lag` returning non-optimal idx.
+
 Version 0.2.0 (2024-03-15)
 **************************
 

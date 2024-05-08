@@ -53,9 +53,9 @@ def mutual_information(
 
 
     :param ts1: First time series.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :param base1: Number of states for first time series.
     :type base1: int
     :param base2: Number of states for second time series.
@@ -80,9 +80,9 @@ def compute_average_mi(  # pylint: disable=too-many-locals
     Compute the average mutual information between two variables.
 
     :param var1: Array containing the states of the first variable.
-    :type var1: ndarray
+    :type var1: numpy.ndarray
     :param var2: Array containing the states of the second variable.
-    :type var2: ndarray
+    :type var2: numpy.ndarray
     :param base1: Number of states for the first variable.
     :type base1: int
     :param base2: Number of states for the second variable.
@@ -118,9 +118,9 @@ def count_occurrences(
     Count occurrences of states and state pairs in two variables.
 
     :param var1: Array containing the states of the first variable.
-    :type var1: ndarray
+    :type var1: numpy.ndarray
     :param var2: Array containing the states of the second variable.
-    :type var2: ndarray
+    :type var2: numpy.ndarray
     :param base1: Number of states for the first variable.
     :type base1: int
     :param base2: Number of states for the second variable.

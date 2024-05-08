@@ -34,7 +34,7 @@ def normalise(
     the normalised time series.
 
     :param ts: Time series to normalise. 1D or 2D. Positional only.
-    :type ts: ndarray, shape (n,) or (m, n)
+    :type ts: numpy.ndarray, shape (n,) or (m, n)
     :param norm: Norm to use.
     :type norm: str or Callable
     :param args: Positional arguments forwarded to the norm function, see documentation
@@ -44,7 +44,7 @@ def normalise(
                    of the norms.
     :type kwargs: dict
     :return: Normalised time series.
-    :rtype: ndarray
+    :rtype: numpy.ndarray
     :raises ValueError: If the norm is unknown. Given as string.
     :raises ValueError: If the norm returns an invalid value. Given a Callable.
     :raises ValueError: If the norm is neither a string nor a Callable.

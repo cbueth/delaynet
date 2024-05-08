@@ -10,9 +10,9 @@ def gravity(ts1, ts2, max_lag_steps: int = 5):
     """Gravity connectivity (GC) metric.
 
     :param ts1: First time series.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :param max_lag_steps: Maximum time lag to consider.
     :type max_lag_steps: int
     :return: Mutual information value and time lag.
@@ -32,9 +32,9 @@ def gravity_single(ts1, ts2, lag_step):
     """Helper function for gravity connectivity metric.
 
     :param ts1: First time series.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :param lag_step: Time lag to consider.
     :type lag_step: int
     :return: Mutual information value and time lag.

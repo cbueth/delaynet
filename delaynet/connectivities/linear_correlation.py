@@ -14,9 +14,9 @@ def linear_correlation(
     Linear correlation (LC) connectivity metric.
 
     :param ts1: First time series.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :param max_lag_steps: Maximum time lag to consider.
     :type max_lag_steps: int
     :param return_abs: Return absolute value of correlation.

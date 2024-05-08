@@ -11,9 +11,9 @@ def ordinal_synchronization(ts1, ts2, d: int = 3, tau: int = 1, max_lag_steps: i
     Ordinal synchronization (OS) connectivity metric.
 
     :param ts1: First time series.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :param d: Embedding dimension / delay dimension.
     :type d: int
     :param tau: OS time delay.
@@ -37,9 +37,9 @@ def os_metric(x1, x2, n, d, tau):
     Ordinal synchronization metric, helper function.
 
     :param x1: First time series.
-    :type x1: ndarray
+    :type x1: numpy.ndarray
     :param x2: Second time series.
-    :type x2: ndarray
+    :type x2: numpy.ndarray
     :param n: Sample size / number of observations.
     :type n: int
     :param d: Embedding dimension / delay dimension.
@@ -94,9 +94,9 @@ def os_metric_vectorized(x1, x2, d, tau):
     Ordinal synchronization metric, helper function.
 
     :param x1: First time series.
-    :type x1: ndarray
+    :type x1: numpy.ndarray
     :param x2: Second time series.
-    :type x2: ndarray
+    :type x2: numpy.ndarray
     :param d: Embedding dimension / delay dimension.
     :type d: int
     :param tau: Time delay.
@@ -133,9 +133,9 @@ def compute_os_aux(
     :param i: Row index.
     :type i: int
     :param x11: Reshaped first time series.
-    :type x11: ndarray
+    :type x11: numpy.ndarray
     :param x22: Reshaped second time series.
-    :type x22: ndarray
+    :type x22: numpy.ndarray
     :param norm: Normalisation factor.
     :type norm: float
     :param min_val: Minimum value.

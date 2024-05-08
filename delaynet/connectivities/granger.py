@@ -39,9 +39,9 @@ def gt_single_lag(ts1, ts2, lag_step: int = 5):
     Testing causality of ts1 -> ts2 with a fixed time lag.
 
     :param ts1: First time series.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :param lag_step: Time lag to consider.
     :type lag_step: int
     :return: Mutual information value and time lag.
@@ -73,9 +73,9 @@ def gt_multi_lag(ts1, ts2, max_lag_steps: int = 5):
     Testing for various time lags and selecting the one with the lowest p-value.
 
     :param ts1: First time series.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :param max_lag_steps: Maximum time lag to consider.
     :type max_lag_steps: int
     :return: Mutual information value and time lag.
@@ -95,9 +95,9 @@ def gt_multi_lag_statsmodels(ts1, ts2, max_lag_steps: int = 5):
     Uses :func:`statsmodels.tsa.stattools.grangercausalitytests` from statsmodels.
 
     :param ts1: First time series.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :param max_lag_steps: Maximum time lag to consider.
     :type max_lag_steps: int
     :return: Mutual information value and time lag.
@@ -125,9 +125,9 @@ def gt_bi_multi_lag(ts1, ts2, max_lag_steps: int = 5):
     Uses :func:`statsmodels.tsa.stattools.grangercausalitytests` from statsmodels.
 
     :param ts1: First time series.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :param max_lag_steps: Maximum time lag to consider.
     :type max_lag_steps: int
     :return: Mutual information value and time lag.

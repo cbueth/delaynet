@@ -39,9 +39,9 @@ def connectivity(
     `float`, or a `tuple` of `float` and `int`.
 
     :param ts1: First time series. Positional only.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series. Positional only.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :param metric: Metric to use.
     :type metric: str or Callable
     :param args: Positional arguments forwarded to the connectivity function, see

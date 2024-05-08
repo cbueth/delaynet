@@ -3,7 +3,7 @@
 from operator import lt, le
 
 import pytest
-from numpy import array, median
+from numpy import array, median, issubdtype, integer
 
 from delaynet.preprocess.symbolic import (
     check_symbolic_pairwise,
@@ -69,7 +69,7 @@ def test_check_symbolic_pairwise_raises(array1, array2, max_symbols, match):
 def test_quantize(array_in, max_symbols, expected):
     """Test quantize by design."""
     result = quantize(array(array_in), max_symbols)
-    assert result.dtype == int
+    assert issubdtype(result.dtype, integer)
     assert result.tolist() == expected
 
 
@@ -109,7 +109,7 @@ def test_quantize_raises(array_in, max_symbols, match):
 def test_round_to_int(array_in, expected):
     """Test round_to_int by design."""
     result = round_to_int(array(array_in))
-    assert result.dtype == int
+    assert issubdtype(result.dtype, integer)
     assert result.tolist() == expected
 
 
@@ -138,7 +138,7 @@ def test_binarize(array_in, threshold, operator, expected):
     """Test binarize by design."""
     kwargs = {} if operator is None else {"operator": operator}
     result = binarize(array(array_in), threshold, **kwargs)
-    assert result.dtype == int
+    assert issubdtype(result.dtype, integer)
     assert result.tolist() == expected
 
 
@@ -159,7 +159,7 @@ def test_binarize(array_in, threshold, operator, expected):
 def test_quantilize(array_in, num_quantiles, expected):
     """Test quantilize by design."""
     result = quantilize(array(array_in), num_quantiles)
-    assert result.dtype == int
+    assert issubdtype(result.dtype, integer)
     assert result.tolist() == expected
 
 
@@ -198,5 +198,5 @@ def test_to_symbolic(method, kwargs, expected):
     """Test to_symbolic by design."""
     array_in = array([1.1, 2.2, 3.3])
     result = to_symbolic(array_in, method, **kwargs)
-    assert result.dtype == int
+    assert issubdtype(result.dtype, integer)
     assert result.tolist() == expected

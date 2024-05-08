@@ -3,7 +3,6 @@ scipy
 statsmodels
 scikit-learn
 numba
-mkl
 # Code Quality
 blackd
 isort

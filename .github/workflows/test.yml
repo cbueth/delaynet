@@ -13,13 +13,15 @@ on:
   pull_request:
     branches:
       - '**'
+  schedule: # Every Monday at 04:00 UTC
+    - cron: '0 4 * * 1'
 
 jobs:
   caching:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
 
     name: Cache for ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -45,7 +47,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         submodule:
           - { name: "All Tests", pytest_args: "tests/" }
       fail-fast: false
@@ -81,7 +83,7 @@ jobs:
       - name: "Run tests ${{ matrix.submodule.name }} with coverage"
         if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: |
-          pytest ${{ matrix.submodule.pytest_args }} --cov=delaynet
+          pytest --cov=delaynet ${{ matrix.submodule.pytest_args }}
         env:
           COVERAGE_FILE: ".coverage.${{ matrix.submodule.name }}"
 
@@ -89,17 +91,13 @@ jobs:
         if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: coverage
+          name: coverage-${{ matrix.submodule.name }}
           path: ".coverage.${{ matrix.submodule.name }}"
 
   coverage:
     name: Merge Coverage
     needs: run-tests
-    strategy:
-      matrix:
-        python-version: ["3.12"]
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -el {0}
@@ -112,13 +110,15 @@ jobs:
         uses: actions/download-artifact@v4
         id: download
         with:
-          name: 'coverage'
+          path: coverage
+          pattern: 'coverage-*'
+          merge-multiple: true
 
       - name: Install coverage
         run: pip install coverage
 
       - name: Merge coverage files
-        run: coverage combine
+        run: coverage combine coverage/
 
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v4

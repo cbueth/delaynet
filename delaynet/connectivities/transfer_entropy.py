@@ -5,7 +5,11 @@ import numpy as np
 from ..decorators import connectivity
 
 
-@connectivity(mcb_kwargs={"n_bins": 2, "alphabet": "ordinal", "strategy": "quantile"})
+@connectivity(
+    check_symbolic=True,
+    entropy_like=True,
+    mcb_kwargs={"n_bins": 2, "alphabet": "ordinal", "strategy": "quantile"},
+)
 def transfer_entropy(ts1, ts2):
     r"""
     Transfer Entropy (TE) connectivity metric.

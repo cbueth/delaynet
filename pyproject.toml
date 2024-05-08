@@ -32,7 +32,6 @@ dependencies = [
     "statsmodels",
     "scikit-learn",
     "numba",
-    "mkl",
 ]
 
 [project.urls]
@@ -63,7 +62,7 @@ version = { attr = "delaynet._version.__version__" }
 
 # --------------------------------------------------------------------------------------
 # Linting
-# --------------------------------------------------------------------------------------b
+# --------------------------------------------------------------------------------------
 [tool.pylint.main]
 # Number of processes to use to do the linting.
 jobs = 5

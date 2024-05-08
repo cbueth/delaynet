@@ -28,7 +28,7 @@ def ordinal_synchronization(ts1, ts2, d: int = 3, tau: int = 1, max_lag_steps: i
         for k in range(max_lag_steps + 1)
     ]
     idx_max = np.argmax(np.abs(os))
-    return 1.0 / np.max(np.abs(os)), idx_max
+    return 1.0 / np.abs(os[idx_max]), idx_max
 
 
 # pylint: disable=too-many-locals

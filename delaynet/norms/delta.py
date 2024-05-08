@@ -10,11 +10,11 @@ def delta(ts, window_size: int = 10):
     """Delta norm.
 
     :param ts: Time series to normalize.
-    :type ts: ndarray
+    :type ts: numpy.ndarray
     :param window_size: Window size to use for calculating the mean.
     :type window_size: int
     :return: Normalized time series.
-    :rtype: ndarray
+    :rtype: numpy.ndarray
     """
     t_ts = ravel(ts)
     t_ts2 = copy(t_ts)

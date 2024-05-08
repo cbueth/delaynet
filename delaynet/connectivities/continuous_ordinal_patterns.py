@@ -16,9 +16,9 @@ def random_patterns(
     Continuous Ordinal Patterns (COP) connectivity metric.
 
     :param ts1: First time series.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :param p_size: Size of the ordinal pattern.
     :type p_size: int
     :param num_rnd_patterns: Number of random patterns to consider.

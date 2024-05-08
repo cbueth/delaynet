@@ -8,7 +8,7 @@ from numpy import ndarray, isnan, isinf, apply_along_axis, floating, integer
 
 from .utils.bind_args import bind_args
 from .utils.multi_coeff_binning import MultipleCoefficientBinning
-from .utils.symbolic import check_symbolic_pairwise, to_symbolic
+from .preprocess.symbolic import check_symbolic_pairwise, to_symbolic
 
 Connectivity = Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
 Norm = Callable[[ndarray, ...], ndarray]
@@ -18,7 +18,7 @@ def connectivity(
     *args,
     entropy_like: bool = False,
     check_symbolic: bool | int | None = False,
-    default_to_symbolic: bool | int | None = False,
+    default_to_symbolic: dict | None = None,
     mcb_kwargs: dict | None = None,
 ):
     """Decorator for the connectivity functions.
@@ -42,9 +42,10 @@ def connectivity(
                            no limit).
                            Necessary for entropy-based connectivities.
     :type check_symbolic: bool | int
-    :param default_to_symbolic: If ``True``, arrays were checked and not symbolic,
-                                they are converted to symbolic. Otherwise, an error is
-                                raised.
+    :param default_to_symbolic: Default configuration for converting to symbolic.
+                                Can be overridden by the ``symbolic_conversion``
+                                argument, when calling the decorated function.
+    :type default_to_symbolic: dict
     :param mcb_kwargs: Keyword arguments for the :py:class:`MultipleCoefficientBinning`
                        transformer. If ``None``, no binning is applied.
     :type mcb_kwargs: dict | None
@@ -67,7 +68,7 @@ def connectivity(
             ts1: ndarray,
             ts2: ndarray,
             *args,
-            symbolic_bins: bool | int | None = False,
+            symbolic_conversion: dict | None = None,
             **kwargs,
         ) -> float | tuple[float, int]:
             """Wrapper for the connectivity functions.
@@ -79,17 +80,14 @@ def connectivity(
             ``max_lag_steps`` will explicitly be checked, if not ``None``.
 
             :param ts1: The first time series.
-            :type ts1: ndarray
+            :type ts1: numpy.ndarray
             :param ts2: The second time series.
-            :type ts2: ndarray
+            :type ts2: numpy.ndarray
             :param args: The args to pass to the connectivity function.
             :type args: list
-            :param symbolic_bins: ``True``, ``Ǹone`` or an integer, the arrays ar
-                                  converted to symbolic. If ``True`` or ``None``, no
-                                  limit is set.
-                                  If an integer, the arrays are digitized into
-                                  ``max_symbols`` bins on [0, max_symbols-1].
-            :type symbolic_bins: bool | int | None
+            :param symbolic_conversion: Keyword arguments for converting to symbolic.
+                                        Overrides the default configuration.
+            :type symbolic_conversion: dict | None
             :param kwargs: The kwargs to pass to the connectivity function.
             :type kwargs: dict
             :return: Connectivity value and lag (if applicable).
@@ -102,10 +100,11 @@ def connectivity(
                                ``connectivity_func`` does not provide it.
             """
             # Check if ts1 and ts2 are ndarrays
-            if not isinstance(ts1, ndarray):
-                raise TypeError(f"`ts1` must be of type ndarray, not {type(ts1)}.")
-            if not isinstance(ts2, ndarray):
-                raise TypeError(f"`ts2` must be of type ndarray, not {type(ts2)}.")
+            if not isinstance(ts1, ndarray) and not isinstance(ts2, ndarray):
+                raise TypeError(
+                    f"`ts1` and `ts2` must be of type ndarray, not {type(ts1)} and "
+                    f"{type(ts2)}."
+                )
             # Check if ts1 and ts2 have the same shape
             if ts1.shape != ts2.shape:
                 raise ValueError(
@@ -113,29 +112,17 @@ def connectivity(
                     f"but have shapes {ts1.shape} and {ts2.shape}."
                 )
 
-            # Convert to symbolic if necessary
-            conversion_condition = (
-                check_symbolic
-                and (ts1.dtype.kind in "f" or ts2.dtype.kind in "f")
-                and (default_to_symbolic or default_to_symbolic is None)
-            )
-            if conversion_condition or (symbolic_bins or symbolic_bins is None):
-                ts1 = to_symbolic(
-                    ts1,
-                    max_symbols=(
-                        symbolic_bins
-                        if (symbolic_bins or symbolic_bins is None)
-                        else default_to_symbolic
-                    ),
-                )
-                ts2 = to_symbolic(
-                    ts2,
-                    max_symbols=(
-                        symbolic_bins
-                        if (symbolic_bins or symbolic_bins is None)
-                        else default_to_symbolic
-                    ),
-                )
+            if symbolic_conversion not in [None, {}]:
+                if not isinstance(symbolic_conversion, dict):
+                    raise TypeError(
+                        f"`symbolic_conversion` must be a dict, not "
+                        f"{type(symbolic_conversion)}."
+                    )
+                ts1 = to_symbolic(ts1, **symbolic_conversion)
+                ts2 = to_symbolic(ts2, **symbolic_conversion)
+            elif default_to_symbolic not in [None, {}]:
+                ts1 = to_symbolic(ts1, **default_to_symbolic)
+                ts2 = to_symbolic(ts2, **default_to_symbolic)
 
             # Check if the time series are symbolic
             if check_symbolic or check_symbolic is None:
@@ -183,11 +170,11 @@ def connectivity(
             """Bin time series using the MultipleCoefficientBinning transformer.
 
             :param ts: Time series to bin.
-            :type ts: ndarray
+            :type ts: numpy.ndarray
             :param binning_kwargs: Keyword arguments for
                                    the :class:`MultipleCoefficientBinning` transformer.
             :return: Binned time series.
-            :rtype: ndarray
+            :rtype: numpy.ndarray
             :raises ValueError: If the binning_kwargs are invalid.
             """
             if not isinstance(binning_kwargs, dict):
@@ -265,13 +252,13 @@ def norm(
             This is useful if you want to pass unused keyword.
 
             :param ts: The time series to normalise.
-            :type ts: ndarray, shape (n,) or (m, n)
+            :type ts: numpy.ndarray, shape (n,) or (m, n)
             :param args: The args to pass to the norm function.
             :type args: list
             :param kwargs: The kwargs to pass to the norm function.
             :type kwargs: dict
             :return: The normalised time series.
-            :rtype: ndarray
+            :rtype: numpy.ndarray
             :raises TypeError: Type of ts is not ndarray of dimension 1 or 2.
             :raises ValueError: If the input time series is empty.
             :raises ValueError: If an argument is missing.

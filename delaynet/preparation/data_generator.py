@@ -38,7 +38,7 @@ def gen_data(
     :type n_nodes: int
     :param kwargs: Additional arguments for the data generation functions.
     :return: Time series, possibly with additional data.
-    :rtype: ndarray or tuple[ndarray, ...]
+    :rtype: numpy.ndarray or tuple[ndarray, ...]
     :raises ValueError: If the generation method is unknown.
     """
     if generation_method.lower() == "rand":
@@ -169,7 +169,7 @@ def gen_fmri(
     :param rng: Random number generator or seed,
                 passed to :func:`numpy.random.default_rng`.
     :return: fMRI time series.
-    :rtype: ndarray[float]
+    :rtype: numpy.ndarray[float]
     :author: Massimiliano Zanin and Carson Büth
     """
     rng = default_rng(rng)
@@ -226,7 +226,7 @@ def gen_fmri_multiple(
     :param rng: Random number generator or seed,
                 passed to :func:`numpy.random.default_rng`.
     :return: fMRI time series. First dimension is time, second dimension is nodes.
-    :rtype: ndarray[float], shape = (ts_len, num_nodes)
+    :rtype: numpy.ndarray[float], shape = (ts_len, num_nodes)
     """
     rng = default_rng(rng)
 
@@ -268,10 +268,10 @@ def __initial_ts(
     :param noise: Standard deviation of the noise.
     :type noise: float
     :param coupling_matrix: Coupling matrix.
-    :type coupling_matrix: ndarray[float], shape = (2, 2)
+    :type coupling_matrix: numpy.ndarray[float], shape = (2, 2)
     :param rng: Random number generator.
     :return: Time series.
-    :rtype: ndarray[float], shape = (ts_len, 2)
+    :rtype: numpy.ndarray[float], shape = (ts_len, 2)
     """
     ts = zeros((ts_len, 2))
 
@@ -301,9 +301,9 @@ def __hrf(times: ndarray[float], rng: Generator = None) -> ndarray[float]:
     Hemodynamic Response Function (HRF).
 
     :param times: Time points.
-    :type times: ndarray[float]
+    :type times: numpy.ndarray[float]
     :return: HRF values.
-    :rtype: ndarray[float]
+    :rtype: numpy.ndarray[float]
     """
     # gamma = gamma_gen(seed=rng)
     gamma.random_state = rng
@@ -332,11 +332,11 @@ def __initial_ts_var_num_nodes(
     :param noise: Standard deviation of the noise.
     :type noise: float
     :param coupling_matrix: Coupling matrix.
-    :type coupling_matrix: ndarray[float], shape = (num_ts, num_ts)
+    :type coupling_matrix: numpy.ndarray[float], shape = (num_ts, num_ts)
     :param rng: Random number generator.
     :type rng: Generator
     :return: Time series.
-    :rtype: ndarray[float], shape = (ts_len, num_ts)
+    :rtype: numpy.ndarray[float], shape = (ts_len, num_ts)
     """
     ts = zeros((ts_len, num_ts))
 

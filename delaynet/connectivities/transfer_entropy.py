@@ -40,9 +40,9 @@ def transfer_entropy(ts1, ts2):
       given :math:`d_{t-k}`
 
     :param ts1: First time series.
-    :type ts1: ndarray
+    :type ts1: numpy.ndarray
     :param ts2: Second time series.
-    :type ts2: ndarray
+    :type ts2: numpy.ndarray
     :return: Transfer Entropy value.
     :rtype: float
     """
@@ -74,9 +74,9 @@ def compute_transfer_entropy(  # pylint: disable=too-many-locals
         \right)
 
     :param source: Source time-series data.
-    :type source: ndarray
+    :type source: numpy.ndarray
     :param dest: Destination time-series data.
-    :type dest: ndarray
+    :type dest: numpy.ndarray
     :param k: Embedding length for the destination variable.
     :type k: int
     :param l: Embedding length for the source variable.
@@ -118,9 +118,9 @@ def count_tuples(source, dest, k, l, delay):  # pylint: disable=too-many-locals
     Count tuples for Transfer Entropy computation.
 
     :param source: Source time-series data.
-    :type source: ndarray
+    :type source: numpy.ndarray
     :param dest: Destination time-series data.
-    :type dest: ndarray
+    :type dest: numpy.ndarray
     :param k: Embedding length for the destination variable.
     :type k: int
     :param l: Embedding length for the source variable.

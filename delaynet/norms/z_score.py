@@ -33,7 +33,7 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
     results in including all periods.
 
     :param ts: Time series to normalize.
-    :type ts: ndarray
+    :type ts: numpy.ndarray
     :param periodicity: Periodicity of the time series - reoccurrence of the same
                         pattern.
     :type periodicity: int > 0
@@ -41,7 +41,7 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
                         current value. If -1, all periods are considered.
     :type max_periods: int >= -1
     :return: Normalized time series.
-    :rtype: ndarray
+    :rtype: numpy.ndarray
     :raises ValueError: If the ``periodicity`` is not a positive integer.
     :raises ValueError: If the ``max_periods`` is not a positive integer or -1.
     :raises ValueError: If :math:`2\times\texttt{periodicity}+1 \leq \texttt{len(ts)}`
@@ -111,12 +111,12 @@ def z_score_vectorized(ts: ndarray, periodicity: int) -> ndarray:
     standard deviation for each periodicity at once.
 
     :param ts: Time series to normalize.
-    :type ts: ndarray
+    :type ts: numpy.ndarray
     :param periodicity: Periodicity of the time series - reoccurrence of the same
                         pattern.
     :type periodicity: int
     :return: Normalized time series.
-    :rtype: ndarray
+    :rtype: numpy.ndarray
     """
     # Create an array of indices for each periodicity
     indices = arange(len(ts)).reshape(-1, periodicity)

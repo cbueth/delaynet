@@ -11,7 +11,7 @@ def test_all_connectivities(connectivity_metric, two_fmri_time_series):
     ts1, ts2 = two_fmri_time_series
     kwargs = {}
     if connectivity_metric.is_entropy_like:
-        kwargs["symbolic_bins"] = 50
+        kwargs["symbolic_conversion"] = {"method": "quantize", "max_symbols": 50}
     result = connectivity(ts1, ts2, metric=connectivity_metric.__name__, **kwargs)
     assert isinstance(result, (float, tuple))
 
@@ -22,6 +22,6 @@ def test_all_conn_querying(metric_str, two_random_time_series):
     ts1, ts2 = two_random_time_series
     kwargs = {}
     if __all_connectivity_metrics_names__[metric_str].is_entropy_like:
-        kwargs["symbolic_bins"] = 50
+        kwargs["symbolic_conversion"] = {"method": "quantize", "max_symbols": 50}
     result = connectivity(ts1, ts2, metric=metric_str, **kwargs)
     assert isinstance(result, (float, tuple))

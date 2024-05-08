@@ -97,6 +97,7 @@ def round_to_int(array: ndarray) -> ndarray[int]:
     >>> round_to_int(array([1.1, 2.2, 3.3]))
     array([1, 2, 3])
     """
+    logging.debug("Rounding to nearest integer.")
     return array.round().astype(int)
 
 
@@ -124,7 +125,7 @@ def quantize(array: ndarray, max_symbols: int) -> ndarray[int]:
     if array.dtype.kind not in "iuf":
         raise ValueError("Input array must be of numeric type to convert.")
 
-    logging.warning(f"Converting to symbolic with max_symbols={max_symbols}.")
+    logging.debug(f"Converting to symbolic with max_symbols={max_symbols}.")
     return (
         (  # Stretch the array linearly to [0, max_symbols-1]
             (array - array.min()) / (array.max() - array.min()) * (max_symbols - 1)
@@ -162,7 +163,7 @@ def quantilize(array: ndarray, num_quantiles: int = 4) -> ndarray[int]:
     if array.dtype.kind not in "iuf":
         raise ValueError("Input array must be of numeric type to convert.")
 
-    logging.warning(f"Converting to symbolic with num_quantiles={num_quantiles}.")
+    logging.debug(f"Converting to symbolic with num_quantiles={num_quantiles}.")
     bins = quantile(array, linspace(0, 1, num_quantiles + 1))[:-1]
     return digitize(array, bins, right=False)
 
@@ -198,4 +199,5 @@ def binarize(
     """
     if callable(threshold):
         threshold = threshold(array)
+    logging.debug(f"Binarizing with threshold={threshold}.")
     return operator(array, threshold).astype(int)

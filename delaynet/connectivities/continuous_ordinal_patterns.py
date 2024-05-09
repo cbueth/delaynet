@@ -1,7 +1,7 @@
 """Continuous Ordinal Patterns (COP) connectivity metric."""
 
 import numpy as np
-from numba import jit
+from numba import njit, prange
 
 from .granger import gt_multi_lag
 
@@ -56,8 +56,8 @@ def random_patterns(
     return best_pv, best_lag
 
 
-@jit(cache=True, nopython=True, nogil=True)
-def norm_window(ts):
+@njit(cache=True, nogil=True)
+def norm_window(ts: np.ndarray) -> np.ndarray:  # pragma: no cover
     """Normalize a window to values between -1 and 1."""
     new_ts = np.copy(ts)
     new_ts -= np.min(new_ts)
@@ -69,8 +69,8 @@ def norm_window(ts):
     return new_ts
 
 
-@jit(cache=True, nopython=True, nogil=True)
-def tranf_ts(ts, patt):
+@njit(cache=True, nogil=True)
+def tranf_ts(ts, patt):  # pragma: no cover
     """Transform a time series using a pattern."""
     ts_l = ts.shape[0]
     w = np.zeros((ts_l - patt.shape[0] + 1))
@@ -83,3 +83,80 @@ def tranf_ts(ts, patt):
         w[t] = w[t] / patt.shape[0] / 2.0
 
     return w
+
+
+# Second implementation
+
+
+@njit(nogil=True, parallel=True)
+def pattern_transform(
+    ts: np.ndarray, patterns: np.ndarray
+) -> np.ndarray:  # pragma: no cover
+    """Transform time series using patterns.
+
+    Multiple time series can be transformed with multiple patterns at once.
+    Patterns need to have the same length.
+
+    :param ts: Time series.
+    :type ts: numpy.ndarray, shape=(n_ts, ts_len)
+    :param patterns: Patterns.
+    :type patterns: numpy.ndarray, shape=(n_patterns, pattern_len)
+    :return: Transformed time series.
+    :rtype: numpy.ndarray, shape=(n_ts, n_patterns, ts_len - pattern_len + 1)
+    """
+    transformed = np.zeros(
+        (ts.shape[0], patterns.shape[0], ts.shape[1] - patterns.shape[1] + 1)
+    )
+    for i in range(ts.shape[0]):
+        normed_windows = norm_windows(ts[i], patterns.shape[1])
+        for j in range(patterns.shape[0]):
+            transformed[i, j] = pattern_distance(normed_windows, patterns[j])
+    return transformed
+
+
+@njit(nogil=True, parallel=True)
+def norm_windows(ts: np.ndarray, window_size: int) -> np.ndarray:  # pragma: no cover
+    """Normalize sliding windows of a time series to values between -1 and 1.
+
+    :param ts: Time series.
+    :type ts: numpy.ndarray
+    :param window_size: Size of the window.
+    :type window_size: int
+    :return: Normalized windows.
+    :rtype: numpy.ndarray
+    """
+    # Create a sliding window view of the input array
+    # windows = np.lib.stride_tricks.sliding_window_view(
+    #     x=ts, window_shape=window_size, writeable=False
+    # )
+    windows = np.lib.stride_tricks.as_strided(
+        x=ts,
+        strides=(ts.strides[0], ts.strides[0]),
+        shape=(ts.shape[0] - window_size + 1, window_size),
+    )
+    normed_windows = np.zeros_like(windows)
+    # Normalize each window to [-1, 1]
+    for i in prange(windows.shape[0]):  # pylint: disable=not-an-iterable
+        normed_windows[i] = norm_window(windows[i])
+    return normed_windows
+
+
+@njit(nogil=True, parallel=True)
+def pattern_distance(
+    windows: np.ndarray, pattern: np.ndarray
+) -> np.ndarray:  # pragma: no cover
+    """Compute the distance between the windows and a pattern.
+
+    :param windows: Normalized windows.
+    :type windows: numpy.ndarray
+    :param pattern: Pattern.
+    :type pattern: numpy.ndarray
+    :return: Distance between the windows and the pattern.
+    :rtype: numpy.ndarray
+    """
+    distances = np.zeros(windows.shape[0])
+    for i in prange(windows.shape[0]):  # pylint: disable=not-an-iterable
+        for j in prange(pattern.shape[0]):  # pylint: disable=not-an-iterable
+            distances[i] += np.abs(windows[i, j] - pattern[j])
+    return distances / pattern.shape[0] / 2.0
+    # equiv. to np.sum(np.abs(windows - pattern), axis=1) / pattern.shape[0] / 2.0

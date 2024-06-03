@@ -41,8 +41,8 @@ def random_patterns(
         best_ret = np.random.uniform(0.0, 1.0, p_size)
         best_ret = norm_window(best_ret)
 
-        t_ts1 = tranf_ts(np.copy(ts1), best_ret)
-        t_ts2 = tranf_ts(np.copy(ts2), best_ret)
+        t_ts1 = pattern_transform(np.copy(ts1), best_ret)
+        t_ts2 = pattern_transform(np.copy(ts2), best_ret)
 
         # p_v = GC.GT_SingleLag( t_ts1, t_ts2, max_lag_steps = max_lag_steps )
         # if best_pv > p_v:
@@ -69,25 +69,6 @@ def norm_window(ts: np.ndarray) -> np.ndarray:  # pragma: no cover
     return new_ts
 
 
-@njit(cache=True, nogil=True)
-def tranf_ts(ts, patt):  # pragma: no cover
-    """Transform a time series using a pattern."""
-    ts_l = ts.shape[0]
-    w = np.zeros((ts_l - patt.shape[0] + 1))
-
-    for t in range(ts_l - patt.shape[0] + 1):
-        n_w = norm_window(ts[t : (t + patt.shape[0])])
-        for l in range(patt.shape[0]):
-            w[t] += np.abs(n_w[l] - patt[l])
-
-        w[t] = w[t] / patt.shape[0] / 2.0
-
-    return w
-
-
-# Second implementation
-
-
 def pattern_transform(ts: np.ndarray, patterns: np.ndarray) -> np.ndarray:
     """Transform time series using patterns.
 
@@ -95,7 +76,7 @@ def pattern_transform(ts: np.ndarray, patterns: np.ndarray) -> np.ndarray:
     Patterns need to have the same length.
 
     This function also accepts 1D time series and patterns.
-    Wrapper for pattern_transform_2d.
+    Wrapper for :func:`pattern_transform_2d`.
 
     :param ts: Time series.
     :type ts: numpy.ndarray, shape=(n_ts, ts_len) or shape=(ts_len,)
@@ -104,12 +85,14 @@ def pattern_transform(ts: np.ndarray, patterns: np.ndarray) -> np.ndarray:
                     or shape=(pattern_len,)
     :return: Transformed time series.
     :rtype: numpy.ndarray, shape=(n_ts, n_patterns, ts_len - pattern_len + 1)
+            or if ``ts`` and/or ``patterns`` are 1D, the squeezed shape.
+            For both 1D, the shape is (ts_len - pattern_len + 1).
     """
     if ts.ndim == 1:
         ts = ts.reshape(1, -1)
     if patterns.ndim == 1:
         patterns = patterns.reshape(1, -1)
-    return pattern_transform_2d(ts, patterns)
+    return pattern_transform_2d(ts, patterns).squeeze()
 
 
 @njit(nogil=True, parallel=True)
@@ -120,6 +103,9 @@ def pattern_transform_2d(
 
     Multiple time series can be transformed with multiple patterns at once.
     Patterns need to have the same length.
+
+    Use :func:`pattern_transform` for convenience if you only have one time series or
+    one pattern to transform.
 
     :param ts: Time series.
     :type ts: numpy.ndarray, shape=(n_ts, ts_len)

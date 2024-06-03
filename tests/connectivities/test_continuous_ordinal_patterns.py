@@ -99,6 +99,21 @@ def test_pattern_distance(windows, pattern, expected):
             [linspace(-1, 1, 8) for _ in range(3)],
             [[[0.0] * (50 - 8 + 1)] * 3] * 20,
         ),
+        (
+            [[0.0, 1.0, 2.0, 3.0], [0.0, 1.0, 2.0, 3.0]],
+            [-1.0, 1.0],  # Single pattern, 1D
+            [[[0.0, 0.0, 0.0]], [[0.0, 0.0, 0.0]]],
+        ),
+        (
+            [0.0, 1.0, 2.0, 3.0],  # Single time series, 1D
+            [[-1.0, 1.0], [1.0, -1.0]],
+            [[[0.0, 0.0, 0.0], [1.0, 1.0, 1.0]]],
+        ),
+        (
+            [0.0, 1.0, 2.0, 3.0],  # Single time series, 1D
+            [1.0, -1.0],  # Single pattern, 1D
+            [[[1.0, 1.0, 1.0]]],
+        ),
     ],
 )
 def test_pattern_transform(ts, patterns, expected):

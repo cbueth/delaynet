@@ -88,8 +88,32 @@ def tranf_ts(ts, patt):  # pragma: no cover
 # Second implementation
 
 
+def pattern_transform(ts: np.ndarray, patterns: np.ndarray) -> np.ndarray:
+    """Transform time series using patterns.
+
+    Multiple time series can be transformed with multiple patterns at once.
+    Patterns need to have the same length.
+
+    This function also accepts 1D time series and patterns.
+    Wrapper for pattern_transform_2d.
+
+    :param ts: Time series.
+    :type ts: numpy.ndarray, shape=(n_ts, ts_len) or shape=(ts_len,)
+    :param patterns: Patterns.
+    :type patterns: numpy.ndarray, shape=(n_patterns, pattern_len)
+                    or shape=(pattern_len,)
+    :return: Transformed time series.
+    :rtype: numpy.ndarray, shape=(n_ts, n_patterns, ts_len - pattern_len + 1)
+    """
+    if ts.ndim == 1:
+        ts = ts.reshape(1, -1)
+    if patterns.ndim == 1:
+        patterns = patterns.reshape(1, -1)
+    return pattern_transform_2d(ts, patterns)
+
+
 @njit(nogil=True, parallel=True)
-def pattern_transform(
+def pattern_transform_2d(
     ts: np.ndarray, patterns: np.ndarray
 ) -> np.ndarray:  # pragma: no cover
     """Transform time series using patterns.

@@ -1,198 +1,61 @@
 """Transfer Entropy (TE) connectivity metric."""
 
-import numpy as np
+from infomeasure import estimator
 
 from ..decorators import connectivity
 
 
 @connectivity(
-    check_symbolic=True,
+    # check_symbolic=True,
     entropy_like=True,
-    mcb_kwargs={"n_bins": 2, "alphabet": "ordinal", "strategy": "quantile"},
+    # mcb_kwargs={"n_bins": 2, "alphabet": "ordinal", "strategy": "quantile"},
 )
-def transfer_entropy(ts1, ts2):
+def transfer_entropy(ts1, ts2, approach: str = "", te_kwargs=None):
     r"""
     Transfer Entropy (TE) connectivity metric.
-
-    Transfer Entropy for Discrete variables,
-    from the source to the destination time-series.
-
-    This function computes Transfer Entropy based on the counts obtained from
-    :func:`count_tuples` function. The formula for Transfer Entropy used is:
-
-    .. math::
-
-       TE = \sum p(s_{t-l}, d_{t}, d_{t-k}) \log_2 \left(
-       \frac{p(d_{t} | s_{t-l}, d_{t-k})}{p(d_{t} | d_{t-k})}
-       \right)
-
-    Where:
-
-    - :math:`TE`: Transfer Entropy
-    - :math:`s_{t-l}`: Source state at time :math:`t-l`
-    - :math:`d_{t}`: Destination state at time :math:`t`
-    - :math:`d_{t-k}`: Past state of the destination at time :math:`t-k`
-    - :math:`p(s_{t-l}, d_{t}, d_{t-k})`: Joint probability of
-      :math:`s_{t-l}`, :math:`d_{t}`, :math:`d_{t-k}`
-    - :math:`p(d_{t} | s_{t-l}, d_{t-k})`: Conditional probability of :math:`d_{t}`
-      given :math:`s_{t-l}`, :math:`d_{t-k}`
-    - :math:`p(d_{t} | d_{t-k})`: Conditional probability of :math:`d_{t}`
-      given :math:`d_{t-k}`
-
     :param ts1: First time series.
     :type ts1: numpy.ndarray
     :param ts2: Second time series.
     :type ts2: numpy.ndarray
+    :param approach: Approach to use. See :func:`infomeasure.transfer_entropy` for
+                     available approaches.
+    :type approach: str
+    :param te_kwargs: Additional keyword arguments for the transfer entropy estimator.
+    :type te_kwargs: dict
     :return: Transfer Entropy value.
     :rtype: float
     """
-    # ts1 = np.array( ts1 > np.median( ts1 ), dtype = int )
-    # ts2 = np.array( ts2 > np.median( ts2 ), dtype = int )
 
-    # te_effective_1_2 = np.zeros((6))  # TODO: implement max_lag_steps=5 ?
+    if approach == "":
+        from infomeasure import (  # pylint: disable=import-outside-toplevel
+            transfer_entropy as im_te,
+        )
 
-    te_o_1_2 = compute_transfer_entropy(ts1, ts2, 2, 1, 0)
-    te_p_1_2 = compute_transfer_entropy(np.random.permutation(ts1), ts2, 2, 1, 0)
+        raise ValueError(
+            "The approach parameter must be given. "
+            "See `infomeasure.transfer_entropy` for available approaches. \n"
+            f"help(infomeasure.transfer_entropy):\n{im_te.__doc__}"
+        )
+    # TODO: implement max_lag_steps=5 ?
 
-    te_o_2_1 = compute_transfer_entropy(ts2, ts1, 2, 1, 0)
-    te_p_2_1 = compute_transfer_entropy(np.random.permutation(ts2), ts1, 2, 1, 0)
-    return -np.max(te_o_1_2 - te_p_1_2 - te_o_2_1 + te_p_2_1)
+    if te_kwargs is None:
+        te_kwargs = {}
 
-
-def compute_transfer_entropy(  # pylint: disable=too-many-locals
-    source, dest, k, l, delay
-):
-    r"""
-    Compute Transfer Entropy from source to destination.
-
-    Transfer Entropy formula used:
-
-    .. math::
-
-        TE = \sum p(s_{t-l}, d_{t}, d_{t-k}) \log \left(
-        \frac{p(d_{t} | s_{t-l}, d_{t-k})}{p(d_{t} | d_{t-k})}
-        \right)
-
-    :param source: Source time-series data.
-    :type source: numpy.ndarray
-    :param dest: Destination time-series data.
-    :type dest: numpy.ndarray
-    :param k: Embedding length for the destination variable.
-    :type k: int
-    :param l: Embedding length for the source variable.
-    :type l: int
-    :param delay: Time delay between source and destination.
-    :type delay: int
-    :return: Transfer Entropy from source to destination.
-    :rtype: float
-    """
-    (
-        source_next_past_count,
-        source_past_count,
-        next_past_count,
-        past_count,
-        observations,
-    ) = count_tuples(source, dest, k, l, delay)
-
-    te = 0
-    for (s_t, d_t, d_t_k), p_s_t_d_t_d_t_k in source_next_past_count.items():
-        p_s_t_d_t_d_t_k /= observations
-
-        p_s_t_d_t_k = source_past_count[s_t, d_t_k] / observations
-        p_d_t_d_t_k = next_past_count[d_t, d_t_k] / past_count[d_t_k]
-        p_d_t_k = past_count[d_t_k] / observations
-
-        log_term = (p_d_t_d_t_k / p_d_t_k) / (p_s_t_d_t_k / p_d_t_k)
-        local_value = np.log(log_term)
-
-        te += p_s_t_d_t_d_t_k * local_value
-
-    # Convert to base 2 logarithm
-    te /= np.log(2)
-
-    return te
-
-
-def count_tuples(source, dest, k, l, delay):  # pylint: disable=too-many-locals
-    """
-    Count tuples for Transfer Entropy computation.
-
-    :param source: Source time-series data.
-    :type source: numpy.ndarray
-    :param dest: Destination time-series data.
-    :type dest: numpy.ndarray
-    :param k: Embedding length for the destination variable.
-    :type k: int
-    :param l: Embedding length for the source variable.
-    :type l: int
-    :param delay: Time delay between source and destination.
-    :type delay: int
-    :return: Several counts for Transfer Entropy computation.
-
-      - ``source_next_past_count``: Count for source, next state of destination,
-        and past state of destination.
-      - ``source_past_count``: Count for source and past state of destination.
-      - ``next_past_count``: Count for next state and past state of destination.
-      - ``past_count``: Count for past state of destination.
-    :rtype: tuple[dict, dict, dict, dict, int]
-    """
-    source_next_past_count = {}
-    source_past_count = {}
-    next_past_count = {}
-    past_count = {}
-    observations = 0
-
-    # Initialize past states
-
-    for t in range(max(k, l + delay), len(dest)):
-        # Next state for the destination variable
-        next_state_dest = dest[t]
-
-        # Update past states
-        past_state_dest = dest[t - k : t]
-        past_state_source = source[t - delay - l + 1 : t - delay + 1]
-
-        # Convert arrays to tuple to use as dictionary keys
-        past_state_dest_t = tuple(past_state_dest)
-        past_state_source_t = tuple(past_state_source)
-
-        # Update counts
-        if (
-            past_state_source_t,
-            next_state_dest,
-            past_state_dest_t,
-        ) in source_next_past_count:
-            source_next_past_count[
-                past_state_source_t, next_state_dest, past_state_dest_t
-            ] += 1
-        else:
-            source_next_past_count[
-                past_state_source_t, next_state_dest, past_state_dest_t
-            ] = 1
-
-        if (past_state_source_t, past_state_dest_t) in source_past_count:
-            source_past_count[past_state_source_t, past_state_dest_t] += 1
-        else:
-            source_past_count[past_state_source_t, past_state_dest_t] = 1
-
-        if (next_state_dest, past_state_dest_t) in next_past_count:
-            next_past_count[next_state_dest, past_state_dest_t] += 1
-        else:
-            next_past_count[next_state_dest, past_state_dest_t] = 1
-
-        if past_state_dest_t in past_count:
-            past_count[past_state_dest_t] += 1
-        else:
-            past_count[past_state_dest_t] = 1
-
-        observations += 1
-
-    return (
-        source_next_past_count,
-        source_past_count,
-        next_past_count,
-        past_count,
-        observations,
+    return -(
+        estimator(
+            source=ts1,
+            dest=ts2,
+            measure="transfer_entropy",
+            approach=approach,
+            **te_kwargs,
+        ).effective_val()
+        - estimator(
+            source=ts2,
+            dest=ts1,
+            measure="transfer_entropy",
+            approach=approach,
+            **te_kwargs,
+        ).effective_val()
     )
 
 

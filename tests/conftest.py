@@ -24,7 +24,12 @@ CONN_METRICS["mutual_information"]["additional_kwargs"] = [
     {"approach": "renyi", "mi_kwargs": {"alpha": 1.0}},
 ]
 CONN_METRICS["transfer_entropy"]["additional_kwargs"] = [
-    {"symbolic_conversion": {"method": "quantize", "max_symbols": 50}},
+    {
+        "approach": "discrete",
+        "symbolic_conversion": {"method": "quantize", "max_symbols": 50},
+    },
+    {"approach": "kernel", "te_kwargs": {"bandwidth": 0.3, "kernel": "box"}},
+    {"approach": "renyi", "te_kwargs": {"alpha": 1.0}},
 ]
 # list of all shorthands, only testing the first set of kwargs
 CONN_METRICS_SHORTHANDS = [

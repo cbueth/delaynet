@@ -18,6 +18,7 @@ __all_norms_names__ = {
     "2dt": second_difference,
     "z-score": z_score,
     "zs": z_score,
+    "zscore": z_score,
 }
 
 # List of all available norms

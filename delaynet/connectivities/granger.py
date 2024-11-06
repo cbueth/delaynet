@@ -68,7 +68,7 @@ def gt_single_lag(ts1, ts2, lag_step: int = 5):
 
 @connectivity
 def gt_multi_lag(ts1, ts2, max_lag_steps: int = 5):
-    """Granger Causality (GC) connectivity metric with variable time lag.
+    """Granger Causality connectivity metric with variable time lag.
 
     Testing for various time lags and selecting the one with the lowest p-value.
 

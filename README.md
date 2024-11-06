@@ -28,7 +28,7 @@ This will automatically install all the necessary dependencies as specified in t
 `conda`, `mamba` or `micromamba` (they can be used interchangeably).
 
 ```bash
-micromamba create -n delay_net -c conda-forge python=3.11
+micromamba create -n delay_net -c conda-forge python=3.12
 micromamba activate delay_net
 pip install delaynet  # or `micromamba install delaynet` when on conda-forge
 ```
@@ -41,17 +41,17 @@ After cloning the repository, navigate to the root folder and
 create the environment with the wished python version and the dependencies.
 
 ```bash
-micromamba create -n delay_net -c conda-forge python=3.11
+micromamba create -n delay_net -c conda-forge python=3.12
 micromamba activate delay_net
 ```
-Using `pip` to install the package in editable mode will also install the
+Either way, using `pip` to install the package in editable mode will also install the
 development dependencies.
 
 ```bash
 pip install -e ".[all]"
 ```
 
-To let `micromamba` handle the dependencies, use the `requirements.txt` file
+Or, to let `micromamba` handle the dependencies, use the `requirements.txt` file
 
 ```bash
 micromamba install --file requirements.txt

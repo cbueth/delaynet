@@ -30,29 +30,32 @@ def random_patterns(
     :return: Mutual information value and time lag.
     :rtype: tuple[float, int]
     """
-    best_pv = 1.0
-    best_lag = 0
+    if p_size + max_lag_steps - 1 > ts1.shape[0]:
+        raise ValueError(
+            "Pattern size + max lag steps cannot be larger than the time series length."
+        )
 
     if linear:
-        best_pv, all_pv = gt_multi_lag(ts1, ts2, max_lag_steps=max_lag_steps)
-        best_lag = np.argmin(all_pv)
+        best_pv, best_lag = gt_multi_lag(ts1, ts2, max_lag_steps=max_lag_steps)
+    else:
+        best_pv, best_lag = np.inf, 0
 
-    for _ in range(num_rnd_patterns):
-        best_ret = np.random.uniform(0.0, 1.0, p_size)
-        best_ret = norm_window(best_ret)
+    rnd_patterns = np.random.uniform(0.0, 1.0, (num_rnd_patterns, p_size))
+    # rnd_patterns = np.linspace(0, 1, p_size)
+    rnd_patterns = np.tile(rnd_patterns, (num_rnd_patterns, 1))
+    for i in range(num_rnd_patterns):
+        rnd_patterns[i] = norm_window(rnd_patterns[i])
 
-        t_ts1 = pattern_transform(np.copy(ts1), best_ret)
-        t_ts2 = pattern_transform(np.copy(ts2), best_ret)
+    t_ts1 = pattern_transform(np.copy(ts1), rnd_patterns)
+    t_ts2 = pattern_transform(np.copy(ts2), rnd_patterns)
 
-        # p_v = GC.GT_SingleLag( t_ts1, t_ts2, max_lag_steps = max_lag_steps )
-        # if best_pv > p_v:
-        #     best_pv = p_v
-
-        p_v, all_pv = gt_multi_lag(t_ts1, t_ts2, max_lag_steps=max_lag_steps)
+    for i in range(num_rnd_patterns):
+        p_v, pv_idx = gt_multi_lag(
+            t_ts1[i, :], t_ts2[i, :], max_lag_steps=max_lag_steps
+        )
         if best_pv > p_v:
             best_pv = p_v
-            best_lag = np.argmin(all_pv)
-
+            best_lag = pv_idx
     return best_pv, best_lag
 
 

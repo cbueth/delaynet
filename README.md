@@ -58,6 +58,8 @@ micromamba install --file requirements.txt
 pip install --no-build-isolation --no-deps -e .
 ```
 
+Finally, the `infomeasure` package must be installed manually, as it is also still under development, see its [Development Setup](https://carlson.pages.ifisc.uib-csic.es/infomeasure/getting_started/#development-setup).
+
 Now, the package can be imported and used in the python environment, from anywhere on
 the system, if the environment is activated.
 

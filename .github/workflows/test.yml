@@ -1,20 +1,20 @@
 name: Test
 
 on:
-  push:
-    branches: # on all branches except `typos`
-      - '**'
-      - '!typos'
-    paths-ignore:
-      - 'docs/**'
-      - 'data/**'
-      - '.git*'
-      - 'README.md'
-  pull_request:
-    branches:
-      - '**'
-  schedule: # Every Monday at 04:00 UTC
-    - cron: '0 4 * * 1'
+#  push:
+#    branches: # on all branches except `typos`
+#      - '**'
+#      - '!typos'
+#    paths-ignore:
+#      - 'docs/**'
+#      - 'data/**'
+#      - '.git*'
+#      - 'README.md'
+#  pull_request:
+#    branches:
+#      - '**'
+#  schedule: # Every Monday at 04:00 UTC
+#    - cron: '0 4 * * 1'
 
 jobs:
   caching:

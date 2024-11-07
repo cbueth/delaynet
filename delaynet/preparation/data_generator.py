@@ -226,7 +226,7 @@ def gen_fmri_multiple(
     :param rng: Random number generator or seed,
                 passed to :func:`numpy.random.default_rng`.
     :return: fMRI time series. First dimension is time, second dimension is nodes.
-    :rtype: numpy.ndarray[float], shape = (ts_len, num_nodes)
+    :rtype: numpy.ndarray[float], shape = (num_nodes, ts_len)
     """
     rng = default_rng(rng)
 
@@ -241,14 +241,14 @@ def gen_fmri_multiple(
     # Generate fMRI time series
     hrf_at_trs = __hrf(arange(0, 30, time_resolution))
     # Convolve the initial time series with the Hemodynamic Response Function (HRF)
-    ts_convolve = zeros((ts_len + size(hrf_at_trs, 0) - 1, n_nodes))
+    ts_convolve = zeros((n_nodes, ts_len + size(hrf_at_trs, 0) - 1))
     for k in range(n_nodes):
-        ts_convolve[:, k] = convolve(ts_init[:, k], hrf_at_trs)
+        ts_convolve[k, :] = convolve(ts_init[:, k], hrf_at_trs)
     # ts_convolve[:, :] = convolve(ts_init, hrf_at_trs) # TODO: check if equivalent
     # Downsample the time series
-    ts_convolve = ts_convolve[::downsampling_factor]
+    ts_convolve = ts_convolve[:, ::downsampling_factor]
     # Add noise
-    ts_convolve += rng.normal(0.0, noise_final_sd, (size(ts_convolve, 0), n_nodes))
+    ts_convolve += rng.normal(0.0, noise_final_sd, (n_nodes, size(ts_convolve, 1)))
 
     return ts_convolve
 

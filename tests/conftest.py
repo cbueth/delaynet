@@ -4,9 +4,45 @@ import pytest
 from numpy import array
 
 from delaynet.preparation.data_generator import gen_rand_data, gen_fmri
-from delaynet.connectivities import __all_connectivity_metrics__
+from delaynet.connectivities import __all_connectivity_metrics_names_simple__
 from delaynet.norms import __all_norms__
 
+
+CONN_METRICS = {
+    name: {
+        "shorthands": value,
+        "additional_kwargs": [{}],
+    }
+    for name, value in __all_connectivity_metrics_names_simple__.items()
+}
+CONN_METRICS["mutual_information"]["additional_kwargs"] = [
+    {
+        "approach": "discrete",
+        "symbolic_conversion": {"method": "quantize", "max_symbols": 50},
+    },
+    {"approach": "kernel", "mi_kwargs": {"bandwidth": 0.3, "kernel": "box"}},
+    {"approach": "renyi", "mi_kwargs": {"alpha": 1.0}},
+]
+CONN_METRICS["transfer_entropy"]["additional_kwargs"] = [
+    {
+        "approach": "discrete",
+        "symbolic_conversion": {"method": "quantize", "max_symbols": 50},
+    },
+    {"approach": "kernel", "te_kwargs": {"bandwidth": 0.3, "kernel": "box"}},
+    {"approach": "renyi", "te_kwargs": {"alpha": 1.0}},
+]
+# list of all shorthands, only testing the first set of kwargs
+CONN_METRICS_SHORTHANDS = [
+    (shorthand, metric["additional_kwargs"][0])
+    for metric in CONN_METRICS.values()
+    for shorthand in metric["shorthands"]
+]
+# list of all kwargs, only testing the first shorthand
+CONN_METRICS_KWARGS = [
+    (metric["shorthands"][0], kwargs)
+    for metric in CONN_METRICS.values()
+    for kwargs in metric["additional_kwargs"]
+]
 
 # ******************************************************************************
 # Dynamic methods
@@ -15,10 +51,23 @@ from delaynet.norms import __all_norms__
 
 @pytest.fixture(
     scope="session",
-    params=__all_connectivity_metrics__,
+    params=CONN_METRICS_SHORTHANDS,
+    ids=[shorthand for shorthand, _ in CONN_METRICS_SHORTHANDS],
 )
-def connectivity_metric(request):
-    """Return a connectivity metric function."""
+def connectivity_metric_shorthand(request):
+    """Return a connectivity metric shorthand and its additional kwargs.
+    All shorthands are tested with the first set of kwargs."""
+    return request.param
+
+
+@pytest.fixture(
+    scope="session",
+    params=CONN_METRICS_KWARGS,
+    ids=[f"{shorthand}{i}" for i, (shorthand, _) in enumerate(CONN_METRICS_KWARGS)],
+)
+def connectivity_metric_kwargs(request):
+    """Return a connectivity metric shorthand and its additional kwargs.
+    All kwargs are tested with the first shorthand."""
     return request.param
 
 

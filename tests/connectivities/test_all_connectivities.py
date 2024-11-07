@@ -1,27 +1,19 @@
 """Programmatic tests for all connectivities in connectivities module."""
 
-import pytest
-
 from delaynet import connectivity
-from delaynet.connectivities import __all_connectivity_metrics_names__
 
 
-def test_all_connectivities(connectivity_metric, two_fmri_time_series):
+def test_all_connectivities(connectivity_metric_kwargs, two_fmri_time_series):
     """Test all connectivity metrics with two fMRI time series."""
+    connectivity_metric, kwargs = connectivity_metric_kwargs
     ts1, ts2 = two_fmri_time_series
-    kwargs = {}
-    if connectivity_metric.is_entropy_like:
-        kwargs["symbolic_conversion"] = {"method": "quantize", "max_symbols": 50}
-    result = connectivity(ts1, ts2, metric=connectivity_metric.__name__, **kwargs)
+    result = connectivity(ts1, ts2, metric=connectivity_metric, **kwargs)
     assert isinstance(result, (float, tuple))
 
 
-@pytest.mark.parametrize("metric_str", __all_connectivity_metrics_names__.keys())
-def test_all_conn_querying(metric_str, two_random_time_series):
+def test_all_conn_querying(connectivity_metric_shorthand, two_random_time_series):
     """Test querying all connectivity metrics."""
+    connectivity_metric, kwargs = connectivity_metric_shorthand
     ts1, ts2 = two_random_time_series
-    kwargs = {}
-    if __all_connectivity_metrics_names__[metric_str].is_entropy_like:
-        kwargs["symbolic_conversion"] = {"method": "quantize", "max_symbols": 50}
-    result = connectivity(ts1, ts2, metric=metric_str, **kwargs)
+    result = connectivity(ts1, ts2, metric=connectivity_metric, **kwargs)
     assert isinstance(result, (float, tuple))

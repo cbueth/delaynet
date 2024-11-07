@@ -1,20 +1,20 @@
 name: Test
 
 on:
-  push:
-    branches: # on all branches except `typos`
-      - '**'
-      - '!typos'
-    paths-ignore:
-      - 'docs/**'
-      - 'data/**'
-      - '.git*'
-      - 'README.md'
-  pull_request:
-    branches:
-      - '**'
-  schedule: # Every Monday at 04:00 UTC
-    - cron: '0 4 * * 1'
+#  push:
+#    branches: # on all branches except `typos`
+#      - '**'
+#      - '!typos'
+#    paths-ignore:
+#      - 'docs/**'
+#      - 'data/**'
+#      - '.git*'
+#      - 'README.md'
+#  pull_request:
+#    branches:
+#      - '**'
+#  schedule: # Every Monday at 04:00 UTC
+#    - cron: '0 4 * * 1'
 
 jobs:
   caching:
@@ -35,13 +35,20 @@ jobs:
       - name: Get week number
         run: echo "WEEK=$(date +'%V')" >> $GITHUB_ENV
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up `infomeaure` GitLab authentication
+        run: git config --global url."https://hub:${{ secrets.GITLAB_INFOMEASURE }}@gitlab.ifisc.uib-csic.es/".insteadOf "https://gitlab.ifisc.uib-csic.es/"
+
+      - name: Clone `infomeasure` repository
+        run: git clone https://gitlab.ifisc.uib-csic.es/carlson/infomeasure.git
+
+      - name: Set up Python ${{ matrix.python-version }} & install `infomeasure`
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-name: delay_net
           create-args: >-
             python=${{ matrix.python-version }}
             --file requirements.txt
+            pip install --no-build-isolation --no-deps ./infomeasure
           cache-environment: true
           cache-environment-key: py${{ matrix.python-version }}-${{ runner.os }}-W${{ env.WEEK }}-${{ hashFiles('requirements.txt') }}
 

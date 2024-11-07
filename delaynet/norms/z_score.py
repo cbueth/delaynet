@@ -1,6 +1,7 @@
 """Z-Score (ZS) normalization."""
 
-from numpy import copy, mean as npmean, mod, size, std, ndarray, arange, integer
+from numba import prange, njit, int64
+from numpy import copy, mean as npmean, mod, std, ndarray, arange, integer
 from ..decorators import norm
 
 from ..utils.logging import logging
@@ -69,19 +70,39 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
         )
         max_periods = -1
 
-    get_sub_ts = _get_sub_ts_all_periods if max_periods == -1 else _get_sub_ts_partial
-
-    ts2 = copy(ts)
-    for k in range(size(ts)):
-        sub_ts = get_sub_ts(ts, k, periodicity, max_periods)
-        st_dev = std(sub_ts)
-        if st_dev > 0:
-            ts2[k] = (ts[k] - npmean(sub_ts)) / st_dev
+    ts2 = (
+        _z_score_loop_all(periodicity, ts)
+        if max_periods == -1
+        else _z_score_loop_partial(periodicity, max_periods, ts)
+    )
 
     return ts2
 
 
-def _get_sub_ts_all_periods(ts, k, periodicity, _):
+@njit(parallel=True)
+def _z_score_loop_all(periodicity, ts):  # pragma: no cover
+    ts2 = copy(ts)
+    for k in prange(ts.size):
+        sub_ts = _get_sub_ts_all_periods(ts, k, periodicity)
+        st_dev = std(sub_ts)
+        if st_dev > 0:
+            ts2[k] = (ts[k] - npmean(sub_ts)) / st_dev
+    return ts2
+
+
+@njit(parallel=True)
+def _z_score_loop_partial(periodicity, max_periods, ts):  # pragma: no cover
+    ts2 = copy(ts)
+    for k in prange(ts.size):
+        sub_ts = _get_sub_ts_partial(ts, k, periodicity, max_periods)
+        st_dev = std(sub_ts)
+        if st_dev > 0:
+            ts2[k] = (ts[k] - npmean(sub_ts)) / st_dev
+    return ts2
+
+
+@njit
+def _get_sub_ts_all_periods(ts, k, periodicity):  # pragma: no cover
     """Get the sub time series for all periods."""
     in_offset = mod(k, periodicity)
     sub_slice = slice(in_offset, None, periodicity)
@@ -91,45 +112,13 @@ def _get_sub_ts_all_periods(ts, k, periodicity, _):
     return sub_ts[mask[sub_slice]]
 
 
-def _get_sub_ts_partial(ts, k, periodicity, max_periods):
+@njit
+def _get_sub_ts_partial(ts, k, periodicity, max_periods):  # pragma: no cover
     """Get the sub time series for a limited number of periods."""
     remainder = mod(k, periodicity)
     start_index = max(remainder, k - (max_periods * periodicity))
     end_index = min(len(ts) - remainder, k + ((max_periods + 1) * periodicity))
-    indices = arange(start_index, end_index, periodicity)
+    indices = arange(start_index, end_index, periodicity, dtype=int64)
     # Remove the current index
     indices = indices[indices != k]
     return ts[indices]
-
-
-@norm
-def z_score_vectorized(ts: ndarray, periodicity: int) -> ndarray:
-    """Z-Score (ZS) normalization.
-
-    This version is optimized to avoid the for loop in the original version.
-    Using reshape and mean/std on the reshaped array, we can compute the mean and
-    standard deviation for each periodicity at once.
-
-    :param ts: Time series to normalize.
-    :type ts: numpy.ndarray
-    :param periodicity: Periodicity of the time series - reoccurrence of the same
-                        pattern.
-    :type periodicity: int
-    :return: Normalized time series.
-    :rtype: numpy.ndarray
-    """
-    # Create an array of indices for each periodicity
-    indices = arange(len(ts)).reshape(-1, periodicity)
-
-    # Use these indices to create a 2D array
-    ts2 = ts[indices]
-
-    # Compute the mean and standard deviation for each periodicity
-    mean = npmean(ts2, axis=0)
-    std_dev = std(ts2, axis=0)
-
-    # Normalize
-    ts2 = (ts2 - mean) / std_dev
-
-    # Flatten the 2D array back into a 1D array
-    return ts2.ravel()

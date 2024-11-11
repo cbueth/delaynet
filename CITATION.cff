@@ -1,0 +1,47 @@
+cff-version: 1.2.0
+message: "If you use this source code, please cite it as below."
+title: DelayNet
+type: software
+authors:
+    - family-names: "Büth"
+      given-names: "Carlson Moses"
+      orcid: "https://orcid.org/0000-0003-2298-8438"
+    - family-names: "Zanin"
+      given-names: "Massimiliano"
+      orcid: "https://orcid.org/0000-0002-5839-0393"
+repository-code: 'https://gitlab.ifisc.uib-csic.es/carlson/delaynet/'
+url: 'https://carlson.pages.ifisc.uib-csic.es/delaynet/'
+keywords:
+    - network dynamics
+    - transport
+    - complex systems
+    - entropy
+    - mutual information
+    - transfer entropy
+license: BSD-3-Clause
+version:
+
+# add when code published
+# doi: 10.5281/zenodo.0000
+# date-released: YYYY-MM-DD
+
+# add when article published
+# preferred-citation:
+#   type: article
+#   authors:
+#     - family-names: "Büth"
+#       given-names: "Carlson Moses"
+#       orcid: "https://orcid.org/0000-0003-2298-8438"
+#     - family-names: "Zanin"
+#       given-names: "Massimiliano"
+#       orcid: "https://orcid.org/0000-0002-5839-0393"
+#   doi: "10.0000/00000"
+#   journal: "JOURNAL"
+#   month: 1
+#   start: 1
+#   end: 2
+#   title: "PROJECTNAME"
+#   issue: 1
+#   volume: 1
+#   year: YYYY
+#   abstract: "ABSTRACT"

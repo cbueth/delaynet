@@ -1,0 +1,72 @@
+image: mambaorg/micromamba
+
+stages:
+  - test
+  - coverage
+  - deploy
+
+.pythonVersions:
+  parallel:
+    matrix:
+      - PYTHON_VERSION: [ "3.12", "3.11", "3.10" ]
+  maxVersion:
+    matrix:
+      - PYTHON_VERSION: [ "3.12" ]
+
+before_script:
+  - micromamba install -y -n base -c conda-forge python=${PYTHON_VERSION} -f requirements.txt
+  - pip install infomeasure --index-url https://__token__:${INFOMEASURE_PKG_ACCESS}@gitlab.ifisc.uib-csic.es/api/v4/projects/202/packages/pypi/simple
+  - pip install --no-build-isolation --no-deps -e .
+
+# Test on all python versions on push to main branch, and on bi-weekly schedule
+test:
+  stage: test
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - delaynet/**/*
+        - tests/**/*
+        - pyproject.toml
+        - requirements.txt
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  parallel: !reference [ .pythonVersions,parallel ]
+  script:
+    - micromamba list
+    - pytest tests/
+  artifacts:
+    expire_in: 1 month
+
+# coverage report - on any change to code and on main branch for coverage badge
+coverage:
+  stage: coverage
+  coverage: /^TOTAL.+?(\d+\%)$/
+  needs: [ ]
+  rules:
+    - changes:
+        compare_to: 'refs/heads/main'
+        paths:
+          - delaynet/**/*
+          - tests/**/*
+          - pyproject.toml
+          - requirements.txt
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - pytest --cov --cov-report term
+  artifacts:
+    expire_in: 1 month
+
+# build documentation to gitlab pages, only on main branch
+pages:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - sphinx-apidoc -o docs/api/ delaynet/ -f
+    - sphinx-build docs/ public -b dirhtml
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 month
+  environment:
+    name: production
+    url: https://${CI_PROJECT_NAMESPACE}.pages.ifisc.uib-csic.es/${CI_PROJECT_NAME}

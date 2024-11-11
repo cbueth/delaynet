@@ -3,6 +3,7 @@
 Re-builds the connectivity decorator from scratch, with some pre-processing
 options.
 """
+
 from collections.abc import Callable
 from functools import wraps
 

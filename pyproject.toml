@@ -12,6 +12,7 @@ license = { text = "BSD-3-Clause" }
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Topic :: Scientific/Engineering :: Information Analysis",
@@ -35,17 +36,17 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://cbueth.de/delaynet"
-Repository = "https://github.com/cbueth/delaynet"
-Issues = "https://github.com/cbueth/delaynet/issues"
-Changelog = "https://cbueth.de/delaynet/changelog"
+Documentation = "https://carlson.pages.ifisc.uib-csic.es/delaynet/"
+Repository = "https://gitlab.ifisc.uib-csic.es/carlson/delaynet"
+Issues = "https://gitlab.ifisc.uib-csic.es/carlson/delaynet/issues"
+Changelog = "https://carlson.pages.ifisc.uib-csic.es/delaynet/changelog/"
 
 [project.optional-dependencies]
-dev = ["black", "isort", "pylint"]
+lint = ["ruff"]
 test = ["pytest", "pytest-cov", "coverage"]
 doc = ["sphinx", "myst-nb", "sphinx-book-theme", "sphinxcontrib-bibtex"]
 plot = ["matplotlib"]
-all = ["delaynet[dev,test,doc,plot]"]
+all = ["delaynet[lint,test,doc,plot]"]
 
 [tool.setuptools.packages.find]
 exclude = [
@@ -63,29 +64,11 @@ version = { attr = "delaynet._version.__version__" }
 # --------------------------------------------------------------------------------------
 # Linting
 # --------------------------------------------------------------------------------------
-[tool.pylint.main]
-# Number of processes to use to do the linting.
-jobs = 5
-# Pickle collected data for later comparisons.
-persistent = true
-# When enabled, pylint would attempt to guess common misconfiguration and emit
-# user-friendly hints instead of false-positive error messages.
-suggestion-mode = true
+[tool.ruff]
+target-version = "py312"
 
-[tool.pylint.basic]
-# Regular expression matching correct module names. Overrides module-naming-
-# style. Additionally to snake case allows for a prepended 'yyyymmdd-' string.
-module-rgx = "(\\d{4}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])-)?(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$"
-# Good variable names which should always be accepted, separated by a comma.
-good-names = ["i", "j", "k", "_"]
-
-[tool.pylint.format]
-# Maximum number of characters on a single line.
-max-line-length = 88
-
-[tool.pylint.design]
-# Maximum number of arguments for function / method.
-max-args = 8
+[tool.ruff.lint]
+select = ["NPY201"]
 
 # --------------------------------------------------------------------------------------
 # Testing

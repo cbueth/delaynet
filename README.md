@@ -1,11 +1,10 @@
 # `DelayNet` — Delay Propagation in Transportation Networks
 
-[//]: # ([![Dev]&#40;https://img.shields.io/badge/docs-dev-blue.svg&#41;]&#40;https://cbueth.github.io/DelayDynamics/&#41;)
-[![Tests](https://github.com/cbueth/delaynet/actions/workflows/test.yml/badge.svg)](https://github.com/cbueth/delaynet/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/cbueth/delaynet/graph/badge.svg?token=G3MEQR5N1Y)](https://codecov.io/gh/cbueth/delaynet)
-[![Lint](https://github.com/cbueth/delaynet/actions/workflows/lint.yml/badge.svg)](https://github.com/cbueth/delaynet/actions/workflows/lint.yml)
-[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/PyCQA/pylint)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://carlson.pages.ifisc.uib-csic.es/delaynet/)
+[![pipeline status](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/badges/main/pipeline.svg)](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/-/pipelines?page=1&scope=all&ref=main)
+[![coverage report](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/badges/main/coverage.svg)](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/-/commits/main)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-1.2-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
 Python package to build networks from delay data.
 

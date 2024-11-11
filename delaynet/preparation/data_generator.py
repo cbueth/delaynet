@@ -276,7 +276,6 @@ def __initial_ts(
     ts = zeros((ts_len, 2))
 
     for k in range(ts_len):
-
         if k == 0:
             ts[k, 0] = rng.normal(0.0, noise)
             ts[k, 1] = rng.normal(0.0, noise)
@@ -341,7 +340,6 @@ def __initial_ts_var_num_nodes(
     ts = zeros((ts_len, num_ts))
 
     for k in range(ts_len):
-
         if k == 0:
             for l in range(num_ts):
                 ts[k, l] = rng.normal(0.0, noise)
@@ -351,7 +349,6 @@ def __initial_ts_var_num_nodes(
             ts[k, l] = ts[k - 1, l] * coupling_matrix[l, l] + rng.normal(0.0, noise)
 
             for l2 in range(num_ts):
-
                 if l == l2:
                     continue
 

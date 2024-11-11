@@ -4,9 +4,8 @@ statsmodels
 scikit-learn
 numba
 # Code Quality
-blackd
-isort
-pylint
+pre-commit
+ruff
 # Testing
 pytest
 pytest-cov

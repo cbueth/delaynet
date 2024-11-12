@@ -11,8 +11,8 @@ Python package to build networks from delay data.
 ---
 
 For details on how to use this package, see the
-[Guide](https://cbueth.github.io/delaynet/guide/), [examples](examples/), or
-the [Documentation](https://cbueth.github.io/delaynet/).
+[Guide](https://carlson.pages.ifisc.uib-csic.es/delaynet/guide/) or
+the [Documentation](https://carlson.pages.ifisc.uib-csic.es/delaynet/).
 
 ## Setup
 
@@ -62,17 +62,14 @@ Finally, the `infomeasure` package must be installed manually, as it is also sti
 Now, the package can be imported and used in the python environment, from anywhere on
 the system, if the environment is activated.
 
-### Testing
+## Set up Jupyter kernel
 
-The tests are specified using the `pytest` signature, see [`tests/`](tests/) folder, and
-can be run using a test runner of choice.
-A pipeline is set up, see [`.github/workflows/test.yml`](.github/workflows/lint.yml).
-
-### Linting
-
-The code is linted using `pylint` and `black`. From the repository root, run:
+If you want to use `delaynet` with its environment `delay_net` in Jupyter, run:
 
 ```bash
-pylint delaynet/
-black delaynet/
+pip install --user ipykernel
+python -m ipykernel install --user --name=delay_net
 ```
+
+This allows you to run Jupyter with the kernel `delay_net` (Kernel > Change Kernel >
+im_env)

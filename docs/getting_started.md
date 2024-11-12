@@ -20,7 +20,7 @@ pip install delaynet
 ```
 
 This will automatically install all the necessary dependencies as specified in the
-[`pyproject.toml`](https://github.com/cbueth/delaynet/blob/main/pyproject.toml) file.
+[`pyproject.toml`](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/blob/main/pyproject.toml) file.
 It is recommended to use a virtual environment, e.g. using
 [`conda`](https://conda.io/projects/conda/en/latest),
 [`mamba`](https://mamba.readthedocs.io/en/latest) or
@@ -88,7 +88,7 @@ pip install -e ".[all]"
 ```
 
 Or, to let `micromamba` handle the dependencies, use the
-[`requirements.txt`](https://github.com/cbueth/delaynet/blob/main/requirements.txt)
+[`requirements.txt`](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/blob/main/requirements.txt)
 file
 
 ```bash
@@ -102,10 +102,12 @@ the system, if the environment is activated.
 ### Testing
 
 The tests are specified using the [`pytest`](https://docs.pytest.org/en/stable/)
-signature, see [`tests/`](https://github.com/cbueth/delaynet/tree/main/tests) folder,
+signature, see [`tests/`](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/tree/main/tests) folder,
 and can be run using a test runner of choice.
 A pipeline is set up, see
-[`.github/workflows/test.yml`](https://github.com/cbueth/delaynet/actions/workflows/test.yml).
+[`.gitlab-ci.yml`](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/blob/main/.gitlab-ci.yml).
+
+```bash
 
 ### Linting
 

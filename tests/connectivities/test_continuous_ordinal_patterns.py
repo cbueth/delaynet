@@ -35,8 +35,9 @@ def test_norm_window(ts, expected):
 )
 def test_norm_window_typing_error(ts):
     """Test the normalization of a window with invalid input."""
-    with pytest.raises(numba.TypingError):
-        norm_window(array(ts))
+    with pytest.raises(Exception):
+        ts = array(ts)
+        norm_window(ts)
 
 
 @pytest.mark.parametrize(

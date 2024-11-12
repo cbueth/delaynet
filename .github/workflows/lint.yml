@@ -5,6 +5,7 @@ on:
 #    paths:
 #      - 'delaynet/**.py'
 #      - 'tests/**.py'
+  workflow_dispatch:
 
 
 jobs:

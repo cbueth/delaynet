@@ -43,15 +43,15 @@ def transfer_entropy(ts1, ts2, approach: str = "", te_kwargs=None):
 
     return -(
         estimator(
-            source=ts1,
-            dest=ts2,
+            ts1,
+            ts2,
             measure="transfer_entropy",
             approach=approach,
             **te_kwargs,
         ).effective_val()
         - estimator(
-            source=ts2,
-            dest=ts1,
+            ts2,
+            ts1,
             measure="transfer_entropy",
             approach=approach,
             **te_kwargs,

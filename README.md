@@ -23,7 +23,7 @@ pip install delaynet  # when public on PyPI
 ```
 
 This will automatically install all the necessary dependencies as specified in the
-`pyproject.toml` file. It is recommended to use a virtual environment, e.g. using
+`pyproject.toml` file. It is recommended to use a virtual environment, e.g., using
 `conda`, `mamba` or `micromamba` (they can be used interchangeably).
 
 ```bash
@@ -57,10 +57,8 @@ micromamba install --file requirements.txt
 pip install --no-build-isolation --no-deps -e .
 ```
 
-Finally, the `infomeasure` package must be installed manually, as it is also still under development, see its [Development Setup](https://carlson.pages.ifisc.uib-csic.es/infomeasure/getting_started/#development-setup).
-
 Now, the package can be imported and used in the python environment, from anywhere on
-the system, if the environment is activated.
+the system if the environment is activated.
 
 ## Set up Jupyter kernel
 

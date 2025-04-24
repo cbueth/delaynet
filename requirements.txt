@@ -1,5 +1,6 @@
 numpy
 scipy
+infomeasure
 statsmodels
 scikit-learn
 numba

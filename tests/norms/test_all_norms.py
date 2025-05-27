@@ -1,4 +1,4 @@
-"""Programmatic tests for all norms in norms module."""
+"""Programmatic tests for rll norms in norms module."""
 
 import pytest
 from numpy import ndarray

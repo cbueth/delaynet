@@ -1,7 +1,8 @@
 """Z-Score (ZS) normalization."""
 
 from numba import prange, njit, int64
-from numpy import copy, mean as npmean, mod, std, ndarray, arange, integer
+from numpy import mean as npmean, mod, std, ndarray, arange, integer, copy, zeros
+
 from ..decorators import norm
 
 from ..utils.logging import logging
@@ -69,6 +70,17 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
             ts.size / periodicity,
         )
         max_periods = -1
+
+    if max_periods == -1 and periodicity == 1:
+        # Simple case, no slicing needed
+        ts_std = std(ts)
+        if ts_std == 0:
+            logging.warning(
+                "Standard deviation of the whole time series is 0, "
+                "returning a zero array of the same size."
+            )
+            return zeros(ts.size)
+        return (ts - npmean(ts)) / ts_std
 
     ts2 = (
         _z_score_loop_all(periodicity, ts)

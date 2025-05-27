@@ -263,6 +263,8 @@ def __initial_ts(
     """
     Generate initial time series.
 
+    Returns two normal distributed, coupled time series.
+
     :param ts_len: Length of time series.
     :type ts_len: int
     :param noise: Standard deviation of the noise.

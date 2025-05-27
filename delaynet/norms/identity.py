@@ -14,5 +14,8 @@ def identity(ts):
     :return: 'Normalized' time series.
     :rtype: numpy.ndarray
     """
-    logging.warning("Identity norm is not a normalization. Only use for testing.")
+    logging.warning(
+        "Identity norm is not a normalization. "
+        "Only use for testing or if data is already normalized."
+    )
     return ts

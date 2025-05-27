@@ -14,6 +14,9 @@ in various fields such as economics, engineering, sociology, biology, and neuros
 It has also been adapted to cater to different situations and types of data.
 :cite:p:`zaninAssessingGrangerCausality2021`
 
+Before using the Granger causality test, be sure to detrend the time series data.
+:cite:p:`Bessler01061984`
+
 This module provides three implementations of the Granger causality test:
 a single lag version, a multi-lag version, and a bidirectional multi-lag version.
 

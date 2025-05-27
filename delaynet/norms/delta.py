@@ -7,7 +7,13 @@ from ..decorators import norm
 
 @norm
 def delta(ts, window_size: int = 10):
-    """Delta norm.
+    r"""Delta norm.
+
+    Local mean subtraction.
+    Subtract the local mean, mean([x_{t - w}, ..., x_{t + w}]), from each value x_t.
+
+    .. math::
+        x_t' = x_t - \left(2w + 1\right)^{-1} \sum_{k = t - w}^{t + w} x_k
 
     :param ts: Time series to normalize.
     :type ts: numpy.ndarray

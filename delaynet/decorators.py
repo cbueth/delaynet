@@ -16,9 +16,9 @@ Norm = Callable[[ndarray, ...], ndarray]
 
 def connectivity(
     *args,
-    entropy_like: bool = False,
+    entropy_like: bool = False,  # TODO: remove this functionality to make package usage more explicit
     check_symbolic: bool | int | None = False,
-    default_to_symbolic: dict | None = None,
+    default_to_symbolic: dict | None = None,  # TODO: remove this functionality to make package usage more explicit
     mcb_kwargs: dict | None = None,
 ):
     """Decorator for the connectivity functions.
@@ -191,10 +191,10 @@ def connectivity(
 
         return wrapper
 
-    # Usage without parentheses
+    # Usage without parentheses (@connectivity)
     if args and callable(args[0]):
         return connectivity_outer(args[0])
-    # Usage with parentheses
+    # Usage with parentheses (@connectivity(), @connectivity(...))
     return connectivity_outer
 
 
@@ -287,7 +287,7 @@ def norm(
             # Call the norm function with the bound arguments
             if ts.ndim == 1:
                 normed_ts = norm_func(*bound_args.args, **bound_args.kwargs)
-            else:
+            else:  # must be 2D, due to previous check
                 normed_ts = apply_along_axis(
                     norm_func,  # func1d
                     1,  # axis
@@ -349,8 +349,8 @@ def norm(
 
         return wrapper
 
-    # Usage without parentheses
+    # Usage without parentheses (@norm)
     if args and callable(args[0]):
         return norm_outer(args[0])
-    # Usage with parentheses
+    # Usage with parentheses (@norm(), @norm(...))
     return norm_outer

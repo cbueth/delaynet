@@ -70,12 +70,12 @@ html_theme_options = {
     "use_download_button": True,
     "path_to_docs": "docs",
     # "home_page_in_toc": True,
-    "launch_buttons": {
-        "binderhub_url": "https://mybinder.org",
-        "colab_url": "https://colab.research.google.com/",
-        "deepnote_url": "https://deepnote.com/",
-        "notebook_interface": "jupyterlab",
-    },
+    # "launch_buttons": {
+    #     "binderhub_url": "https://mybinder.org",
+    #     "colab_url": "https://colab.research.google.com/",
+    #     "deepnote_url": "https://deepnote.com/",
+    #     "notebook_interface": "jupyterlab",
+    # },
 }
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
@@ -84,5 +84,5 @@ intersphinx_mapping = {
     "numba": ("https://numba.readthedocs.io/en/stable", None),
     "statsmodels": ("https://www.statsmodels.org/stable", None),
     "sklearn": ("https://scikit-learn.org/stable", None),
-    # "infomeasure": ("https://carlson.pages.ifisc.uib-csic.es/infomeasure/", None),
+    "infomeasure": ("https://infomeasure.readthedocs.io/en/stable", None),
 }

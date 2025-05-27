@@ -40,7 +40,7 @@ def linear_correlation(x: ndarray, y: ndarray):
     """Simplified linear correlation metric."""
     print("Calculating linear correlation...")
     stat = pearsonr(x, y)
-    print(f"Linear correlation: {stat[0]}" f" (p-value: {stat[1]})")
+    print(f"Linear correlation: {stat[0]} (p-value: {stat[1]})")
     return stat[0]
 
 

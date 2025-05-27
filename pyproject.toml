@@ -63,7 +63,7 @@ version = { attr = "delaynet._version.__version__" }
 # Linting
 # --------------------------------------------------------------------------------------
 [tool.ruff]
-target-version = "py312"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = ["NPY201"]

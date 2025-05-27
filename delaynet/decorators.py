@@ -18,7 +18,8 @@ def connectivity(
     *args,
     entropy_like: bool = False,  # TODO: remove this functionality to make package usage more explicit
     check_symbolic: bool | int | None = False,
-    default_to_symbolic: dict | None = None,  # TODO: remove this functionality to make package usage more explicit
+    default_to_symbolic: dict
+    | None = None,  # TODO: remove this functionality to make package usage more explicit
     mcb_kwargs: dict | None = None,
 ):
     """Decorator for the connectivity functions.

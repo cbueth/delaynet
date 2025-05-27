@@ -188,8 +188,7 @@ class MultipleCoefficientBinning:
             alphabet = check_array(self.alphabet, ensure_2d=False, dtype=None)
             if alphabet.shape != (self.n_bins,):
                 raise ValueError(
-                    "If 'alphabet' is array-like, its shape "
-                    "must be equal to (n_bins,)."
+                    "If 'alphabet' is array-like, its shape must be equal to (n_bins,)."
                 )
         return alphabet
 

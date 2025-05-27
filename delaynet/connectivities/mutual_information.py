@@ -51,6 +51,7 @@ def mutual_information(
             mi_values.append(mi)
 
     # TODO: or do we need the p-Value?
+    # change to min p-value
     idx_max = max(range(len(mi_values)), key=mi_values.__getitem__)
     return -mi_values[idx_max], idx_max
 

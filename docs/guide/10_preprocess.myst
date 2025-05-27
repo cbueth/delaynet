@@ -1,1 +1,11 @@
 # Preprocessing
+
+Nan checks, missing values
+
+## Symbolization
+
+- {py:func}`delaynet.preprocess.symbolic.quantize`: Convert to symbolic by digitizing into ``max_symbols`` bins.
+- {py:func}`delaynet.preprocess.symbolic.quantilize`: Convert to symbolic by quantilizing into ``num_quantiles``
+  bins.
+- {py:func}`delaynet.preprocess.symbolic.binarize`: Convert to binary based on a threshold.
+- {py:func}`delaynet.preprocess.symbolic.round_to_int`: Round to the nearest integer.

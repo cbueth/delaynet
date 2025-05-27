@@ -1,1 +1,13 @@
 # Normalization Methods
+
+rename Detrending
+
+## Delta normalization
+
+## Second difference normalization
+
+## Z-score normalization
+
+## Identity normalization
+
+Toy/test normalization

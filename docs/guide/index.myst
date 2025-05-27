@@ -12,4 +12,8 @@ Example reference to {cite:p}`zaninAssessingGrangerCausality2021`.
    10_preprocess
    20_norm
    30_connectivity
+   40_network_reconstruction
+   41_network_pruning
+   42_topological_analysis
+   50_evaluation
 ```

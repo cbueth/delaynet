@@ -27,6 +27,7 @@ __all_connectivity_metrics_names__ = {
     "mi": mutual_information,
     "ordinal synchronization": ordinal_synchronization,
     "ordinal synchronisation": ordinal_synchronization,
+    "ordinal_synchronisation": ordinal_synchronization,
     "os": ordinal_synchronization,
     "rank correlation": rank_correlation,
     "rc": rank_correlation,

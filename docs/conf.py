@@ -9,10 +9,6 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath(".."))
 
 # autodoc_mock_imports = [
 #     "modules that are not installed but referenced in the docs",
@@ -21,8 +17,10 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+from datetime import datetime
+
 project = "DelayNet"
-copyright = "2024, Carlson Büth"
+copyright = f"2024–{datetime.now().year}, infomeasure maintainers"
 author = "Carlson Büth"
 version = "0.2.0"
 
@@ -37,6 +35,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.autosectionlabel",
     "sphinxcontrib.bibtex",
+    "sphinx_design",  # Further directives
 ]
 
 templates_path = ["_templates"]
@@ -62,6 +61,7 @@ nb_execution_timeout = 180
 
 html_theme = "sphinx_book_theme"
 html_static_path = ["_static"]
+html_js_files = ["custom.js"]
 html_theme_options = {
     "repository_url": "https://gitlab.ifisc.uib-csic.es/carlson/delaynet",
     "repository_branch": "main",
@@ -76,6 +76,21 @@ html_theme_options = {
     #     "deepnote_url": "https://deepnote.com/",
     #     "notebook_interface": "jupyterlab",
     # },
+    "logo": {
+        "image_light": "_static/dn_banner.png",
+        "image_dark": "_static/dn_banner_dark.png",
+    },
+}
+html_favicon = "_static/dn_logo_200x200.png"
+html_sidebars = {
+    "**": [
+        "navbar-logo.html",
+        "icon-links.html",
+        "search-button-field.html",
+        "sbt-sidebar-nav.html",
+        "sidebar-ethical-ads.html",
+    ],
+    "index": [],
 }
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),

@@ -1,3 +1,4 @@
+(reference_guide)=
 # Reference Guide
 -----------------
 
@@ -7,6 +8,8 @@ Example reference to {cite:p}`zaninAssessingGrangerCausality2021`.
 .. toctree::
    :maxdepth: 2
 
+   00_preparation
+   10_preprocess
    20_norm
    30_connectivity
 ```

@@ -45,7 +45,14 @@ Changelog = "https://carlson.pages.ifisc.uib-csic.es/delaynet/changelog/"
 [project.optional-dependencies]
 lint = ["ruff"]
 test = ["pytest", "pytest-cov", "coverage"]
-doc = ["sphinx", "myst-nb", "sphinx-book-theme", "sphinxcontrib-bibtex", "matplotlib"]
+doc = [
+    "sphinx",
+    "myst-nb",
+    "sphinx-design",
+    "sphinx-book-theme",
+    "sphinxcontrib-bibtex",
+    "matplotlib",
+]
 all = ["delaynet[lint,test,doc]"]
 
 [tool.setuptools.packages.find]

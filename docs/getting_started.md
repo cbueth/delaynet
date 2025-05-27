@@ -4,33 +4,33 @@ kernelspec:
   name: python3
 ---
 
-```{code-cell} ipython3
-:tags: [remove-input]
-# Import path of delaynet, from here one directory up
-import sys, os
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
-```
-
+(getting_started)=
 # Getting Started
 
-This package can be installed from PyPI using pip:
+```{warning}
+Use {ref}`Development Setup` until public release.
+```
+
+This package can be [installed from PyPI](https://pypi.org/project/delaynet/) using pip:
 
 ```bash
 pip install delaynet
 ```
 
 This will automatically install all the necessary dependencies as specified in the
-[`pyproject.toml`](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/blob/main/pyproject.toml) file.
-It is recommended to use a virtual environment, e.g. using
+[`pyproject.toml`](https://github.com/cbueth/delaynet/blob/main/pyproject.toml) file.
+It is recommended to use a virtual environment, e.g., using
 [`conda`](https://conda.io/projects/conda/en/latest),
 [`mamba`](https://mamba.readthedocs.io/en/latest) or
 [`micromamba`](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html)
 (they can be used interchangeably).
+`delaynet` can be installed from
+the [`conda-forge`](https://anaconda.org/conda-forge/delaynet) channel.
 
 ```bash
-micromamba create -n delay_net -c conda-forge python=3.11
-micromamba activate delay_net
-pip install delaynet
+conda create -n delay_net -c conda-forge python=3.13
+conda activate delay_net
+conda install -c conda-forge delaynet
 ```
 
 ## Usage
@@ -67,54 +67,54 @@ dn.show_connectivity_metrics()
 For more insight into the package, read the [Guide](guide/index.myst)
 or the [API Reference](api/index.rst).
 
+(dev_setup)=
 ## Development Setup
 
-For development, we recommend using
-[`micromamba`](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html)
-to create a virtual environment and installing the package in editable mode.
+For development, we recommend using [`micromamba`](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html)
+to create a virtual environment (`conda` or `mamba` also work)
+and installing the package in editable mode.
 After cloning the repository, navigate to the root folder and
-create the environment with the wished python version and the dependencies.
+create the environment with the desired python version and the dependencies.
 
 ```bash
-micromamba create -n delay_net -c conda-forge python=3.11
+micromamba create -n delay_net -c conda-forge python=3.13
 micromamba activate delay_net
 ```
 
-Either way, install the package directly with pip in editable mode, including all
-development dependencies, like so:
+To let `micromamba` handle the dependencies, use the `requirements` files
+
+```bash
+micromamba install -f requirements.txt
+pip install --no-build-isolation --no-deps -e .
+```
+
+Alternatively, if you prefer to use `pip` instead of `micromamba`,
+installing the package in editable mode will also install the development dependencies.
 
 ```bash
 pip install -e ".[all]"
 ```
 
-Or, to let `micromamba` handle the dependencies, use the
-[`requirements.txt`](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/blob/main/requirements.txt)
-file
-
-```bash
-micromamba install --file requirements.txt
-pip install --no-build-isolation --no-deps -e .
-```
-
 Now, the package can be imported and used in the python environment, from anywhere on
 the system, if the environment is activated.
+For new changes, the repository only needs to be updated, but the package does not need
+to be reinstalled.
 
 ### Testing
 
-The tests are specified using the [`pytest`](https://docs.pytest.org/en/stable/)
-signature, see [`tests/`](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/tree/main/tests) folder,
-and can be run using a test runner of choice.
-A pipeline is set up, see
-[`.gitlab-ci.yml`](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/blob/main/.gitlab-ci.yml).
+The package can be tested using pytest and coverage.
+To run the tests, execute the following command:
 
 ```bash
+pytest --cov delaynet/ tests/
+```
 
-### Linting
+### Pre-Commit
 
-The code is linted using [`pylint`](https://pylint.pycqa.org/en/latest/index.html) and
-[`black`](https://black.readthedocs.io/en/stable/). From the repository root, run:
+The project uses `pre-commit` for code formatting and linting.
+They are installed with the development dependencies.
+To install and run the pre-commit hooks, use:
 
 ```bash
-pylint delaynet/
-black delaynet/
+pre-commit run --all-files
 ```

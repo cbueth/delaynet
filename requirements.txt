@@ -14,6 +14,7 @@ coverage
 # Documentation
 sphinx
 myst-nb
+sphinx-design
 sphinx-book-theme
 sphinxcontrib-bibtex
 # Plotting

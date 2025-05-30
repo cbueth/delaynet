@@ -1,4 +1,4 @@
-"""Decorators for the DelayNet package."""
+"""Decorators for the delaynet package."""
 
 from functools import wraps
 from collections.abc import Callable

@@ -1,4 +1,4 @@
-"""DelayNet init."""
+"""delaynet init."""
 
 from ._version import __version__
 from .utils.logging import logging
@@ -11,4 +11,4 @@ from . import preparation
 # Set package attributes
 __author__ = "Carlson Büth"
 
-logging.info("DelayNet version %s", __version__)
+logging.info("delaynet version %s", __version__)

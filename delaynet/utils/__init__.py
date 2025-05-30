@@ -1,1 +1,1 @@
-"""Utility functions for DelayNet."""
+"""Utility functions for delaynet."""

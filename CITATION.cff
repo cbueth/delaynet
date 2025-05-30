@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this source code, please cite it as below."
-title: DelayNet
+title: delaynet
 type: software
 authors:
     - family-names: "Büth"

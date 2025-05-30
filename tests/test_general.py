@@ -1,4 +1,4 @@
-"""General tests for DelayNet module."""
+"""General tests for delaynet module."""
 
 import delaynet
 

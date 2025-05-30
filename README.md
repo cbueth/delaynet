@@ -1,4 +1,4 @@
-# `DelayNet` — Delay Propagation in Transportation Networks
+# `delaynet` — Delay Propagation in Transportation Networks
 
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://carlson.pages.ifisc.uib-csic.es/delaynet/)
 [![pipeline status](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/badges/main/pipeline.svg)](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/-/pipelines?page=1&scope=all&ref=main)

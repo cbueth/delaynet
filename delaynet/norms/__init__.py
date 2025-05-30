@@ -1,4 +1,4 @@
-"""Norms init, subpackage of DelayNet."""
+"""Norms init, subpackage of delaynet."""
 
 # Import all norms
 from .delta import delta

@@ -1,4 +1,4 @@
-"""Logging configuration for DelayNet."""
+"""Logging configuration for delaynet."""
 
 import logging
 

@@ -1,6 +1,6 @@
 <!-- omit in toc -->
 
-# Contributing to DelayNet
+# Contributing to delaynet
 
 First off, thanks for taking the time to contribute! ❤️
 
@@ -116,7 +116,7 @@ Once it's filed:
 
 ### Suggesting Enhancements
 
-This section guides you through submitting an enhancement suggestion for DelayNet,
+This section guides you through submitting an enhancement suggestion for delaynet,
 **including completely new features and minor improvements to existing functionality**.
 Following these guidelines will help maintainers and the community to understand your
 suggestion and find related suggestions.
@@ -150,7 +150,7 @@ as [GitLab issues](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/issues).
 - **Describe the current behavior** and **explain which behavior you expected to see
   instead** and why. At this point you can also tell which alternatives do not work for
   you.
-- **Explain why this enhancement would be useful** to most DelayNet users. You may
+- **Explain why this enhancement would be useful** to most delaynet users. You may
   also want to point out the other projects that solved it better and which could serve
   as inspiration.
 

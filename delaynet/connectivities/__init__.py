@@ -1,4 +1,4 @@
-"""Connectivities init, subpackage of DelayNet."""
+"""Connectivities init, subpackage of delaynet."""
 
 # Import all connectivity metrics
 from .continuous_ordinal_patterns import random_patterns

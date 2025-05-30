@@ -1,1 +1,1 @@
-"""Tests for the DelayNet module."""
+"""Tests for the delaynet module."""

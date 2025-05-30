@@ -1,4 +1,4 @@
-"""Generate example data for DelayNet."""
+"""Generate example data for delaynet."""
 
 from numpy import (
     zeros,
@@ -58,7 +58,7 @@ def gen_rand_data(
     rng=None,
 ) -> tuple[ndarray[bool], ndarray[float], ndarray[float]]:
     """
-    Generate random data for DelayNet.
+    Generate random data for delaynet.
 
 
     :param ts_len: Length of time series.

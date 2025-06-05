@@ -9,9 +9,9 @@ from ..decorators import norm
 def second_difference(ts):
     """Second difference (2diff) norm.
 
-    :param ts: Time series to normalize.
+    :param ts: Time series to normalise.
     :type ts: numpy.ndarray
-    :return: Normalized time series (length is reduced by 2).
+    :return: Normalised time series (length is reduced by 2).
     :rtype: numpy.ndarray
     """
     t_ts = ravel(

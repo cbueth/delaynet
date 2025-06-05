@@ -25,7 +25,7 @@ from delaynet.connectivities.continuous_ordinal_patterns import (
     ],
 )
 def test_norm_window(ts, expected):
-    """Test the normalization of a window by design."""
+    """Test the normalisation of a window by design."""
     assert allclose(norm_window(array(ts)), array(expected))
 
 
@@ -34,7 +34,7 @@ def test_norm_window(ts, expected):
     [None, [1, 2, 3], True, "string", 1, 1.0, [1, 2, "string"], [1, 2, None]],
 )
 def test_norm_window_typing_error(ts):
-    """Test the normalization of a window with invalid input."""
+    """Test the normalisation of a window with invalid input."""
     with pytest.raises(Exception):
         ts = array(ts)
         norm_window(ts)
@@ -53,7 +53,7 @@ def test_norm_window_typing_error(ts):
     ],
 )
 def test_norm_windows(ts, window_size, expected):
-    """Test the normalization of windows."""
+    """Test the normalisation of windows."""
     assert allclose(norm_windows(array(ts), window_size), array(expected))
 
 

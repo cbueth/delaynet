@@ -61,7 +61,7 @@ def random_patterns(
 
 @njit(cache=True, nogil=True)
 def norm_window(ts: np.ndarray) -> np.ndarray:  # pragma: no cover
-    """Normalize a window to values between -1 and 1."""
+    """Normalise a window to values between -1 and 1."""
     new_ts = np.copy(ts)
     new_ts -= np.min(new_ts)
     new_ts /= np.max(new_ts)
@@ -129,13 +129,13 @@ def pattern_transform_2d(
 
 @njit(nogil=True, parallel=True)
 def norm_windows(ts: np.ndarray, window_size: int) -> np.ndarray:  # pragma: no cover
-    """Normalize sliding windows of a time series to values between -1 and 1.
+    """Normalise sliding windows of a time series to values between -1 and 1.
 
     :param ts: Time series.
     :type ts: numpy.ndarray
     :param window_size: Size of the window.
     :type window_size: int
-    :return: Normalized windows.
+    :return: Normalised windows.
     :rtype: numpy.ndarray
     """
     # Create a sliding window view of the input array
@@ -148,7 +148,7 @@ def norm_windows(ts: np.ndarray, window_size: int) -> np.ndarray:  # pragma: no 
         shape=(ts.shape[0] - window_size + 1, window_size),
     )
     normed_windows = np.zeros_like(windows)
-    # Normalize each window to [-1, 1]
+    # Normalise each window to [-1, 1]
     for i in prange(windows.shape[0]):  # pylint: disable=not-an-iterable
         normed_windows[i] = norm_window(windows[i])
     return normed_windows
@@ -160,7 +160,7 @@ def pattern_distance(
 ) -> np.ndarray:  # pragma: no cover
     """Compute the distance between the windows and a pattern.
 
-    :param windows: Normalized windows.
+    :param windows: Normalised windows.
     :type windows: numpy.ndarray
     :param pattern: Pattern.
     :type pattern: numpy.ndarray

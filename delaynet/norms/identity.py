@@ -1,4 +1,4 @@
-"""Identity / Normalization."""
+"""Identity / Normalisation."""
 
 import logging
 
@@ -7,15 +7,15 @@ from ..decorators import norm
 
 @norm
 def identity(ts):
-    """Identity 'normalization'.
+    """Identity 'normalisation'.
 
-    :param ts: Time series to normalize.
+    :param ts: Time series to normalise.
     :type ts: numpy.ndarray
-    :return: 'Normalized' time series.
+    :return: 'Normalised' time series.
     :rtype: numpy.ndarray
     """
     logging.warning(
-        "Identity norm is not a normalization. "
-        "Only use for testing or if data is already normalized."
+        "Identity norm is not a normalisation. "
+        "Only use for testing or if data is already normalised."
     )
     return ts

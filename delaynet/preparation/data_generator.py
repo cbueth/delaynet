@@ -311,7 +311,7 @@ def __hrf(times: ndarray[float], rng: Generator = None) -> ndarray[float]:
     # Generate Peak and Undershoot
     peak_values = gamma.pdf(times, 6)
     undershoot_values = gamma.pdf(times, 12)
-    # Normalize
+    # Normalise
     values = peak_values - 0.35 * undershoot_values
     return values / np_max(values) * 0.6
 

@@ -15,11 +15,11 @@ def delta(ts, window_size: int = 10):
     .. math::
         x_t' = x_t - \left(2w + 1\right)^{-1} \sum_{k = t - w}^{t + w} x_k
 
-    :param ts: Time series to normalize.
+    :param ts: Time series to normalise.
     :type ts: numpy.ndarray
     :param window_size: Window size to use for calculating the mean.
     :type window_size: int
-    :return: Normalized time series.
+    :return: Normalised time series.
     :rtype: numpy.ndarray
     """
     t_ts = ravel(ts)

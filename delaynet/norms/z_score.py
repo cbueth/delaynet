@@ -1,4 +1,4 @@
-"""Z-Score (ZS) normalization."""
+"""Z-Score (ZS) normalisation."""
 
 from numba import prange, njit, int64
 from numpy import mean as npmean, mod, std, ndarray, arange, integer, copy, zeros
@@ -10,9 +10,9 @@ from ..utils.logging import logging
 
 @norm
 def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray:
-    r"""Z-Score (ZS) normalization.
+    r"""Z-Score (ZS) normalisation.
 
-    The Z-Score (ZS) normalization is a standard score that measures the number of
+    The Z-Score (ZS) normalisation is a standard score that measures the number of
     standard deviations a data point is from the mean. It is calculated as:
 
     .. math::
@@ -21,12 +21,12 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
     where :math:`X` is the data point, :math:`\mu` is the mean, and :math:`\sigma` is
     the standard deviation.
 
-    The Z-Score normalization is applied to a time series by computing the mean and
+    The Z-Score normalisation is applied to a time series by computing the mean and
     standard deviation of a sub time series around each data point.
     The sub time series is defined by the periodicity and the maximum number of periods
     to consider before and after the current value.
     Mean and standard deviation are computed for each sub time series and used to
-    normalize the data point.
+    normalise the data point.
     The current value is removed from the sub time series to avoid bias.
 
     For a valid Z-Score, :math:`2\times\texttt{periodicity}+1 \leq \texttt{len(ts)}`
@@ -34,7 +34,7 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
     Also, :math:`\texttt{max\_periods} \times \texttt{periodicity} \geq\texttt{len(ts)}`
     results in including all periods.
 
-    :param ts: Time series to normalize.
+    :param ts: Time series to normalise.
     :type ts: numpy.ndarray
     :param periodicity: Periodicity of the time series - reoccurrence of the same
                         pattern.
@@ -42,7 +42,7 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
     :param max_periods: Maximum number of periods to consider before and after the
                         current value. If -1, all periods are considered.
     :type max_periods: int >= -1
-    :return: Normalized time series.
+    :return: Normalised time series.
     :rtype: numpy.ndarray
     :raises ValueError: If the ``periodicity`` is not a positive integer.
     :raises ValueError: If the ``max_periods`` is not a positive integer or -1.

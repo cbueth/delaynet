@@ -1,6 +1,33 @@
 (reference_guide)=
 # Reference Guide
------------------
+
+Welcome to the `delaynet` Reference Guide.
+This guide provides comprehensive documentation for the `delaynet` package, a Python library for **reconstructing delay functional networks** from time series data.
+Reconstruction can be performed using various building blocks and connectivities,
+e.g. by detecting causality relationships with granger causality tests or transfer entropy.
+
+## Sections
+
+`delaynet` offers a suite of tools for analyzing time series data and reconstructing delay networks from time series.
+The package is designed to be flexible and extensible, allowing users to apply various methods for preprocessing, normalisation, and connectivity analysis.
+
+## What You'll Find in This Guide
+
+- **[Preparation](00_preparation)**: Learn what data format to prepare, or how to generate synthetic data for testing and experimentation, including random data and fMRI time series.
+
+- **[Preprocessing](10_preprocess)**: Discover methods for preparing time series data for analysis, including symbolization techniques for converting continuous time series to discrete form.
+
+- **[Normalisation Methods](20_norm)**: Explore various normalisation techniques to standardize time series data, remove trends, and make different time series comparable.
+
+- **[Connectivity Measures](30_connectivity)**: Learn about the different connectivity measures available in `delaynet`, including Granger Causality, Linear Correlation, Mutual Information, and more.
+
+- **[Network Reconstruction](40_network_reconstruction)**: Understand how to infer the structure of a network from time series data (work in progress).
+
+- **[Network Pruning](41_network_pruning)**: Learn about methods for simplifying complex networks by removing weak or insignificant connections (work in progress).
+
+- **[Topological Analysis](42_topological_analysis)**: Discover techniques for analyzing the structural properties of networks (work in progress).
+
+- **[Evaluation](50_evaluation)**: Find out how to evaluate the performance of network reconstruction methods.
 
 Example reference to {cite:p}`zaninAssessingGrangerCausality2021`.
 

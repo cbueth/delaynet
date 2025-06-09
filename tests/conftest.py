@@ -3,7 +3,7 @@
 import pytest
 from numpy import array
 
-from delaynet.preparation.data_generator import gen_rand_data, gen_fmri
+from delaynet.preparation.data_generator import gen_delayed_causal_network, gen_fmri
 from delaynet.connectivities import __all_connectivity_metrics_names_simple__
 from delaynet.norms import __all_norms__
 
@@ -88,7 +88,7 @@ def norm(request):
 @pytest.fixture(scope="session")
 def two_random_time_series():
     """Return two random time series. Fixed seed."""
-    _, _, ts = gen_rand_data(
+    _, _, ts = gen_delayed_causal_network(
         ts_len=1000, n_nodes=2, l_dens=0.5, wm_min_max=(0.5, 1.5), rng=0
     )
     return ts[0, :], ts[1, :]

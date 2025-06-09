@@ -10,7 +10,7 @@ from numpy import zeros, save, floating
 
 from delaynet import normalise, connectivity
 from delaynet.evaluation import roc_auc_rank_c
-from delaynet.preparation import gen_rand_data
+from delaynet.preparation import gen_delayed_causal_network
 
 
 def test_all_metrics(n_nodes: int = 15, l_dens: float = 0.5, ts_len: int = 1000):
@@ -32,7 +32,7 @@ def test_all_metrics(n_nodes: int = 15, l_dens: float = 0.5, ts_len: int = 1000)
     metrics = ["COP", "GC", "GC_Bi", "GV", "MI", "OS", "RC", "TE"]
 
     # Testing all combination on the same random data
-    am, wm, all_ts = gen_rand_data(n_nodes, ts_len, l_dens, (0.5, 1.5), 0)
+    am, wm, all_ts = gen_delayed_causal_network(n_nodes, ts_len, l_dens, (0.5, 1.5), 0)
 
     all_res = {}
     for norm, metric in product(norms, metrics):

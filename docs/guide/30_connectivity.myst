@@ -1,19 +1,197 @@
+(connectivity_measure)=
 # Connectivity Measures
 
-## Continuous ordinal patterns
+`delaynet` provides a variety of connectivity measures to analyze the relationships between time series.
+These measures can be used to detect causal relationships, correlations, and synchronization between different time series.
 
-## Granger causality
+To measure a significant correlation between two time series,
+each connectivity approach calculates a $p$-value.
+This $p$-value indicates the probability that the observed correlation
+between two time series is due to random chance.
+A strong correlation results in a low $p$-value.
+Later on, it is possible to prune weak connections based on these $p$-values,
+see {ref}`network_pruning`.
 
-## Linear correlation
+One assumption is that the information propagation in the network can have varying
+delays between each node in the network.
+Due to this, the connectivity needs to be calculated for different delay steps.
+It is possible to either test for all delays up to a certain maximum delay,
+or to test for specific delays.
+The best delay value and it's corresponding $p$-value are returned.
 
-## Mutual information
+## Using Connectivity Measures
 
-## Ordinal synchronization
+`delaynet` provides a unified interface for all connectivity measures through the {py:func}`~delaynet.connectivity.connectivity` function:
 
-## Rank correlation
+```python
+from delaynet.connectivity import connectivity
 
-## Transfer entropy
+# Calculate connectivity between two time series
+result = connectivity(ts1, ts2, metric="linear_correlation", max_lag_steps=5)
+# tests all 1, ...., 5 lags
+result = connectivity(ts1, ts2, metric="linear_correlation", lags=[1, 2, 5, 10])
+# tests only specified lags
+```
 
-## Gravity
+Now, `result` is a tuple of the best $p$-value and the corresponding delay step.
+For example, if `result` is `(0.05, 3)`, it means that the best $p$-value is 0.05
+and it occurs with a lag of 3 time steps.
 
-Toy connectivity
+You can view all available connectivity measures using the {py:func}`~delaynet.connectivity.show_connectivity_metrics()` function:
+
+```python
+from delaynet.connectivity import show_connectivity_metrics
+
+# Show all available connectivity measures
+show_connectivity_metrics()
+```
+
+## Available Connectivity Metrics
+
+`delaynet` provides a diverse set of connectivity metrics to analyze relationships between time series data. Each metric offers different approaches to detecting connections, from simple correlations to complex causality measures. Below is a comprehensive list of all available metrics with their descriptions and usage examples.
+
+### Continuous Ordinal Patterns
+
+The Continuous Ordinal Patterns (COP) connectivity metric analyzes the patterns in time series data to detect relationships.
+
+```python
+from delaynet.connectivity import connectivity
+
+# Calculate COP connectivity
+result = connectivity(ts1, ts2, metric="random_patterns", p_size=5, num_rnd_patterns=50, max_lag_steps=5)
+```
+
+Parameters:
+- `p_size`: Size of the ordinal pattern
+- `num_rnd_patterns`: Number of random patterns to consider
+- `max_lag_steps`: Maximum time lag to consider
+
+### Granger Causality
+
+Granger Causality (GC) is a statistical concept of causality based on prediction.
+If a time series X "Granger-causes" a time series Y, then past values of X should contain information that helps predict Y beyond the information contained in past values of Y alone
+{cite:p}`zaninAssessingGrangerCausality2021`.
+Before using Granger Causality, it's important to detrend the time series data to avoid spurious results.
+
+`delaynet` provides several implementations of Granger Causality:
+
+#### Single Lag Granger Causality
+
+```python
+from delaynet.connectivity import connectivity
+
+# Calculate single lag Granger Causality
+result = connectivity(ts1, ts2, metric="gt_single_lag", lag_step=5)
+```
+
+#### Multi-Lag Granger Causality
+
+```python
+from delaynet.connectivity import connectivity
+
+# Calculate multi-lag Granger Causality
+result = connectivity(ts1, ts2, metric="gt_multi_lag", max_lag_steps=5)
+```
+
+#### Bidirectional Multi-Lag Granger Causality
+
+```python
+from delaynet.connectivity import connectivity
+
+# Calculate bidirectional multi-lag Granger Causality
+result = connectivity(ts1, ts2, metric="gt_bi_multi_lag", max_lag_steps=5)
+```
+
+### Linear Correlation
+
+The Linear Correlation (LC) connectivity metric calculates the Pearson correlation coefficient between two time series.
+
+```python
+from delaynet.connectivity import connectivity
+
+# Calculate linear correlation
+result = connectivity(ts1, ts2, metric="linear_correlation", max_lag_steps=5, return_abs=True)
+```
+
+Parameters:
+- `max_lag_steps`: Maximum time lag to consider
+- `return_abs`: Whether to return the absolute value of the correlation
+
+### Mutual Information
+
+Mutual Information (MI) measures the amount of information obtained about one random variable through observing another random variable.
+
+```python
+from delaynet.connectivity import connectivity
+
+# Calculate mutual information
+result = connectivity(ts1, ts2, metric="mutual_information", approach="binning", max_lag_steps=5)
+```
+
+Parameters:
+- `approach`: The approach to use for estimating mutual information (see `infomeasure.mutual_information` for available approaches)
+- `max_lag_steps`: Maximum time lag to consider
+
+### Ordinal Synchronization
+
+The Ordinal Synchronization (OS) connectivity metric measures the synchronization between two time series based on their ordinal patterns.
+
+```python
+from delaynet.connectivity import connectivity
+
+# Calculate ordinal synchronization
+result = connectivity(ts1, ts2, metric="ordinal_synchronization", d=3, tau=1, max_lag_steps=5)
+```
+
+Parameters:
+- `d`: Embedding dimension / delay dimension
+- `tau`: OS time delay
+- `max_lag_steps`: Maximum time lag to consider
+
+### Rank Correlation
+
+The Rank Correlation (RC) connectivity metric calculates the Spearman rank correlation between two time series.
+
+```python
+from delaynet.connectivity import connectivity
+
+# Calculate rank correlation
+result = connectivity(ts1, ts2, metric="rank_correlation", max_lag_steps=5)
+```
+
+Parameters:
+- `max_lag_steps`: Maximum time lag to consider
+
+### Transfer Entropy
+
+Transfer Entropy (TE) measures the amount of directed transfer of information between two random processes.
+
+```python
+from delaynet.connectivity import connectivity
+
+# Calculate transfer entropy
+result = connectivity(ts1, ts2, metric="transfer_entropy", approach="binning")
+```
+
+Parameters:
+- `approach`: The approach to use for estimating transfer entropy (see `infomeasure.transfer_entropy` for available approaches)
+
+### Gravity
+
+```{note}
+How useful is this one?
+```
+
+The Gravity connectivity metric calculates a measure of interaction between two time series based on the product of their exponential sums.
+This is a toy metric that may not have practical applications but can serve as an educational tool.
+
+```python
+from delaynet.connectivity import connectivity
+
+# Calculate gravity
+result = connectivity(ts1, ts2, metric="gravity", max_lag_steps=5)
+```
+
+
+Parameters:
+- `max_lag_steps`: Maximum time lag to consider

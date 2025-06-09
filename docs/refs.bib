@@ -5,7 +5,6 @@
   journal = {Applied Economics},
   volume = {16},
   number = {3},
-  eprint = {https://doi.org/10.1080/00036848400000041},
   pages = {335--342},
   publisher = {Routledge},
   doi = {10.1080/00036848400000041}
@@ -32,8 +31,6 @@
   journal = {Econometrica},
   volume = {37},
   number = {3},
-  eprint = {1912791},
-  eprinttype = {jstor},
   pages = {424},
   issn = {00129682},
   doi = {10.2307/1912791},
@@ -52,4 +49,36 @@
   urldate = {2024-03-15},
   abstract = {The Granger test is one of the best known techniques to detect causality relationships among time series, and has been used uncountable times in science and engineering. The quality of its results strongly depends on the quality of the underlying data, and different approaches have been proposed to reduce the impact of, for instance, observational noise or irregular sampling. Less attention has nevertheless been devoted to situations in which the analysed time series are irregularly polluted with missing and extreme values. In this contribution I tackle this problem by comparing four different data pre-processing strategies and evaluating their performance with synthetic time series, both in dyadic tests and functional network contexts. I further apply these strategies to a real-world problem, involving inferring the structure behind the propagation of delays in an air transport system. Finally, some guidelines are provided on when and how these strategies ought to be used.},
   keywords = {Couplings,Dynamics,Europe,functional networks,Granger causality,missing data,Pollution measurement,Predictive models,Standards,Time series analysis}
+}
+
+@article{rajapakseLearningEffectiveBrain2007,
+  title = {Learning Effective Brain Connectivity with Dynamic {{Bayesian}} Networks},
+  author = {Rajapakse, Jagath C. and Zhou, Juan},
+  year = {2007},
+  month = sep,
+  journal = {NeuroImage},
+  volume = {37},
+  number = {3},
+  pages = {749--760},
+  issn = {1053-8119},
+  doi = {10.1016/j.neuroimage.2007.06.003},
+  urldate = {2025-06-06},
+  abstract = {We propose to use dynamic Bayesian networks (DBN) to learn the structure of effective brain connectivity from functional MRI data in an exploratory manner. In our previous work, we used Bayesian networks (BN) to learn the functional structure of the brain (Zheng, X., Rajapakse, J.C., 2006. Learning functional structure from fMR images. NeuroImage 31 (4), 1601--1613). However, BN provides a single snapshot of effective connectivity of the entire experiment and therefore is unable to accurately capture the temporal characteristics of connectivity. Dynamic Bayesian networks (DBN) use a Markov chain to model fMRI time-series and thereby determine temporal relationships of interactions among brain regions. Experiments on synthetic fMRI data demonstrate that the performance of DBN is comparable to Granger causality mapping (GCM) in determining the structure of linearly connected networks. Dynamic Bayesian networks render more accurate and informative brain connectivity than earlier methods as connectivity is described in complete statistical sense and temporal characteristics of time-series are explicitly taken into account. The functional structures inferred on two real fMRI datasets are consistent with the previous literature and more accurate than those discovered by BN. Furthermore, we study the effects of hemodynamic noise, scanner noise, inter-scan interval, and the variability of hemodynamic parameters on the derived connectivity.},
+  keywords = {Bayesian networks,Causal effects,Dynamic Bayesian networks,Effective connectivity,Functional MRI,Hemodynamic response function,Markov chain Monte Carlo methods,Markov chains}
+}
+
+@article{roebroeckMappingDirectedInfluence2005,
+  title = {Mapping Directed Influence over the Brain Using {{Granger}} Causality and {{fMRI}}},
+  author = {Roebroeck, Alard and Formisano, Elia and Goebel, Rainer},
+  year = {2005},
+  month = mar,
+  journal = {NeuroImage},
+  volume = {25},
+  number = {1},
+  pages = {230--242},
+  issn = {1053-8119},
+  doi = {10.1016/j.neuroimage.2004.11.017},
+  urldate = {2025-06-06},
+  abstract = {We propose Granger causality mapping (GCM) as an approach to explore directed influences between neuronal populations (effective connectivity) in fMRI data. The method does not rely on a priori specification of a model that contains pre-selected regions and connections between them. This distinguishes it from other fMRI effective connectivity approaches that aim at testing or contrasting specific hypotheses about neuronal interactions. Instead, GCM relies on the concept of Granger causality to define the existence and direction of influence from information in the data. Temporal precedence information is exploited to compute Granger causality maps that identify voxels that are sources or targets of directed influence for any selected region-of-interest. We investigated the method by simulations and by application to fMRI data of a complex visuomotor task. The presented exploratory approach of mapping influences between a region of interest and the rest of the brain can form a useful complement to existing models of effective connectivity.},
+  keywords = {Autoregressive models,Effective connectivity,fMRI,Granger causality}
 }

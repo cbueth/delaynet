@@ -1,1 +1,98 @@
 # Topological Analysis
+
+```{warning}
+The Topological Analysis functionality is currently a work in progress. This section will be expanded in future versions of `delaynet`.
+```
+
+Topological analysis involves studying the structural properties of networks to understand their organization, robustness, and function. This analysis can reveal important features such as community structure, centrality of nodes, and network motifs.
+
+## Future Functionality
+
+The Topological Analysis module will include:
+
+- Network metrics calculation (degree distribution, clustering coefficient)
+- Community detection algorithms to identify groups of densely connected nodes
+- Centrality measures to identify important nodes in the network
+
+Ideas, but not needed:
+
+- Other network metrics (path length, diameter)
+- Motif analysis to detect recurring patterns in network structure
+- Visualisation tools for network topology
+
+Maybe best is to not programm much and just integrate with existing libraries like NetworkX.
+
+## Planned Implementation
+
+The planned implementation will include functions for calculating various network metrics:
+
+```python
+# Pseudocode for future implementation
+def calculate_network_metrics(adjacency_matrix):
+    """
+    Calculate various topological metrics for a network.
+
+    Parameters:
+    -----------
+    adjacency_matrix : numpy.ndarray
+        Adjacency matrix of the network, shape (n_nodes, n_nodes)
+
+    Returns:
+    --------
+    metrics : dict
+        Dictionary containing various network metrics
+    """
+    import networkx as nx
+
+    # Convert adjacency matrix to NetworkX graph
+    G = nx.from_numpy_array(adjacency_matrix, create_using=nx.DiGraph)
+
+    # Calculate metrics
+    metrics = {
+        'average_degree': sum(dict(G.degree()).values()) / G.number_of_nodes(),
+        'clustering_coefficient': nx.average_clustering(G),
+        'average_path_length': nx.average_shortest_path_length(G),
+        'diameter': nx.diameter(G),
+        'density': nx.density(G),
+        'degree_centrality': nx.degree_centrality(G),
+        'betweenness_centrality': nx.betweenness_centrality(G),
+        'eigenvector_centrality': nx.eigenvector_centrality(G)
+    }
+
+    return metrics
+
+def detect_communities(adjacency_matrix, method='louvain'):
+    """
+    Detect communities in a network.
+
+    Parameters:
+    -----------
+    adjacency_matrix : numpy.ndarray
+        Adjacency matrix of the network, shape (n_nodes, n_nodes)
+    method : str
+        Community detection method to use
+
+    Returns:
+    --------
+    communities : list
+        List of communities, where each community is a list of node indices
+    """
+    import networkx as nx
+    import community as community_louvain
+
+    # Convert adjacency matrix to NetworkX graph
+    G = nx.from_numpy_array(adjacency_matrix)
+
+    if method == 'louvain':
+        partition = community_louvain.best_partition(G)
+        communities = {}
+        for node, community_id in partition.items():
+            if community_id not in communities:
+                communities[community_id] = []
+            communities[community_id].append(node)
+        return list(communities.values())
+
+    # Other methods can be implemented here
+
+    return []
+```

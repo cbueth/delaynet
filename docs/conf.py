@@ -54,6 +54,7 @@ language = "en"
 
 myst_enable_extensions = ["colon_fence", "deflist", "dollarmath", "amsmath"]
 myst_heading_anchors = 3
+myst_links_external_new_tab = True
 nb_execution_timeout = 180
 
 # -- Options for HTML output -------------------------------------------------

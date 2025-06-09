@@ -26,7 +26,8 @@ def gen_data(
     """Wrapper for the different data generation approaches.
 
     Supported generation methods:
-    - 'rand': Random time series. :func:`gen_rand_data`
+
+    - 'dcn': Delayed causal network time series. :func:`gen_delayed_causal_network`
     - 'fmri': fMRI time series. :func:`gen_fmri`
 
     :param generation_method: Type of time series to generate.
@@ -41,8 +42,8 @@ def gen_data(
     :rtype: numpy.ndarray or tuple[ndarray, ...]
     :raises ValueError: If the generation method is unknown.
     """
-    if generation_method.lower() == "rand":
-        return gen_rand_data(ts_len, n_nodes, **kwargs)
+    if generation_method.lower() == "dcn":
+        return gen_delayed_causal_network(ts_len, n_nodes, **kwargs)
     if generation_method.lower() == "fmri":
         if n_nodes == 1:
             return gen_fmri(ts_len, **kwargs)
@@ -50,7 +51,7 @@ def gen_data(
     raise ValueError(f"Unknown generation method: {generation_method}.")
 
 
-def gen_rand_data(
+def gen_delayed_causal_network(
     ts_len: int,
     n_nodes: int,
     l_dens: float,
@@ -58,7 +59,7 @@ def gen_rand_data(
     rng=None,
 ) -> tuple[ndarray[bool], ndarray[float], ndarray[float]]:
     """
-    Generate random data for delaynet.
+    Generate delayed causal network data for delaynet.
 
 
     :param ts_len: Length of time series.
@@ -143,15 +144,8 @@ def gen_fmri(
     Generate fMRI time series.
 
     This function generates random fMRI time series.
-    It is based on the studies by Roebroeck et al.[1]_ and Rajapakse and Zhou[2]_.
-
-    .. [1] Alard Roebroeck, Elia Formisano, Rainer Goebel,
-        "Mapping directed influence over the brain using Granger causality and fMRI",
-        https://doi.org/10.1016/j.neuroimage.2004.11.017
-
-    .. [2] Jagath C. Rajapakse, Juan Zhou,
-        "Learning effective brain connectivity with dynamic Bayesian networks",
-        https://doi.org/10.1016/j.neuroimage.2007.06.003
+    It is based on the studies by :cite:t:`roebroeckMappingDirectedInfluence2005`
+    and :cite:t:`rajapakseLearningEffectiveBrain2007`.
 
     :param ts_len: Length of the time series.
     :type ts_len: int

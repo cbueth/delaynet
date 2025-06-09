@@ -1,6 +1,189 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
 # Preparation
 
+This section covers the data preparation functionality in `delaynet`.
+First, {ref}`data_preparation` describes what input data `delaynet` needs.
+Second, {ref}`data_generation` will describe how to generate synthetic data
+for testing and experimentation.
+
+(data_preparation)=
+## Data preparation
+
+In order to reconstruct delay functional networks,
+`delaynet` requires a set of time series data for each node in the network.
+For each pair of nodes a weight as $p$-value can be calculated with a given {ref}`connectivity measure <connectivity_measure>`.
+The data length must be consistent across all nodes.
+For example, having ten nodes with time series:
+
+```{code-cell}
+:tags: [hide-input]
+import pandas as pd
+import numpy as np
+
+# randomly generated columns
+nodes = 10
+ts_len = 200
+# do random walks for each node
+data = np.random.randint(low=-1, high=2, size=(ts_len, nodes))
+# running culmulate (1d random walks)
+data = np.cumsum(data, axis=0)
+
+data = pd.DataFrame(
+    index=pd.date_range(start=pd.Timestamp.now().floor('h'), periods=ts_len, freq='10min'),
+    columns=range(1, nodes+1),
+    data=data,
+)
+data
+```
+
+If you already have a dataset, you can advance to the {ref}`next section <preprocessing>`.
+
+(data_generation)=
 ## Data generation
 
-- Random data: adjacency, weight matrix, lag, time series (exponential)
-- FMRI Random data
+`delaynet` provides several methods for generating synthetic data that can be used for testing and experimentation. The library offers two primary data generation methods:
+
+1. **Delayed Causal Network Generation**: Creates time series with explicit causal relationships and time delays between nodes, suitable for testing delay network reconstruction algorithms.
+2. **fMRI Data Generation**: Simulates realistic fMRI signals with hemodynamic response functions, based on neuroimaging research.
+
+Both methods are accessible through the convenient {py:func}`dn.preparation.gen_data()<delaynet.preparation.data_generator.gen_data>` function, which serves as a unified interface for all data generation approaches:
+
+```{code-cell}
+:tags: [hide-input]
+import delaynet as dn
+help(dn.preparation.gen_data)
+```
+
+### 1. Delayed Causal Network Generation
+
+The delayed causal network generation process follows these steps:
+
+1. **Adjacency Matrix Generation**: Creates a random binary matrix where each entry has a probability `l_dens` of being 1 (indicating a connection). Self-loops are explicitly removed by setting diagonal elements to False.
+
+2. **Weight Matrix Creation**: Assigns random weights to connections in the adjacency matrix. Weights are uniformly distributed between the minimum and maximum values specified in `wm_min_max`. Non-connections (where adjacency matrix is 0) have zero weight.
+
+3. **Lag Matrix Generation**: Creates a matrix of random integers between 1 and 4, representing time delays between connected nodes.
+
+4. **Time Series Generation**: For each connection in the network:
+   - With 80% probability, no effect is applied (simulating sporadic influence)
+   - With 20% probability, a value from an exponential distribution is generated, scaled by the connection weight
+   - This value is added to the source node's time series
+   - The same value is added to the target node's time series after the specified lag
+
+This approach creates time series with causal relationships that have both magnitude (weight) and temporal (lag) components, making it suitable for testing delay network reconstruction algorithms.
+
+```{code-cell}
+from numpy.random import default_rng
+
+# Generate random data
+adjacency_matrix, weight_matrix, time_series = dn.preparation.data_generator.gen_delayed_causal_network(
+    ts_len=1000,  # Length of time series
+    n_nodes=5,    # Number of nodes
+    l_dens=0.3,   # Density of the adjacency matrix
+    wm_min_max=(0.5, 1.5),  # Min and max of the weight matrix
+    rng=default_rng(1249687)
+)
+```
+
+
+```{code-cell}
+:tags: [hide-input]
+import matplotlib.pyplot as plt
+
+# Plot the time series data
+plt.figure(figsize=(10, 4), dpi=300)
+plt.plot(time_series.T[:105])
+plt.title('Delayed Causal Time Series')
+plt.xlim(-5, 105)
+plt.xlabel('Sample Index')
+plt.ylabel('Signal')
+plt.grid()
+plt.show()
+```
+
+### 2. fMRI Data Generation
+
+The functional Magnetic Resonance Imaging (fMRI) data generation process simulates realistic functional MRI signals by modeling both the underlying neural activity and the hemodynamic response. This approach is based on studies by Roebroeck *et al.* and Rajapakse and Zhou {cite:p}`roebroeckMappingDirectedInfluence2005,rajapakseLearningEffectiveBrain2007`.
+
+{cite:t}`roebroeckMappingDirectedInfluence2005` proposed Granger causality mapping (GCM) as an approach to explore directed influences between neuronal populations in fMRI data. Their method doesn't rely on a priori specification of a model with pre-selected regions and connections, instead using temporal precedence information to identify voxels that are sources or targets of directed influence.
+{cite:t}`rajapakseLearningEffectiveBrain2007` extended this work by using dynamic Bayesian networks (DBN) to learn effective brain connectivity. Their approach uses a Markov chain to model fMRI time-series and determine temporal relationships between brain regions. Their research demonstrated that DBN performance is comparable to GCM for linearly connected networks, while providing more complete statistical descriptions of connectivity. They also studied the effects of various noise types, inter-scan intervals, and hemodynamic parameter variability on connectivity analysis. Together, these papers provide the theoretical foundation for generating realistic fMRI data with directed causal influences.
+
+The generation process follows these steps:
+
+1. **Initial Time Series Generation**: Creates coupled time series representing underlying neural activity:
+   - For a single node (`gen_fmri()`): Generates two coupled time series with a specified coupling strength
+   - For multiple nodes (`gen_fmri_multiple()`): Creates a network where the first node influences all other nodes with the specified coupling strength
+
+2. **Hemodynamic Response Function (HRF) Application**: Convolves the neural activity with a hemodynamic response function:
+   - The HRF is modeled using gamma distributions with both peak and undershoot components
+   - This simulates the blood-oxygen-level-dependent (BOLD) response that fMRI measures
+
+3. **Downsampling**: Reduces the temporal resolution of the signal to match typical fMRI acquisition rates:
+   - The downsampling factor parameter controls the temporal resolution
+   - This simulates the relatively slow sampling rate of fMRI compared to actual neural activity
+
+4. **Noise Addition**: Adds Gaussian noise to the final time series:
+   - The noise level can be controlled separately for the initial neural activity and the final fMRI signal
+   - This simulates measurement noise in real fMRI data
+
+This approach creates realistic fMRI time series with directed influences between regions, making it suitable for testing connectivity analysis methods in neuroimaging research.
+
+```{code-cell}
+# Generate fMRI data for a single node
+fmri_data = dn.preparation.data_generator.gen_fmri(
+    ts_len=1000,               # Length of time series
+    downsampling_factor=2,     # Downsampling factor
+    time_resolution=0.2,       # Time resolution
+    coupling_strength=2.0,     # Coupling strength
+    noise_initial_sd=1.0,      # Standard deviation of initial noise
+    noise_final_sd=0.1,        # Standard deviation of final noise
+    rng=default_rng(1249687)
+)
+```
+
+```{code-cell}
+:tags: [hide-input]
+# Plot the generated fMRI data for a single node
+plt.figure(figsize=(10, 4), dpi=300)
+plt.plot(fmri_data)
+plt.title('Generated fMRI Data for a Single Node')
+plt.xlabel('Sample Index')
+plt.ylabel('Signal Amplitude')
+plt.grid()
+plt.show()
+```
+
+```{code-cell}
+# Generate fMRI data for multiple nodes
+multi_fmri_data = dn.preparation.data_generator.gen_fmri_multiple(
+    ts_len=1000,               # Length of time series
+    n_nodes=5,                 # Number of nodes
+    downsampling_factor=2,     # Downsampling factor
+    time_resolution=0.2,       # Time resolution
+    coupling_strength=2.0,     # Coupling strength
+    noise_initial_sd=1.0,      # Standard deviation of initial noise
+    noise_final_sd=0.1,        # Standard deviation of final noise
+    rng=default_rng(1249687)
+)
+```
+
+```{code-cell}
+:tags: [hide-input]
+# Plot multiple nodes' fMRI data
+plt.figure(figsize=(12, 6), dpi=300)
+plt.plot(multi_fmri_data.T, label=range(1, multi_fmri_data.shape[0]+1))
+plt.xlabel('Sample Index')
+plt.ylabel('Signal Amplitude')
+plt.title('Generated FMRI Data for Multiple Nodes')
+plt.legend()
+plt.grid()
+plt.show()
+```
+
+
+The generated fMRI data simulates realistic brain activity patterns with directed influences between regions, making it suitable for testing connectivity analysis methods.

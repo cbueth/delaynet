@@ -4,7 +4,7 @@ import pytest
 from numpy import array_equal
 from numpy.random import default_rng
 
-from delaynet.preparation.data_generator import gen_rand_data
+from delaynet.preparation.data_generator import gen_delayed_causal_network
 
 
 @pytest.mark.parametrize("n_nodes", [1, 2, 10])
@@ -12,9 +12,9 @@ from delaynet.preparation.data_generator import gen_rand_data
 @pytest.mark.parametrize("l_dens", [0.0, 0.5, 1.0])
 @pytest.mark.parametrize("wm_min_max", [(0.0, 1.0), (0.5, 1.5), (1.0, 2.0)])
 @pytest.mark.parametrize("rng", [None, 0, default_rng(0)])
-def test_gen_rand_data(n_nodes, ts_len, l_dens, wm_min_max: tuple[float, float], rng):
-    """Test the gen_rand_data function."""
-    am, wm, ts = gen_rand_data(ts_len, n_nodes, l_dens, wm_min_max, rng)
+def test_gen_delayed_causal_network(n_nodes, ts_len, l_dens, wm_min_max: tuple[float, float], rng):
+    """Test the gen_delayed_causal_network function."""
+    am, wm, ts = gen_delayed_causal_network(ts_len, n_nodes, l_dens, wm_min_max, rng)
     assert am.shape == (n_nodes, n_nodes)
     assert wm.shape == (n_nodes, n_nodes)
     assert ts.shape == (n_nodes, ts_len)
@@ -29,8 +29,8 @@ def test_gen_rand_data(n_nodes, ts_len, l_dens, wm_min_max: tuple[float, float],
 @pytest.mark.parametrize(
     "rng, is_stable", [(None, False), (0, True), (default_rng(0), False)]
 )
-def test_gen_rand_data_stability(rng, is_stable):
-    """Test if the gen_rand_data function is stable.
+def test_gen_delayed_causal_network_stability(rng, is_stable):
+    """Test if the gen_delayed_causal_network function is stable.
     This is, if the same random seed is used, the output should be the same.
     But using the same random generator twice should not produce the same output.
     """
@@ -38,8 +38,8 @@ def test_gen_rand_data_stability(rng, is_stable):
     ts_len = 10
     l_dens = 0.5
     wm_min_max = (0.5, 1.5)
-    am1, wm1, ts1 = gen_rand_data(ts_len, n_nodes, l_dens, wm_min_max, rng)
-    am2, wm2, ts2 = gen_rand_data(ts_len, n_nodes, l_dens, wm_min_max, rng)
+    am1, wm1, ts1 = gen_delayed_causal_network(ts_len, n_nodes, l_dens, wm_min_max, rng)
+    am2, wm2, ts2 = gen_delayed_causal_network(ts_len, n_nodes, l_dens, wm_min_max, rng)
     assert array_equal(am1, am2) == is_stable
     assert array_equal(wm1, wm2) == is_stable
     assert array_equal(ts1, ts2) == is_stable
@@ -59,7 +59,7 @@ def test_gen_rand_data_stability(rng, is_stable):
         # rng is not `None`, an `int` or a `numpy.random.Generator`
     ],
 )
-def test_gen_rand_data_invalid_inputs(n_nodes, ts_len, l_dens, wm_min_max, rng, error):
-    """Test the gen_rand_data function with invalid inputs."""
+def test_gen_delayed_causal_network_invalid_inputs(n_nodes, ts_len, l_dens, wm_min_max, rng, error):
+    """Test the gen_delayed_causal_network function with invalid inputs."""
     with pytest.raises(error):
-        gen_rand_data(ts_len, n_nodes, l_dens, wm_min_max, rng)
+        gen_delayed_causal_network(ts_len, n_nodes, l_dens, wm_min_max, rng)

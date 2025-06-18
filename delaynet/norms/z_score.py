@@ -71,7 +71,7 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
         )
         max_periods = -1
 
-    if max_periods == -1 and periodicity == 1:
+    if max_periods == -1 or periodicity == 1:
         # Simple case, no slicing needed
         ts_std = std(ts)
         if ts_std == 0:

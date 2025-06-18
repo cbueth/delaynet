@@ -2,6 +2,7 @@
 
 import pytest
 from numpy import array, array_equal
+from numpy.testing import assert_approx_equal, assert_allclose
 
 from delaynet import normalise, logging
 
@@ -10,14 +11,45 @@ from delaynet import normalise, logging
     "ts, periodicity, max_periods, expected",
     [
         ([0, 0, 0], 1, 1, [0, 0, 0]),  # zero
-        ([1, 1, 1], 1, 1, [1, 1, 1]),  # constant
-        ([-1, -1, -1], 1, 1, [-1, -1, -1]),  # constant
+        ([1, 1, 1], 1, 1, [0, 0, 0]),  # constant
+        ([-1, -1, -1], 1, 1, [0, 0, 0]),  # constant
         ([1, -1, 1, -1, 1, -1], 1, 1, [1, -1, 1, -1, 1, -1]),  # alternating
         ([1, -1, 1, -1, 1, -1], 1, 2, [1, -1, 1, -1, 1, -1]),  # alternating
         ([1, -1, 1, -1, 1, -1], 1, -1, [1, -1, 1, -1, 1, -1]),  # alternating
         ([1, 0, 0, 1, 0, 0, 1, 0, 0], 3, 1, [1, 0, 0, 1, 0, 0, 1, 0, 0]),  # periodic
         ([4, 0, 0, 4, 0, 0, 4, 0, 0], 3, 1, [4, 0, 0, 4, 0, 0, 4, 0, 0]),  # periodic
-        ([4, 0, 0, 4, 0, 0, 4, 0, 0], 1, 1, [4, -1, -1, 4, -1, -1, 4, -1, 0]),
+        (
+            [4, 0, 0, 4, 0, 0, 4, 0, 0],
+            1,
+            1,
+            [
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+            ],
+        ),  # periodic
+        (
+            [9, 0, 0, 9, 0, 0, 9, 0, 0],
+            1,
+            1,
+            [
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+            ],
+        ),  # periodic
         ([-1, 0, -1, 0, -1, 0], 2, 1, [-1, 0, -1, 0, -1, 0]),  # periodic, negative
     ],
 )
@@ -29,7 +61,7 @@ def test_z_score(ts, periodicity, max_periods, expected):
         periodicity=periodicity,
         max_periods=max_periods,
     )
-    assert array_equal(result, array(expected))
+    assert_allclose(result, array(expected))
 
 
 @pytest.mark.parametrize(

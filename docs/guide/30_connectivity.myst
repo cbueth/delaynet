@@ -24,12 +24,12 @@ The best delay value and it's corresponding $p$-value are returned.
 `delaynet` provides a unified interface for all connectivity measures through the {py:func}`~delaynet.connectivity.connectivity` function:
 
 ```python
-from delaynet.connectivity import connectivity
+import delaynet as dn
 
 # Calculate connectivity between two time series
-result = connectivity(ts1, ts2, metric="linear_correlation", max_lag_steps=5)
+result = dn.connectivity(ts1, ts2, metric="linear_correlation", lag_steps=5)
 # tests all 1, ...., 5 lags
-result = connectivity(ts1, ts2, metric="linear_correlation", lags=[1, 2, 5, 10])
+result = dn.connectivity(ts1, ts2, metric="linear_correlation", lags=[1, 2, 5, 10])
 # tests only specified lags
 ```
 
@@ -55,16 +55,16 @@ show_connectivity_metrics()
 The Continuous Ordinal Patterns (COP) connectivity metric analyzes the patterns in time series data to detect relationships.
 
 ```python
-from delaynet.connectivity import connectivity
+import delaynet as dn
 
 # Calculate COP connectivity
-result = connectivity(ts1, ts2, metric="random_patterns", p_size=5, num_rnd_patterns=50, max_lag_steps=5)
+result = dn.connectivity(ts1, ts2, metric="random_patterns", p_size=5, num_rnd_patterns=50, lag_steps=5)
 ```
 
 Parameters:
 - `p_size`: Size of the ordinal pattern
 - `num_rnd_patterns`: Number of random patterns to consider
-- `max_lag_steps`: Maximum time lag to consider
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
 
 ### Granger Causality
 
@@ -73,33 +73,11 @@ If a time series X "Granger-causes" a time series Y, then past values of X shoul
 {cite:p}`zaninAssessingGrangerCausality2021`.
 Before using Granger Causality, it's important to detrend the time series data to avoid spurious results.
 
-`delaynet` provides several implementations of Granger Causality:
-
-#### Single Lag Granger Causality
-
 ```python
-from delaynet.connectivity import connectivity
+import delaynet as dn
 
-# Calculate single lag Granger Causality
-result = connectivity(ts1, ts2, metric="gt_single_lag", lag_step=5)
-```
-
-#### Multi-Lag Granger Causality
-
-```python
-from delaynet.connectivity import connectivity
-
-# Calculate multi-lag Granger Causality
-result = connectivity(ts1, ts2, metric="gt_multi_lag", max_lag_steps=5)
-```
-
-#### Bidirectional Multi-Lag Granger Causality
-
-```python
-from delaynet.connectivity import connectivity
-
-# Calculate bidirectional multi-lag Granger Causality
-result = connectivity(ts1, ts2, metric="gt_bi_multi_lag", max_lag_steps=5)
+# Calculate single-lag Granger Causality
+result = dn.connectivity(ts1, ts2, metric="granger causality", lag_steps=5)
 ```
 
 ### Linear Correlation
@@ -107,14 +85,14 @@ result = connectivity(ts1, ts2, metric="gt_bi_multi_lag", max_lag_steps=5)
 The Linear Correlation (LC) connectivity metric calculates the Pearson correlation coefficient between two time series.
 
 ```python
-from delaynet.connectivity import connectivity
+import delaynet as dn
 
 # Calculate linear correlation
-result = connectivity(ts1, ts2, metric="linear_correlation", max_lag_steps=5, return_abs=True)
+result = dn.connectivity(ts1, ts2, metric="linear_correlation", lag_steps=5, return_abs=True)
 ```
 
 Parameters:
-- `max_lag_steps`: Maximum time lag to consider
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
 - `return_abs`: Whether to return the absolute value of the correlation
 
 ### Mutual Information
@@ -122,55 +100,55 @@ Parameters:
 Mutual Information (MI) measures the amount of information obtained about one random variable through observing another random variable.
 
 ```python
-from delaynet.connectivity import connectivity
+import delaynet as dn
 
 # Calculate mutual information
-result = connectivity(ts1, ts2, metric="mutual_information", approach="binning", max_lag_steps=5)
+result = dn.connectivity(ts1, ts2, metric="mutual_information", approach="binning", lag_steps=5)
 ```
 
 Parameters:
 - `approach`: The approach to use for estimating mutual information (see `infomeasure.mutual_information` for available approaches)
-- `max_lag_steps`: Maximum time lag to consider
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
 
 ### Ordinal Synchronization
 
 The Ordinal Synchronization (OS) connectivity metric measures the synchronization between two time series based on their ordinal patterns.
 
 ```python
-from delaynet.connectivity import connectivity
+import delaynet as dn
 
 # Calculate ordinal synchronization
-result = connectivity(ts1, ts2, metric="ordinal_synchronization", d=3, tau=1, max_lag_steps=5)
+result = dn.connectivity(ts1, ts2, metric="ordinal_synchronization", d=3, tau=1, lag_steps=5)
 ```
 
 Parameters:
 - `d`: Embedding dimension / delay dimension
 - `tau`: OS time delay
-- `max_lag_steps`: Maximum time lag to consider
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
 
 ### Rank Correlation
 
 The Rank Correlation (RC) connectivity metric calculates the Spearman rank correlation between two time series.
 
 ```python
-from delaynet.connectivity import connectivity
+import delaynet as dn
 
 # Calculate rank correlation
-result = connectivity(ts1, ts2, metric="rank_correlation", max_lag_steps=5)
+result = dn.connectivity(ts1, ts2, metric="rank_correlation", lag_steps=5)
 ```
 
 Parameters:
-- `max_lag_steps`: Maximum time lag to consider
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
 
 ### Transfer Entropy
 
 Transfer Entropy (TE) measures the amount of directed transfer of information between two random processes.
 
 ```python
-from delaynet.connectivity import connectivity
+import delaynet as dn
 
 # Calculate transfer entropy
-result = connectivity(ts1, ts2, metric="transfer_entropy", approach="binning")
+result = dn.connectivity(ts1, ts2, metric="transfer_entropy", approach="binning")
 ```
 
 Parameters:
@@ -186,12 +164,12 @@ The Gravity connectivity metric calculates a measure of interaction between two 
 This is a toy metric that may not have practical applications but can serve as an educational tool.
 
 ```python
-from delaynet.connectivity import connectivity
+import delaynet as dn
 
 # Calculate gravity
-result = connectivity(ts1, ts2, metric="gravity", max_lag_steps=5)
+result = dn.connectivity(ts1, ts2, metric="gravity", lag_steps=5)
 ```
 
 
 Parameters:
-- `max_lag_steps`: Maximum time lag to consider
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.

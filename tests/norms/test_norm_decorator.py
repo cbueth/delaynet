@@ -2,7 +2,6 @@
 
 from sys import version_info
 
-# pylint: disable=unexpected-keyword-arg
 import pytest
 from numpy import ndarray, array, array_equal, hstack, nan, inf, isnan, isinf
 
@@ -99,7 +98,7 @@ def test_norm_decorator_mixed_args(check_kwargs):
 
     # Test with missing required keyword argument
     with pytest.raises(TypeError, match=error_msg):
-        mixed_args_norm(array([1, 2, 3]), 2)  # pylint: disable=missing-kwoa
+        mixed_args_norm(array([1, 2, 3]), 2)
 
     # Test with unknown keyword argument
     if check_kwargs:

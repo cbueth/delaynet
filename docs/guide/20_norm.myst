@@ -152,11 +152,11 @@ You can refer to each method by its full name or by its shorthand:
 The full list can easily be pretty printed using {py:func}`dn.show_connectivity_metrics()<delaynet.connectivity.show_connectivity_metrics>`.
 
 ```python
-from delaynet import normalise
+import delaynet as dn
 
 # Normalise using the delta method
-normalised_ts = normalise(time_series, method="delta", window_size=10)
+normalised_ts = dn.normalise(time_series, method="delta", window_size=10)
 
 # Normalise using the Z-Score method
-normalised_ts = normalise(time_series, method="zs", periodicity=24)
+normalised_ts = dn.normalise(time_series, method="zs", periodicity=24)
 ```

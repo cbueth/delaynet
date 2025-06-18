@@ -11,4 +11,4 @@ from . import preparation
 # Set package attributes
 __author__ = "Carlson Büth"
 
-logging.info("delaynet version %s", __version__)
+logging.debug("delaynet version %s", __version__)

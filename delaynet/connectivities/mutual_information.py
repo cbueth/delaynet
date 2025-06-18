@@ -1,17 +1,23 @@
 """Mutual information (MI) connectivity metric."""
 
-from infomeasure import mutual_information as im_mi
+from PIL.ImageChops import offset
+from infomeasure import estimator
 
 from ..decorators import connectivity
+from ..utils.lag_steps import find_optimal_lag
 
 
 @connectivity(
-    # check_symbolic=True,
-    entropy_like=True,
     # mcb_kwargs={"n_bins": 3, "alphabet": "ordinal", "strategy": "quantile"},
 )
 def mutual_information(
-    ts1, ts2, approach: str = "", max_lag_steps: int = 5, mi_kwargs=None
+    ts1,
+    ts2,
+    approach: str = "",
+    lag_steps: int | list = None,
+    hypothesis_type: str = "permutation_test",
+    n_tests: int = 20,
+    mi_kwargs=None,
 ):
     r"""Mutual Information (MI) connectivity metric.
 
@@ -23,17 +29,28 @@ def mutual_information(
     :param approach: Approach to use. See :func:`infomeasure.mutual_information` for
                      available approaches.
     :type approach: str
-    :param max_lag_steps: Maximum time lag to consider.
-    :type max_lag_steps: int
+    :param lag_steps: Time lags to consider.
+                      Can be a single integer or a list of integers.
+                      An integer will consider lags [1, ..., lag_steps].
+                      A list will consider the specified values as lags.
+    :type lag_steps: int | list
+    :param hypothesis_type: Type of hypothesis test to use.
+                            Either 'permutation_test' or 'bootstrap'.
+                            Default is 'permutation_test'.
+    :type hypothesis_type: str
+    :param n_tests: Number of iterations or resamples to perform within the hypothesis
+                    test.
+    :type n_tests: int
     :param mi_kwargs: Additional keyword arguments for the mutual information estimator.
     :type mi_kwargs: dict
-    :return: Mutual information value and time lag.
+    :return: Best *p*-value and corresponding lag.
     :rtype: tuple[float, int]
-
-    :raises ValueError: If `approach` is not given.
+    :raises ValueError: If ``approach`` is not given.
     """
 
     if approach == "":
+        from infomeasure import mutual_information as im_mi
+
         raise ValueError(
             "The approach parameter must be given. "
             "See `infomeasure.mutual_information` for available approaches. \n"
@@ -42,22 +59,16 @@ def mutual_information(
 
     if mi_kwargs is None:
         mi_kwargs = {}
-    mi_values = []
-    for t in range(0, max_lag_steps + 1):
-        mi = im_mi(ts1, ts2, approach=approach, offset=t, **mi_kwargs)
-        if isinstance(mi, tuple):
-            mi_values.append(mi[0])
-        else:
-            mi_values.append(mi)
 
-    # TODO: or do we need the p-Value?
-    # change to min p-value
-    idx_max = max(range(len(mi_values)), key=mi_values.__getitem__)
-    return -mi_values[idx_max], idx_max
+    def mi_p_value(x, y, lag, **kwargs):
+        est = estimator(
+            x,
+            y,
+            measure="mutual_information",
+            approach=approach,
+            offset=lag,
+            **kwargs,
+        )
+        return est.p_value(method=hypothesis_type, n_tests=n_tests)
 
-
-# TODO: transfer tests
-# Test the function
-# var1 = array([0, 1, 0, 1, 1])
-# var2 = array([1, 0, 1, 1, 0])
-# print("Average MI:", compute_average_mi(var1, var2, 2, 2))
+    return find_optimal_lag(mi_p_value, ts1, ts2, lag_steps, **mi_kwargs)

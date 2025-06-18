@@ -3,16 +3,24 @@
 from infomeasure import estimator
 
 from ..decorators import connectivity
+from ..utils.lag_steps import find_optimal_lag
 
 
 @connectivity(
-    # check_symbolic=True,
-    entropy_like=True,
     # mcb_kwargs={"n_bins": 2, "alphabet": "ordinal", "strategy": "quantile"},
 )
-def transfer_entropy(ts1, ts2, approach: str = "", te_kwargs=None):
+def transfer_entropy(
+    ts1,
+    ts2,
+    approach: str = "",
+    lag_steps: int | list = None,
+    hypothesis_type: str = "permutation_test",
+    n_tests: int = 20,
+    te_kwargs=None,
+):
     r"""
     Transfer Entropy (TE) connectivity metric.
+
     :param ts1: First time series.
     :type ts1: numpy.ndarray
     :param ts2: Second time series.
@@ -20,14 +28,26 @@ def transfer_entropy(ts1, ts2, approach: str = "", te_kwargs=None):
     :param approach: Approach to use. See :func:`infomeasure.transfer_entropy` for
                      available approaches.
     :type approach: str
+    :param lag_steps: Time lags to consider.
+                      Can be a single integer or a list of integers.
+                      An integer will consider lags [1, ..., lag_steps].
+                      A list will consider the specified values as lags.
+    :type lag_steps: int | list
+    :param hypothesis_type: Type of hypothesis test to use.
+                            Either 'permutation_test' or 'bootstrap'.
+                            Default is 'permutation_test'.
+    :type hypothesis_type: str
+    :param n_tests: Number of iterations or resamples to perform within the hypothesis
+                    test.
+    :type n_tests: int
     :param te_kwargs: Additional keyword arguments for the transfer entropy estimator.
     :type te_kwargs: dict
-    :return: Transfer Entropy value.
-    :rtype: float
+    :return: Best *p*-value and corresponding lag.
+    :rtype: tuple[float, int]
     """
 
     if approach == "":
-        from infomeasure import (  # pylint: disable=import-outside-toplevel
+        from infomeasure import (
             transfer_entropy as im_te,
         )
 
@@ -36,37 +56,19 @@ def transfer_entropy(ts1, ts2, approach: str = "", te_kwargs=None):
             "See `infomeasure.transfer_entropy` for available approaches. \n"
             f"help(infomeasure.transfer_entropy):\n{im_te.__doc__}"
         )
-    # TODO: implement max_lag_steps=5 ?
 
     if te_kwargs is None:
         te_kwargs = {}
 
-    return -(
-        estimator(
-            ts1,
-            ts2,
+    def te_p_value(x, y, lag, **kwargs):
+        est = estimator(
+            x,
+            y,
             measure="transfer_entropy",
             approach=approach,
-            **te_kwargs,
-        ).effective_val()
-        - estimator(
-            ts2,
-            ts1,
-            measure="transfer_entropy",
-            approach=approach,
-            **te_kwargs,
-        ).effective_val()
-    )
+            offset=lag,
+            **kwargs,
+        )
+        return est.p_value(method=hypothesis_type, n_tests=n_tests)
 
-
-# TODO: Transfer tests
-# Test the function
-# source = np.array([0, 1, 0, 1, 0, 1, 0, 1, 0, 1])
-# dest = np.array([0, 0, 1, 1, 0, 0, 1, 1, 0, 0])
-
-# k = 2  # Embedding length for destination
-# l = 2  # Embedding length for source
-# delay = 1  # Time delay between source and destination
-
-# te_value = compute_transfer_entropy(source, dest, k, l, delay)
-# te_value
+    return find_optimal_lag(te_p_value, ts1, ts2, lag_steps, **te_kwargs)

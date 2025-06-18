@@ -12,7 +12,9 @@ from delaynet.preparation.data_generator import gen_delayed_causal_network
 @pytest.mark.parametrize("l_dens", [0.0, 0.5, 1.0])
 @pytest.mark.parametrize("wm_min_max", [(0.0, 1.0), (0.5, 1.5), (1.0, 2.0)])
 @pytest.mark.parametrize("rng", [None, 0, default_rng(0)])
-def test_gen_delayed_causal_network(n_nodes, ts_len, l_dens, wm_min_max: tuple[float, float], rng):
+def test_gen_delayed_causal_network(
+    n_nodes, ts_len, l_dens, wm_min_max: tuple[float, float], rng
+):
     """Test the gen_delayed_causal_network function."""
     am, wm, ts = gen_delayed_causal_network(ts_len, n_nodes, l_dens, wm_min_max, rng)
     assert am.shape == (n_nodes, n_nodes)
@@ -59,7 +61,9 @@ def test_gen_delayed_causal_network_stability(rng, is_stable):
         # rng is not `None`, an `int` or a `numpy.random.Generator`
     ],
 )
-def test_gen_delayed_causal_network_invalid_inputs(n_nodes, ts_len, l_dens, wm_min_max, rng, error):
+def test_gen_delayed_causal_network_invalid_inputs(
+    n_nodes, ts_len, l_dens, wm_min_max, rng, error
+):
     """Test the gen_delayed_causal_network function with invalid inputs."""
     with pytest.raises(error):
         gen_delayed_causal_network(ts_len, n_nodes, l_dens, wm_min_max, rng)

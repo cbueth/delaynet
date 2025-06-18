@@ -16,18 +16,12 @@ CONN_METRICS = {
     for name, value in __all_connectivity_metrics_names_simple__.items()
 }
 CONN_METRICS["mutual_information"]["additional_kwargs"] = [
-    {
-        "approach": "discrete",
-        "symbolic_conversion": {"method": "quantize", "max_symbols": 50},
-    },
+    {"approach": "discrete"},
     {"approach": "kernel", "mi_kwargs": {"bandwidth": 0.3, "kernel": "box"}},
     {"approach": "renyi", "mi_kwargs": {"alpha": 1.0}},
 ]
 CONN_METRICS["transfer_entropy"]["additional_kwargs"] = [
-    {
-        "approach": "discrete",
-        "symbolic_conversion": {"method": "quantize", "max_symbols": 50},
-    },
+    {"approach": "discrete"},
     {"approach": "kernel", "te_kwargs": {"bandwidth": 0.3, "kernel": "box"}},
     {"approach": "renyi", "te_kwargs": {"alpha": 1.0}},
 ]
@@ -97,7 +91,6 @@ def two_random_time_series():
 @pytest.fixture(scope="session")
 def random_time_series(two_random_time_series):
     """Return random time series."""
-    # pylint: disable = redefined-outer-name
     return two_random_time_series[0]
 
 
@@ -122,7 +115,6 @@ def two_fmri_time_series():
 @pytest.fixture(scope="session")
 def fmri_time_series(two_fmri_time_series):
     """Return fMRI time series."""
-    # pylint: disable = redefined-outer-name
     return two_fmri_time_series[0]
 
 
@@ -147,6 +139,6 @@ def time_series(request):
 @pytest.fixture(scope="module")
 def two_time_series():
     """Return two time series."""
-    ts1 = array([1, 2, 3, 4, 5])
-    ts2 = array([5, 4, 3, 2, 1])
+    ts1 = array([1, 2, 3, 4, 5, 6, 7, 8])
+    ts2 = array([8, 7, 6, 5, 4, 3, 2, 1])
     return ts1, ts2

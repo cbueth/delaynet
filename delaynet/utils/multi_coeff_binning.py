@@ -19,7 +19,7 @@ from sklearn.utils.multiclass import check_classification_targets
 @njit()
 def _uniform_bins(timestamp_min, timestamp_max, n_timestamps, n_bins):
     bin_edges = np.empty((n_timestamps, n_bins - 1))
-    for i in prange(n_timestamps):  # pylint: disable=not-an-iterable
+    for i in prange(n_timestamps):
         bin_edges[i] = np.linspace(timestamp_min[i], timestamp_max[i], n_bins + 1)[1:-1]
     return bin_edges
 
@@ -27,7 +27,7 @@ def _uniform_bins(timestamp_min, timestamp_max, n_timestamps, n_bins):
 @njit()
 def _digitize_1d(x, bins, n_samples, n_timestamps):
     x_digit = np.empty((n_samples, n_timestamps))
-    for i in prange(n_timestamps):  # pylint: disable=not-an-iterable
+    for i in prange(n_timestamps):
         x_digit[:, i] = np.digitize(x[:, i], bins, right=True)
     return x_digit
 
@@ -35,7 +35,7 @@ def _digitize_1d(x, bins, n_samples, n_timestamps):
 @njit()
 def _digitize_2d(x, bins, n_samples, n_timestamps):
     x_digit = np.empty((n_samples, n_timestamps))
-    for i in prange(n_timestamps):  # pylint: disable=not-an-iterable
+    for i in prange(n_timestamps):
         x_digit[:, i] = np.digitize(x[:, i], bins[i], right=True)
     return x_digit
 

@@ -7,8 +7,8 @@ from inspect import signature
 from numpy import ndarray, isnan, isinf, apply_along_axis, floating, integer
 
 from .utils.bind_args import bind_args
+from .utils.lag_steps import assure_lag_list
 from .utils.multi_coeff_binning import MultipleCoefficientBinning
-from .preprocess.symbolic import check_symbolic_pairwise, to_symbolic
 
 Connectivity = Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
 Norm = Callable[[ndarray, ...], ndarray]
@@ -16,10 +16,6 @@ Norm = Callable[[ndarray, ...], ndarray]
 
 def connectivity(
     *args,
-    entropy_like: bool = False,  # TODO: remove this functionality to make package usage more explicit
-    check_symbolic: bool | int | None = False,
-    default_to_symbolic: dict
-    | None = None,  # TODO: remove this functionality to make package usage more explicit
     mcb_kwargs: dict | None = None,
 ):
     """Decorator for the connectivity functions.
@@ -36,17 +32,6 @@ def connectivity(
 
     Shape of the input time series must be equal.
 
-    :param entropy_like: If ``True``, mark the connectivity as entropy-like.
-    :type entropy_like: bool
-    :param check_symbolic: If ``True``, check if the connectivity values are symbolic.
-                           A specific number of unique symbols can be set (``None`` for
-                           no limit).
-                           Necessary for entropy-based connectivities.
-    :type check_symbolic: bool | int
-    :param default_to_symbolic: Default configuration for converting to symbolic.
-                                Can be overridden by the ``symbolic_conversion``
-                                argument, when calling the decorated function.
-    :type default_to_symbolic: dict
     :param mcb_kwargs: Keyword arguments for the :py:class:`MultipleCoefficientBinning`
                        transformer. If ``None``, no binning is applied.
     :type mcb_kwargs: dict | None
@@ -63,13 +48,19 @@ def connectivity(
         :return: The decorated connectivity function.
         :rtype: Callable
         """
+        # Check if the decorated function accepts 'lag_steps' as a keyword argument
+        sig = signature(connectivity_func)
+        if "lag_steps" not in sig.parameters:
+            raise TypeError(
+                f"The decorated function `{connectivity_func.__name__}` does not accept"
+                " 'lag_steps' as a keyword argument."
+            )
 
         @wraps(connectivity_func)
         def wrapper(
             ts1: ndarray,
             ts2: ndarray,
             *args,
-            symbolic_conversion: dict | None = None,
             **kwargs,
         ) -> float | tuple[float, int]:
             """Wrapper for the connectivity functions.
@@ -78,7 +69,7 @@ def connectivity(
             not checked for availability.
             This is useful if you want to pass unused keyword.
 
-            ``max_lag_steps`` will explicitly be checked, if not ``None``.
+            ``lag_steps`` will explicitly be checked, if not ``None``.
 
             :param ts1: The first time series.
             :type ts1: numpy.ndarray
@@ -86,9 +77,9 @@ def connectivity(
             :type ts2: numpy.ndarray
             :param args: The args to pass to the connectivity function.
             :type args: list
-            :param symbolic_conversion: Keyword arguments for converting to symbolic.
-                                        Overrides the default configuration.
-            :type symbolic_conversion: dict | None
+            :param lag_steps: The number of lag steps to consider. Default value is 1.
+                              Can be integer for [1, ..., num], or a list of integers.
+            :type lag_steps: int | list[int] | None
             :param kwargs: The kwargs to pass to the connectivity function.
             :type kwargs: dict
             :return: Connectivity value and lag (if applicable).
@@ -97,7 +88,7 @@ def connectivity(
             :raises ValueError: If ``ts1`` and ``ts2`` do not have the same shape.
             :raises ValueError: If an argument is missing.
             :raises TypeError: If an unknown kwarg is passed.
-            :raises TypeError: If ``max_lag_steps`` is not ``None`` and
+            :raises TypeError: If ``lag_steps`` is not ``None`` and
                                ``connectivity_func`` does not provide it.
             """
             # Check if ts1 and ts2 are ndarrays
@@ -113,59 +104,39 @@ def connectivity(
                     f"but have shapes {ts1.shape} and {ts2.shape}."
                 )
 
-            if symbolic_conversion not in [None, {}]:
-                if not isinstance(symbolic_conversion, dict):
-                    raise TypeError(
-                        f"`symbolic_conversion` must be a dict, not "
-                        f"{type(symbolic_conversion)}."
-                    )
-                ts1 = to_symbolic(ts1, **symbolic_conversion)
-                ts2 = to_symbolic(ts2, **symbolic_conversion)
-            elif default_to_symbolic not in [None, {}]:
-                ts1 = to_symbolic(ts1, **default_to_symbolic)
-                ts2 = to_symbolic(ts2, **default_to_symbolic)
-
-            # Check if the time series are symbolic
-            if check_symbolic or check_symbolic is None:
-                check_symbolic_pairwise(
-                    ts1,
-                    ts2,
-                    max_symbols=None if check_symbolic is True else check_symbolic,
-                    # if check_symbolic is True, no limit is set
-                )
-
             # Multiple Coefficient Binning (MCB)
             if mcb_kwargs is not None:
                 ts1 = bin_timeseries(ts1, mcb_kwargs)
                 ts2 = bin_timeseries(ts2, mcb_kwargs)
 
-            # Check if max_lag_steps in function signature
-            if "max_lag_steps" in kwargs and kwargs["max_lag_steps"] is not None:
-                if "max_lag_steps" not in signature(connectivity_func).parameters:
-                    raise TypeError(
-                        f"{connectivity_func.__name__} does not provide finding the "
-                        "optimal time lag."
-                    )
+            # Prepare lag steps for the connectivity function
+            # num -> [1, ..., num], or keeping list if already a list
+            # lag_steps = assure_lag_list(lag_steps)
+            if kwargs.get("lag_steps") is None:
+                raise ValueError(
+                    "`lag_steps` must be passed to the connectivity function "
+                    "as keyword argument."
+                )
+            kwargs["lag_steps"] = assure_lag_list(kwargs.get("lag_steps"))
 
+            # Bind args for the connectivity function
+            # - makes sure only existing args are passed to it
             bound_args = bind_args(connectivity_func, [ts1, ts2, *args], kwargs)
             # Call the norm function with the bound arguments
             conn_value = connectivity_func(*bound_args.args, **bound_args.kwargs)
 
-            if isinstance(conn_value, (float, floating)):
-                return conn_value
-            if isinstance(conn_value, tuple) and len(conn_value) == 2:
-                if isinstance(conn_value[0], (float, floating)) and isinstance(
-                    conn_value[1], (int, integer)
-                ):
-                    return conn_value[0], conn_value[1]
+            if not (isinstance(conn_value, tuple) and len(conn_value) == 2):
+                raise ValueError("Metric function must return tuple of float and int.")
+            if not (
+                isinstance(conn_value[0], (float, floating))
+                and isinstance(conn_value[1], (int, integer))
+            ):
                 raise ValueError(
                     "Invalid return value of connectivity function. "
                     "First value of tuple must be float, second must be int. "
                     f"Got {type(conn_value[0])} and {type(conn_value[1])}."
                 )
-            raise ValueError(
-                "Metric function must return float or tuple of float and int."
-            )
+            return conn_value
 
         def bin_timeseries(ts: ndarray, binning_kwargs: dict) -> ndarray:
             """Bin time series using the MultipleCoefficientBinning transformer.
@@ -186,9 +157,6 @@ def connectivity(
             transformer.fit(ts.reshape(-1, 1))
             ts = transformer.transform(ts.reshape(-1, 1))[:, 0]
             return ts
-
-        # Mark connectivity as entropy-likeness
-        wrapper.is_entropy_like = entropy_like
 
         return wrapper
 

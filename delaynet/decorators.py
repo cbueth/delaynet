@@ -8,7 +8,6 @@ from numpy import ndarray, isnan, isinf, apply_along_axis, floating, integer
 
 from .utils.bind_args import bind_args
 from .utils.lag_steps import assure_lag_list
-from .utils.multi_coeff_binning import MultipleCoefficientBinning
 
 Connectivity = Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
 Norm = Callable[[ndarray, ...], ndarray]
@@ -16,7 +15,6 @@ Norm = Callable[[ndarray, ...], ndarray]
 
 def connectivity(
     *args,
-    mcb_kwargs: dict | None = None,
 ):
     """Decorator for the connectivity functions.
 
@@ -32,9 +30,6 @@ def connectivity(
 
     Shape of the input time series must be equal.
 
-    :param mcb_kwargs: Keyword arguments for the :py:class:`MultipleCoefficientBinning`
-                       transformer. If ``None``, no binning is applied.
-    :type mcb_kwargs: dict | None
     :return: The decorated function.
     :rtype: Callable
     :raises TypeError: If ``mcb_kwargs`` is not ``None`` or a ``dict``.
@@ -104,11 +99,6 @@ def connectivity(
                     f"but have shapes {ts1.shape} and {ts2.shape}."
                 )
 
-            # Multiple Coefficient Binning (MCB)
-            if mcb_kwargs is not None:
-                ts1 = bin_timeseries(ts1, mcb_kwargs)
-                ts2 = bin_timeseries(ts2, mcb_kwargs)
-
             # Prepare lag steps for the connectivity function
             # num -> [1, ..., num], or keeping list if already a list
             # lag_steps = assure_lag_list(lag_steps)
@@ -137,26 +127,6 @@ def connectivity(
                     f"Got {type(conn_value[0])} and {type(conn_value[1])}."
                 )
             return conn_value
-
-        def bin_timeseries(ts: ndarray, binning_kwargs: dict) -> ndarray:
-            """Bin time series using the MultipleCoefficientBinning transformer.
-
-            :param ts: Time series to bin.
-            :type ts: numpy.ndarray
-            :param binning_kwargs: Keyword arguments for
-                                   the :class:`MultipleCoefficientBinning` transformer.
-            :return: Binned time series.
-            :rtype: numpy.ndarray
-            :raises ValueError: If the binning_kwargs are invalid.
-            """
-            if not isinstance(binning_kwargs, dict):
-                raise ValueError(
-                    f"binning_kwargs must be a dict, not {type(binning_kwargs)}."
-                )
-            transformer = MultipleCoefficientBinning(**binning_kwargs)
-            transformer.fit(ts.reshape(-1, 1))
-            ts = transformer.transform(ts.reshape(-1, 1))[:, 0]
-            return ts
 
         return wrapper
 

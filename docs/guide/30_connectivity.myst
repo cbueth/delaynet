@@ -103,7 +103,7 @@ Mutual Information (MI) measures the amount of information obtained about one ra
 import delaynet as dn
 
 # Calculate mutual information
-result = dn.connectivity(ts1, ts2, metric="mutual_information", approach="binning", lag_steps=5)
+result = dn.connectivity(ts1, ts2, metric="mutual_information", approach="kernel", lag_steps=5)
 ```
 
 Parameters:
@@ -148,7 +148,7 @@ Transfer Entropy (TE) measures the amount of directed transfer of information be
 import delaynet as dn
 
 # Calculate transfer entropy
-result = dn.connectivity(ts1, ts2, metric="transfer_entropy", approach="binning")
+result = dn.connectivity(ts1, ts2, metric="transfer_entropy", approach="discrete")
 ```
 
 Parameters:

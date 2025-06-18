@@ -11,20 +11,16 @@ def dict_lookup(lookup: dict) -> dict:
     :raises TypeError: If the lookup is not a dict.
 
     :example:
-    >>> dict_lookup({"a": 1, "b": 2, "c": 1})
-    {1: ["a", "c"], 2: ["b"]}
-
-    >>> dict_lookup({"a": 1, "b": 2, "c": 1, "d": 2})
-    {1: ["a", "c"], 2: ["b", "d"]}
-
-    >>> dict_lookup({})
-    {}
-
-    >>> dict_lookup(123)
-    Traceback (most recent call last):
-        ...
-    TypeError: Expected dict, got <class 'int'>.
-
+        >>> dict_lookup({"a": 1, "b": 2, "c": 1})
+        {1: ["a", "c"], 2: ["b"]}
+        >>> dict_lookup({"a": 1, "b": 2, "c": 1, "d": 2})
+        {1: ["a", "c"], 2: ["b", "d"]}
+        >>> dict_lookup({})
+        {}
+        >>> dict_lookup(123)
+        Traceback (most recent call last):
+            ...
+        TypeError: Expected dict, got <class 'int'>.
     """
     # Check if the lookup is a dict
     if not isinstance(lookup, dict):

@@ -71,10 +71,7 @@ def connectivity(
 
     # connectivity metric is a callable,
     # add decorator to assure correct kwargs, type and shape
-    mcb_kwargs = kwargs.pop("mcb_kwargs", None)
-    return connectivity_decorator(mcb_kwargs=mcb_kwargs)(metric)(
-        ts1, ts2, *args, **kwargs
-    )
+    return connectivity_decorator()(metric)(ts1, ts2, *args, **kwargs)
 
 
 def show_connectivity_metrics():

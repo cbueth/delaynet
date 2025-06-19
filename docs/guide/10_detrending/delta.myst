@@ -1,0 +1,58 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(delta)=
+# Delta Norm
+
+The delta detrending method performs local mean subtraction. For each value in the time series, it subtracts the mean of a window of values centered around that point. (**CITE**)
+
+```python
+from delaynet.norms import delta
+
+# Apply delta detrending with a window size of 10
+normalised_ts = delta(time_series, window_size=10)
+```
+
+Mathematically, the delta detrending is defined as:
+
+$$x_t' = x_t - \frac{1}{2w + 1} \sum_{k = t - w}^{t + w} x_k$$
+
+where $x_t$ is the value at time $t$, $w$ is the window size, and $x_t'$ is the detrended value.
+
+```{code-cell}
+:tags: [hide-input]
+import delaynet as dn
+from numpy.random import default_rng
+import matplotlib.pyplot as plt
+
+# Generate fMRI data for a single node
+fmri_data = dn.preparation.data_generator.gen_fmri(
+    ts_len=1000,               # Length of time series
+    downsampling_factor=2,     # Downsampling factor
+    time_resolution=0.2,       # Time resolution
+    coupling_strength=2.0,     # Coupling strength
+    noise_initial_sd=1.0,      # Standard deviation of initial noise
+    noise_final_sd=0.1,        # Standard deviation of final noise
+    rng=default_rng(25968)     # Random number generator seed
+)[:, 0]
+
+# Plot the original fMRI data and the delta detrended fMRI data
+plt.figure(figsize=(10, 4), dpi=300)
+plt.plot(fmri_data, label='Original FMRI Data')
+plt.title('Original and Delta Detrended FMRI Data')
+plt.plot(dn.norms.delta(fmri_data, window_size=5), label=r'Delta Detrended $5$ Window')
+plt.plot(dn.norms.delta(fmri_data, window_size=15), label=r'Delta Detrended $15$ Window')
+plt.plot(dn.norms.delta(fmri_data, window_size=30), label=r'Delta Detrended $30$ Window')
+plt.legend()
+plt.grid()
+plt.show()
+```
+
+(link_to_method)=
+```{eval-rst}
+.. automethod:: delaynet.norms.delta
+    :noindex:
+```

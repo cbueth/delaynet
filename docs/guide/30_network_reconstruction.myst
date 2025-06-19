@@ -1,0 +1,91 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(network_reconstruction)=
+# Network Reconstruction
+
+Network reconstruction is the process of inferring the structure of a network from time series data. This is a crucial step in understanding the relationships between different nodes in a complex system.
+Put simply, network reconstruction applies connectivity measures to each pair of time series.
+This results in a $(n \times n)$ matrix of $p$-values and lags.
+
+## The `reconstruct_network` Function
+
+The `delaynet` package provides the {func}`~delaynet.network_reconstruction.reconstruct_network` function to generate $p$-value matrices by applying connectivity measures to pairs of time series.
+As described in the {ref}`connectivity_sec` section, connectivity measures return $p$-values that indicate the strength of connections between time series.
+Therefore, the $p$-value matrix in network reconstruction represents a matrix of $p$-values, where lower values indicate stronger connections.
+
+### Basic Usage
+
+
+```{code-cell}
+import numpy as np
+from delaynet.network_reconstruction import reconstruct_network
+
+# Generate sample data: 100 time points, 5 nodes
+np.random.seed(42)  # For reproducible results
+data = np.random.randn(100, 5)
+
+# Reconstruct network using linear correlation
+weights, lags = reconstruct_network(data, "linear_correlation", lag_steps=5)
+
+print(f"P-value matrix shape: {weights.shape}")
+print(f"Lag matrix shape: {lags.shape}")
+print(f"P-value matrix:\n{weights}")
+print(f"Lag matrix:\n{lags}")
+```
+
+### Understanding the Output
+
+The function returns two matrices:
+
+1. **$p$-value Matrix**: Contains $p$-values representing the strength of connections between nodes. Lower $p$-values indicate stronger connections.
+2. **Lag Matrix**: Contains the optimal time lags at which the strongest connections were found.
+
+```{code-cell} ipython3
+# Analyze the results
+print("Strong connections (p < 0.05):")
+strong_connections = np.where(weights < 0.05)
+for i, j in zip(strong_connections[0], strong_connections[1]):
+    if i != j:
+        print(f"Node {i} -> Node {j}: p-value = {weights[i,j]:.4f}, lag = {lags[i,j]}")
+```
+
+### Using Different Connectivity Measures
+
+You can use any of the available connectivity measures:
+
+```{code-cell}
+# Using transfer entropy
+weights_te, lags_te = reconstruct_network(data, "transfer_entropy", approach = "ksg", lag_steps=3)
+
+# Using mutual information
+weights_mi, lags_mi = reconstruct_network(data, "mutual_information", approach = "ksg", lag_steps=3)
+
+print(f"Transfer entropy p-values:\n{weights_te}")
+print(f"Mutual information p-values:\n{weights_mi}")
+```
+
+### Custom Connectivity Measures
+
+You can also provide your own connectivity measure as a callable:
+
+```{code-cell}
+def custom_correlation_metric(ts1, ts2, lag_steps=None):
+    """Custom connectivity measure based on correlation."""
+    # Simple example: return absolute correlation as p-value and lag 1
+    correlation = abs(np.corrcoef(ts1, ts2)[0, 1])
+    return correlation, 1
+
+# Use custom metric
+weights_custom, lags_custom = reconstruct_network(data, custom_correlation_metric, lag_steps=5)
+print(f"Custom metric p-values:\n{weights_custom}")
+```
+
+## Function Reference
+
+```{eval-rst}
+.. autofunction:: delaynet.network_reconstruction.reconstruct_network
+```

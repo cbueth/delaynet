@@ -16,7 +16,7 @@ for testing and experimentation.
 
 In order to reconstruct delay functional networks,
 `delaynet` requires a set of time series data for each node in the network.
-For each pair of nodes a weight as $p$-value can be calculated with a given {ref}`connectivity measure <connectivity_measure>`.
+For each pair of nodes a weight as $p$-value can be calculated with a given {ref}`connectivity measure <connectivity_sec>`.
 The data length must be consistent across all nodes.
 For example, having ten nodes with time series:
 
@@ -41,7 +41,33 @@ data = pd.DataFrame(
 data
 ```
 
-If you already have a dataset, you can advance to the {ref}`next section <preprocessing>`.
+```{attention}
+When working with time series data, it's important to check for NaN values and missing data before analysis.
+`delaynet` currently doesn't provide specific functions for handling NaN values or missing data.
+When preprocessing your data, make sure you choose a method that best suits your dataset and research question,
+e.g. replacing NaNs with zeros, mean, median imputation, or using interpolation methods.
+```
+
+### Data cleaning
+Before performing any {ref}`detrending <detrending_sec>` and {ref}`connectivity analysis <connectivity_sec>`,
+it's crucial to clean the data. This includes handling missing values and outliers.
+
+#### Handling Missing Values
+
+Missing values can be handled by filling them with a specific value or method like mean imputation:
+
+```{code-cell}
+import numpy as np
+
+# Sample data with missing values
+data = np.array([10.0, 20.0, None, np.nan, 50.0], dtype=np.float64)
+
+# Fill missing values - in-place replacement
+np.nan_to_num(data, nan=0.0, copy=False)
+data
+```
+
+If you already have a dataset, you can advance to the {ref}`next section <detrending_sec>`.
 
 (data_generation)=
 ## Data generation

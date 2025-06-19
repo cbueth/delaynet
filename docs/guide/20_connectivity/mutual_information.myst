@@ -1,0 +1,26 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(mutual_information)=
+# Mutual Information
+
+Mutual Information (MI) measures the amount of information obtained about one random variable through observing another random variable.
+
+```python
+import delaynet as dn
+
+# Calculate mutual information
+result = dn.connectivity(ts1, ts2, metric="mutual_information", approach="kernel", lag_steps=5)
+```
+
+Parameters:
+- `approach`: The approach to use for estimating mutual information (see `infomeasure.mutual_information` for available approaches)
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
+
+```{eval-rst}
+.. automethod:: delaynet.connectivities.mutual_information
+    :noindex:
+```

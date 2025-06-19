@@ -1,4 +1,4 @@
-# Topological Analysis
+# Network Analysis
 
 ```{warning}
 The Topological Analysis functionality is currently a work in progress. This section will be expanded in future versions of `delaynet`.
@@ -6,7 +6,59 @@ The Topological Analysis functionality is currently a work in progress. This sec
 
 Topological analysis involves studying the structural properties of networks to understand their organization, robustness, and function. This analysis can reveal important features such as community structure, centrality of nodes, and network motifs.
 
-## Future Functionality
+(network_pruning)=
+## Network Pruning
+
+Network pruning is the process of simplifying a complex network by removing weak or insignificant connections. This is an important step in network analysis as it helps to focus on the most important relationships and reduce noise.
+This can also support science communication by highlighting the most important relationships in a network.
+
+As described in the {ref}`network_reconstruction` section, the weight matrix in network reconstruction represents a matrix of $p$-values, where lower values indicate stronger connections. Network pruning methods typically remove connections with $p$-values above a certain threshold, retaining only the strongest and most significant connections. The output of pruning is a binary matrix, where 1 indicates a significant connection and 0 indicates no connection.
+
+### Future Functionality
+
+The Network Pruning module will include:
+
+- Significance-based pruning to retain only connections with $p$-values below a significance level
+
+Ideas, but not needed:
+- Topological pruning methods to preserve network structure while reducing complexity(?)
+- Adaptive pruning algorithms that adjust thresholds based on network properties
+- Methods for evaluating the impact of pruning on network metrics
+
+### Planned Implementation
+
+The planned implementation will include a function for significance-based pruning:
+
+```python
+# Pseudocode for future implementation
+
+def significance_pruning(weight_matrix, alpha=0.05):
+    """
+    Prune a network by removing statistically insignificant connections.
+
+    Since the weight matrix already contains :math:`p`-values, connections with
+    :math:`p`-values above the significance level (alpha) are considered insignificant
+    and are removed.
+
+    Parameters:
+    -----------
+    weight_matrix : numpy.ndarray
+        Weight matrix of :math:`p`-values, shape (n_nodes, n_nodes)
+    alpha : float
+        Significance level
+
+    Returns:
+    --------
+    pruned_matrix : numpy.ndarray, dtype=bool
+        Binary pruned matrix, shape (n_nodes, n_nodes), where True indicates
+        a significant connection (`p-value` <= `alpha`)
+        and False indicates no connection
+    """
+    # Create a binary matrix where 1 indicates a significant connection (p-value <= alpha)
+    # and 0 indicates no connection (p-value > alpha)
+    pruned_matrix = (weight_matrix <= alpha).astype(bool)
+    return pruned_matrix
+```
 
 The Topological Analysis module will include:
 

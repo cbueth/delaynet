@@ -1,0 +1,25 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(transfer_entropy)=
+# Transfer Entropy
+
+Transfer Entropy (TE) measures the amount of directed transfer of information between two random processes.
+
+```python
+import delaynet as dn
+
+# Calculate transfer entropy
+result = dn.connectivity(ts1, ts2, metric="transfer_entropy", approach="discrete")
+```
+
+Parameters:
+- `approach`: The approach to use for estimating transfer entropy (see `infomeasure.transfer_entropy` for available approaches)
+
+```{eval-rst}
+.. automethod:: delaynet.connectivities.transfer_entropy
+    :noindex:
+```

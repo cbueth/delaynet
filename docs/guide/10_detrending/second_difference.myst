@@ -1,0 +1,51 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(second_difference)=
+# Second-Order Differentiation
+
+The second difference detrending calculates the difference of differences, which is a common method for detrending time series. This method is particularly useful for removing linear trends.
+
+```python
+from delaynet.norms import second_difference
+
+# Apply second difference detrending
+normalised_ts = second_difference(time_series)
+```
+
+Note that the length of the time series is reduced by 2 after applying this detrending.
+
+```{code-cell}
+:tags: [hide-input]
+import delaynet as dn
+from numpy.random import default_rng
+import matplotlib.pyplot as plt
+
+# Generate fMRI data for a single node
+fmri_data = dn.preparation.data_generator.gen_fmri(
+    ts_len=1000,               # Length of time series
+    downsampling_factor=2,     # Downsampling factor
+    time_resolution=0.2,       # Time resolution
+    coupling_strength=2.0,     # Coupling strength
+    noise_initial_sd=1.0,      # Standard deviation of initial noise
+    noise_final_sd=0.1,        # Standard deviation of final noise
+    rng=default_rng(25968)     # Random number generator seed
+)[:, 0]
+
+plt.figure(figsize=(10, 4), dpi=300)
+plt.plot(fmri_data, label='Original FMRI Data')
+plt.title('Original and Second Difference Detrended FMRI Data')
+plt.plot(dn.norms.second_difference(fmri_data), label='Second Difference Detrended Data')
+plt.legend()
+plt.grid()
+plt.show()
+```
+
+(link_to_method)=
+```{eval-rst}
+.. automethod:: delaynet.norms.second_difference
+    :noindex:
+```

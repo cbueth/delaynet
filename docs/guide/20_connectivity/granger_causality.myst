@@ -1,0 +1,25 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(granger_causality)=
+# Granger Causality
+
+Granger Causality (GC) is a statistical concept of causality based on prediction.
+If a time series X "Granger-causes" a time series Y, then past values of X should contain information that helps predict Y beyond the information contained in past values of Y alone
+{cite:p}`zaninAssessingGrangerCausality2021`.
+Before using Granger Causality, it's important to detrend the time series data to avoid spurious results.
+
+```python
+import delaynet as dn
+
+# Calculate single-lag Granger Causality
+result = dn.connectivity(ts1, ts2, metric="granger causality", lag_steps=5)
+```
+
+```{eval-rst}
+.. automethod:: delaynet.connectivities.granger.gt_multi_lag
+    :noindex:
+```

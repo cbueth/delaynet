@@ -1,0 +1,26 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(linear_correlation)=
+# Linear Correlation
+
+The Linear Correlation (LC) connectivity metric calculates the Pearson correlation coefficient between two time series.
+
+```python
+import delaynet as dn
+
+# Calculate linear correlation
+result = dn.connectivity(ts1, ts2, metric="linear_correlation", lag_steps=5, return_abs=True)
+```
+
+Parameters:
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
+- `return_abs`: Whether to return the absolute value of the correlation
+
+```{eval-rst}
+.. automethod:: delaynet.connectivities.linear_correlation
+    :noindex:
+```

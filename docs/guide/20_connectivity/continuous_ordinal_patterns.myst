@@ -1,0 +1,27 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(continuous_ordinal_patterns)=
+# Continuous Ordinal Patterns
+
+The Continuous Ordinal Patterns (COP) connectivity metric analyzes the patterns in time series data to detect relationships.
+
+```python
+import delaynet as dn
+
+# Calculate COP connectivity
+result = dn.connectivity(ts1, ts2, metric="random_patterns", p_size=5, num_rnd_patterns=50, lag_steps=5)
+```
+
+Parameters:
+- `p_size`: Size of the ordinal pattern
+- `num_rnd_patterns`: Number of random patterns to consider
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
+
+```{eval-rst}
+.. automethod:: delaynet.connectivities.continuous_ordinal_patterns.random_patterns
+    :noindex:
+```

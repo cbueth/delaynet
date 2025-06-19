@@ -1,0 +1,25 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(rank_correlation)=
+# Rank Correlation
+
+The Rank Correlation (RC) connectivity metric calculates the Spearman rank correlation between two time series.
+
+```python
+import delaynet as dn
+
+# Calculate rank correlation
+result = dn.connectivity(ts1, ts2, metric="rank_correlation", lag_steps=5)
+```
+
+Parameters:
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
+
+```{eval-rst}
+.. automethod:: delaynet.connectivities.rank_correlation
+    :noindex:
+```

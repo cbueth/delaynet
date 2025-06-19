@@ -1,6 +1,29 @@
 # Changelog
 
-## Version 0.2.1 (2025-0X-XX)
+## Version 0.3.0 (2025-0X-XX)
+
+- 🏗️ **Network Reconstruction and Documentation Overhaul**
+
+  - **Added:** Complete network reconstruction functionality with the new {func}`~delaynet.network_reconstruction.reconstruct_network` function that applies connectivity measures to pairs of time series to build networks represented by $p$-value and lag matrices.
+  - **Enhanced:** Documentation structure with comprehensive individual guides for each method:
+    - Dedicated guides for each detrending method with examples and mathematical background
+    - Individual connectivity method guides with detailed explanations and use cases  
+    - New network reconstruction guide with practical examples and custom metric support
+    - Network analysis guide for interpreting and working with reconstructed networks
+  - **Improved:** Core connectivity framework with better error handling and validation
+  - **Streamlined:** Documentation organization by consolidating scattered guides into focused, method-specific documentation that's easier to navigate and understand
+
+- 🔄 **Connectivity Framework Unification** (`bbbe265`)
+
+  - **Unified:** All connectivity measures now return consistent $p$-values for statistical significance testing
+  - **Added:** Universal $p$-value support across all connectivity methods for standardized output
+  - **Streamlined:** Unified `lag_steps` parameter handling across all connectivity measures
+  - **Removed:** Ordinal Patterns Connectivity and Bi-Granger due to unclear $p$-value
+
+- 🗑️ **Symbolization Removal** (`a4db41c`)
+
+  - **Removed:** Symbolization functionality to streamline the package and focus on core connectivity measures
+  - **Simplified:** Codebase by eliminating unused symbolization components
 
 - 🚀 [#22](https://github.com/cbueth/delaynet/pull/22): Enhancements and Fixes for Entropy-based Connectivities
 
@@ -36,7 +59,7 @@
 - 🔄 Granger: Rework bidirectional version
 
   - Add description of GC
-  - Add bibliography for doc  
+  - Add bibliography for doc
     [`sphinxcontrib.bibtex`](https://sphinxcontrib-bibtex.readthedocs.io/en/latest)
 
 - 🐛 Fix: Stability of random data

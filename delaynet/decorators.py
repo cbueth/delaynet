@@ -9,7 +9,7 @@ from numpy import ndarray, isnan, isinf, apply_along_axis, floating, integer
 from .utils.bind_args import bind_args
 from .utils.lag_steps import assure_lag_list
 
-Connectivity = Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
+Connectivity = Callable[[ndarray, ndarray, ...], tuple[float, int]]
 Norm = Callable[[ndarray, ...], ndarray]
 
 
@@ -57,7 +57,7 @@ def connectivity(
             ts2: ndarray,
             *args,
             **kwargs,
-        ) -> float | tuple[float, int]:
+        ) -> tuple[float, int]:
             """Wrapper for the connectivity functions.
 
             If kwargs have a key ``check_kwargs`` with value ``False``, the kwargs are
@@ -72,13 +72,13 @@ def connectivity(
             :type ts2: numpy.ndarray
             :param args: The args to pass to the connectivity function.
             :type args: list
-            :param lag_steps: The number of lag steps to consider. Default value is 1.
+            :param lag_steps: The number of lag steps to consider. Required.
                               Can be integer for [1, ..., num], or a list of integers.
             :type lag_steps: int | list[int] | None
             :param kwargs: The kwargs to pass to the connectivity function.
             :type kwargs: dict
             :return: Connectivity value and lag (if applicable).
-            :rtype: float | tuple[float, int]
+            :rtype: tuple[float, int]
             :raises TypeError: type of ``ts1`` or ``ts2`` is not ndarray.
             :raises ValueError: If ``ts1`` and ``ts2`` do not have the same shape.
             :raises ValueError: If an argument is missing.

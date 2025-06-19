@@ -6,6 +6,7 @@ from .utils.logging import logging
 # Expose most common functions
 from .connectivity import connectivity, show_connectivity_metrics
 from .normalisation import normalise, show_norms
+from .network_reconstruction import reconstruct_network
 from . import preparation
 
 # Set package attributes

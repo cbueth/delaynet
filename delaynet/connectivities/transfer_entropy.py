@@ -66,7 +66,7 @@ def transfer_entropy(
             y,
             measure="transfer_entropy",
             approach=approach,
-            offset=lag,
+            prop_time=lag,
             **kwargs,
         )
         return est.p_value(method=hypothesis_type, n_tests=n_tests)

@@ -10,7 +10,7 @@ from functools import wraps
 from numpy import ndarray, array
 from scipy.stats import pearsonr
 
-Connectivity = Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
+Connectivity = Callable[[ndarray, ndarray, ...], tuple[float, int]]
 
 
 def connectivity(*args, pre_processing_info: int | None = None) -> Callable:
@@ -20,7 +20,7 @@ def connectivity(*args, pre_processing_info: int | None = None) -> Callable:
         @wraps(connectivity_func)
         def wrapper(
             ts1: ndarray, ts2: ndarray, *args, **kwargs
-        ) -> float | tuple[float, int]:
+        ) -> tuple[float, int]:
             if pre_processing_info is not None:
                 print(f"Pre-processing info: {pre_processing_info}")
             return connectivity_func(ts1, ts2, *args, **kwargs)
@@ -41,7 +41,7 @@ def linear_correlation(x: ndarray, y: ndarray):
     print("Calculating linear correlation...")
     stat = pearsonr(x, y)
     print(f"Linear correlation: {stat[0]} (p-value: {stat[1]})")
-    return stat[0]
+    return stat[1], 0  # Return p-value and lag=0
 
 
 @connectivity
@@ -50,7 +50,7 @@ def dot_product(x: ndarray, y: ndarray):
     print("Calculating dot product...")
     stat = x @ y
     print(f"Dot product: {stat}")
-    return stat
+    return float(stat), 0  # Return dot product value and lag=0
 
 
 __method_dict__ = {"lc": linear_correlation, "dp": dot_product}

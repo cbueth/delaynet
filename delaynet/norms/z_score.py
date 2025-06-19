@@ -31,7 +31,7 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
 
     For a valid Z-Score, :math:`2\times\texttt{periodicity}+1 \leq \texttt{len(ts)}`
     needs to be satisfied.
-    Also, :math:`\texttt{max\_periods} \times \texttt{periodicity} \geq\texttt{len(ts)}`
+    Also, :math:`\texttt{max_periods} \times \texttt{periodicity} \geq\texttt{len(ts)}`
     results in including all periods.
 
     :param ts: Time series to normalise.

@@ -12,7 +12,7 @@ from .connectivities import (
 from .decorators import connectivity as connectivity_decorator
 
 
-Metric = str | Callable[[ndarray, ndarray, ...], float | tuple[float, int]]
+Metric = str | Callable[[ndarray, ndarray, ...], tuple[float, int]]
 
 
 def connectivity(
@@ -21,8 +21,9 @@ def connectivity(
     /,
     metric: Metric,
     *args,
+    lag_steps: int | list[int] | None = None,
     **kwargs,
-) -> float | tuple[float, int]:
+) -> tuple[float, int]:
     """
     Calculate connectivity between two time series using a given metric.
 
@@ -36,7 +37,7 @@ def connectivity(
     :attr:`delaynet.connectivities.__all_connectivity_metrics__`)
 
     If a `callable` is given, it should take two time series as input and return a
-    `float`, or a `tuple` of `float` and `int`.
+    `tuple` of `float` and `int`.
 
     :param ts1: First time series. Positional only.
     :type ts1: numpy.ndarray
@@ -47,14 +48,18 @@ def connectivity(
     :param args: Positional arguments forwarded to the connectivity function, see
                  documentation.
     :type args: list
+    :param lag_steps: The number of lag steps to consider. Required.
+                      Can be integer for [1, ..., num], or a list of integers.
+    :type lag_steps: int | list[int] | None
     :param kwargs: Keyword arguments forwarded to the connectivity function, see
                    documentation.
-    :return: Connectivity value and lag (if applicable).
-    :rtype: float or tuple of float and int
+    :return: Connectivity value and lag.
+    :rtype: tuple of float and int
     :raises ValueError: If the metric is unknown. Given as string.
     :raises ValueError: If the metric returns an invalid value. Given a Callable.
     :raises ValueError: If the metric is neither a string nor a Callable.
     """
+    kwargs["lag_steps"] = lag_steps
 
     if isinstance(metric, str):
         metric = metric.lower()

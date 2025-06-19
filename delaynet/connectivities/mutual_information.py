@@ -66,7 +66,7 @@ def mutual_information(
             y,
             measure="mutual_information",
             approach=approach,
-            offset=lag,
+            prop_time=lag,
             **kwargs,
         )
         return est.p_value(method=hypothesis_type, n_tests=n_tests)

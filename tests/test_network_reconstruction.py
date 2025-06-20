@@ -2,8 +2,21 @@
 
 import pytest
 from numpy import (
-    ndarray, column_stack, random, diag, eye, all as np_all,
-    array, zeros, allclose, float64, float32, int64, int32, isfinite, corrcoef
+    ndarray,
+    column_stack,
+    random,
+    diag,
+    eye,
+    all as np_all,
+    array,
+    zeros,
+    allclose,
+    float64,
+    float32,
+    int64,
+    int32,
+    isfinite,
+    corrcoef,
 )
 from numpy.testing import assert_array_equal
 
@@ -313,7 +326,9 @@ def test_reconstruct_network_with_callable_metric(two_time_series, callable_metr
         lambda ts1, ts2, lag_steps=None: (0.5, "invalid"),  # invalid lag type
     ],
 )
-def test_reconstruct_network_with_invalid_callable_metric(two_time_series, invalid_callable_metric):
+def test_reconstruct_network_with_invalid_callable_metric(
+    two_time_series, invalid_callable_metric
+):
     """Test network reconstruction with invalid callable metrics."""
     ts1, ts2 = two_time_series
     time_series = column_stack([ts1, ts2])

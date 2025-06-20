@@ -145,7 +145,14 @@ def norm(
 ):
     """Decorator for the norm functions.
 
-    Input time series can be 1D or 2D. If 2D, the norm is applied to each row.
+    Input time series can be of any shape. For 1D arrays, the norm is applied directly.
+    For higher dimensional arrays, an 'axis' kwarg must be provided to specify along
+    which axis to apply the normalization.
+
+    The decorator automatically detects if the norm function has an 'axis' parameter
+    in its signature. If it does, the axis is passed directly to the function.
+    If not, apply_along_axis is used to apply the function along the specified axis.
+
     Input must be non-empty.
     If ``check_shape`` is ``True``, the shape of the output time series is checked.
     Otherwise, only the dimensionality must remain the same, so the length of the time
@@ -191,15 +198,16 @@ def norm(
             This is useful if you want to pass unused keyword.
 
             :param ts: The time series to normalise.
-            :type ts: numpy.ndarray, shape (n,) or (m, n)
+            :type ts: numpy.ndarray of any shape
             :param args: The args to pass to the norm function.
             :type args: list
             :param kwargs: The kwargs to pass to the norm function.
             :type kwargs: dict
             :return: The normalised time series.
             :rtype: numpy.ndarray
-            :raises TypeError: Type of ts is not ndarray of dimension 1 or 2.
+            :raises TypeError: Type of ts is not ndarray.
             :raises ValueError: If the input time series is empty.
+            :raises ValueError: If axis kwarg is missing for multidimensional arrays.
             :raises ValueError: If an argument is missing.
             :raises TypeError: If an unknown kwarg is passed.
             :raises ValueError: If the shape of the norm output is not equal to the
@@ -215,25 +223,69 @@ def norm(
             # Check if ts is an ndarray
             if not isinstance(ts, ndarray):
                 raise TypeError(f"ts must be of type ndarray, not {type(ts)}.")
-            # Check if ts is 1D or 2D
-            if ts.ndim not in [1, 2]:
-                raise TypeError(f"ts must be of dimension 1 or 2, not {ts.ndim}.")
+
             # Check if ts is empty
             if ts.size == 0:
                 raise ValueError("ts must not be empty.")
 
-            bound_args = bind_args(norm_func, [ts, *args], kwargs)
-            # Call the norm function with the bound arguments
+            # Check if norm_func has an 'axis' parameter in its signature
+            sig = signature(norm_func)
+            has_axis_param = "axis" in sig.parameters
+
+            # For 1D arrays, apply norm directly (existing behavior)
             if ts.ndim == 1:
-                normed_ts = norm_func(*bound_args.args, **bound_args.kwargs)
-            else:  # must be 2D, due to previous check
-                normed_ts = apply_along_axis(
-                    norm_func,  # func1d
-                    1,  # axis
-                    ts,  # arr
-                    *bound_args.args[1:],  # args for func1d
-                    **bound_args.kwargs,  # kwargs for func1d
-                )
+                # Validate axis if provided
+                if "axis" in kwargs:
+                    axis = kwargs["axis"]
+                    # Validate axis bounds for 1D array
+                    if axis < -ts.ndim or axis >= ts.ndim:
+                        raise ValueError(
+                            f"axis {axis} is out of bounds for array of dimension {ts.ndim}"
+                        )
+
+                if has_axis_param:
+                    bound_args = bind_args(norm_func, [ts, *args], kwargs)
+                    normed_ts = norm_func(*bound_args.args, **bound_args.kwargs)
+                else:
+                    # Remove 'axis' from kwargs if function doesn't accept it
+                    kwargs_without_axis = {
+                        k: v for k, v in kwargs.items() if k != "axis"
+                    }
+                    bound_args = bind_args(norm_func, [ts, *args], kwargs_without_axis)
+                    normed_ts = norm_func(*bound_args.args, **bound_args.kwargs)
+            else:
+                # For higher dimensional arrays, require axis kwarg
+                if "axis" not in kwargs:
+                    raise ValueError(
+                        f"For {ts.ndim}D arrays, 'axis' kwarg must be specified to "
+                        f"indicate along which axis to apply the normalization."
+                    )
+
+                axis = kwargs["axis"]
+
+                # Validate axis bounds
+                if axis < -ts.ndim or axis >= ts.ndim:
+                    raise ValueError(
+                        f"axis {axis} is out of bounds for array of dimension {ts.ndim}"
+                    )
+
+                if has_axis_param:
+                    # Pass axis directly to the norm function
+                    bound_args = bind_args(norm_func, [ts, *args], kwargs)
+                    normed_ts = norm_func(*bound_args.args, **bound_args.kwargs)
+                else:
+                    # Use apply_along_axis, removing 'axis' from kwargs for the norm function
+                    kwargs_without_axis = {
+                        k: v for k, v in kwargs.items() if k != "axis"
+                    }
+                    bound_args = bind_args(norm_func, [ts, *args], kwargs_without_axis)
+                    normed_ts = apply_along_axis(
+                        norm_func,  # func1d
+                        axis,  # axis
+                        ts,  # arr
+                        *bound_args.args[1:],  # args for func1d
+                        **bound_args.kwargs,  # kwargs for func1d
+                    )
 
             # Get the shape/dimensionality of the input time series
             shape_dim = ts.shape if check_shape else ts.ndim

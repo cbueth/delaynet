@@ -18,9 +18,7 @@ def connectivity(*args, pre_processing_info: int | None = None) -> Callable:
 
     def decorate(connectivity_func: Connectivity) -> Connectivity:
         @wraps(connectivity_func)
-        def wrapper(
-            ts1: ndarray, ts2: ndarray, *args, **kwargs
-        ) -> tuple[float, int]:
+        def wrapper(ts1: ndarray, ts2: ndarray, *args, **kwargs) -> tuple[float, int]:
             if pre_processing_info is not None:
                 print(f"Pre-processing info: {pre_processing_info}")
             return connectivity_func(ts1, ts2, *args, **kwargs)

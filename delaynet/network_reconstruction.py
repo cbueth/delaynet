@@ -11,8 +11,10 @@ from .connectivity import connectivity, Metric
 
 
 def reconstruct_network(
-    time_series: ndarray, connectivity_measure: Metric,
-    lag_steps: int | list[int] | None = None, **kwargs
+    time_series: ndarray,
+    connectivity_measure: Metric,
+    lag_steps: int | list[int] | None = None,
+    **kwargs,
 ) -> tuple[ndarray, ndarray]:
     """
     Reconstruct a network from time series data.

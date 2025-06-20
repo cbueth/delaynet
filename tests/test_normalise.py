@@ -9,7 +9,14 @@ def test_normalise_with_string_metric(time_series):
     """Test normalise with string norm.
     All norms are programmatically tested in norms/test_all_norms.py.
     """
-    assert array_equal(normalise(time_series, norm="id"), time_series)
+    if time_series.ndim > 1:
+        # For 2D arrays, test with axis=0 and axis=1
+        result_axis0 = normalise(time_series, norm="id", axis=0)
+        result_axis1 = normalise(time_series, norm="id", axis=1)
+        assert array_equal(result_axis0, time_series)
+        assert array_equal(result_axis1, time_series)
+    else:
+        assert array_equal(normalise(time_series, norm="id"), time_series)
 
 
 @pytest.mark.parametrize(
@@ -22,8 +29,13 @@ def test_normalise_with_string_metric(time_series):
 )
 def test_normalise_with_valid_norm(time_series, norm):
     """Test normalise and pass norm as function."""
-    result = normalise(time_series, norm)
-    assert isinstance(result, ndarray)
+    if time_series.ndim > 1:
+        # For 2D arrays, test with axis=0
+        result = normalise(time_series, norm, axis=0)
+        assert isinstance(result, ndarray)
+    else:
+        result = normalise(time_series, norm)
+        assert isinstance(result, ndarray)
 
 
 # check that when passing a norm, the decorator norm is applied
@@ -48,7 +60,10 @@ def test_normalise_with_invalid_norm_type(time_series, invalid_norm):
 def test_normalise_kwargs_unknown(time_series):
     """Test normalise with unknown keyword argument."""
     with pytest.raises(TypeError, match="got an unexpected keyword argument 'b'"):
-        normalise(time_series, norm="id", b=2)
+        if time_series.ndim > 1:
+            normalise(time_series, norm="id", axis=0, b=2)
+        else:
+            normalise(time_series, norm="id", b=2)
 
 
 def test_normalise_ts_positional_only(time_series):
@@ -69,8 +84,14 @@ def test_normalise_ts_positional_only(time_series):
 )
 def test_normalise_invalid_time_series(invalid_time_series):
     """Test normalise with invalid time series."""
-    with pytest.raises(TypeError):
-        normalise(invalid_time_series, norm="id")
+    if hasattr(invalid_time_series, 'ndim') and invalid_time_series.ndim > 1:
+        # For 3D arrays, we expect ValueError about missing axis parameter
+        with pytest.raises(ValueError, match="axis.*kwarg must be specified"):
+            normalise(invalid_time_series, norm="id")
+    else:
+        # For non-ndarray types, we expect TypeError
+        with pytest.raises(TypeError):
+            normalise(invalid_time_series, norm="id")
 
 
 @pytest.mark.parametrize(

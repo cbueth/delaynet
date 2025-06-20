@@ -96,7 +96,7 @@ project:
 - Open an [Issue](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/issues/new). (Since we can't
   be sure at this point whether it is a bug or not, we ask you not to talk about a bug
   yet and not to label the issue.)
-- Explain the behavior you would expect and the actual behavior.
+- Explain the behaviour you would expect and the actual behaviour.
 - Please provide as much context as possible and describe the *reproduction steps* that
   someone else can follow to recreate the issue on their own. This usually includes your
   code. For good bug reports you should isolate the problem and create a reduced test
@@ -147,7 +147,7 @@ as [GitLab issues](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/issues).
 - Use a **clear and descriptive title** for the issue to identify the suggestion.
 - Provide a **step-by-step description of the suggested enhancement** in as many details
   as possible.
-- **Describe the current behavior** and **explain which behavior you expected to see
+- **Describe the current behaviour** and **explain which behaviour you expected to see
   instead** and why. At this point you can also tell which alternatives do not work for
   you.
 - **Explain why this enhancement would be useful** to most delaynet users. You may

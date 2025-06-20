@@ -84,7 +84,7 @@ def test_normalise_ts_positional_only(time_series):
 )
 def test_normalise_invalid_time_series(invalid_time_series):
     """Test normalise with invalid time series."""
-    if hasattr(invalid_time_series, 'ndim') and invalid_time_series.ndim > 1:
+    if hasattr(invalid_time_series, "ndim") and invalid_time_series.ndim > 1:
         # For 3D arrays, we expect ValueError about missing axis parameter
         with pytest.raises(ValueError, match="axis.*kwarg must be specified"):
             normalise(invalid_time_series, norm="id")

@@ -232,7 +232,7 @@ def norm(
             sig = signature(norm_func)
             has_axis_param = "axis" in sig.parameters
 
-            # For 1D arrays, apply norm directly (existing behavior)
+            # For 1D arrays, apply norm directly (existing behaviour)
             if ts.ndim == 1:
                 # Validate axis if provided
                 if "axis" in kwargs:

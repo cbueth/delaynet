@@ -35,10 +35,12 @@ def axis_dependent_norm(ts: ndarray, axis: int = -1) -> ndarray:
 
     return ts * multiplier
 
+
 @norm
 def axis_independent_norm(ts: ndarray) -> ndarray:
     """Same as axis_dependent_norm, but without the axis parameter."""
     return ts * arange(ts.shape[0])
+
 
 def test_norm_decorator_simple():
     """Test the norm decorator by designing a simple norm."""
@@ -275,7 +277,7 @@ def test_norm_decorator_check_shape(time_series, test_norm, shortening, check_sh
     # For multidimensional arrays, we need to provide an axis parameter
     kwargs = {}
     if time_series.ndim > 1:
-        kwargs['axis'] = 1  # Use axis=1 for backward compatibility
+        kwargs["axis"] = 1  # Use axis=1 for backward compatibility
 
     if shortening and check_shape:
         with pytest.raises(
@@ -299,7 +301,7 @@ def test_norm_decorator_check_shape_dimensionality(time_series, dim_diff):
     # For multidimensional arrays, we need to provide an axis parameter
     kwargs = {}
     if time_series.ndim > 1:
-        kwargs['axis'] = 1  # Use axis=1 for backward compatibility
+        kwargs["axis"] = 1  # Use axis=1 for backward compatibility
 
     with pytest.raises(
         ValueError,
@@ -358,19 +360,17 @@ def test_norm_decorator_check_shape_dimensionality(time_series, dim_diff):
         ),
         (
             array([[[1, 1], [1, 1]], [[1, 1], [1, 1]], [[1, 1], [1, 1]]]),
-            -2, # equivalent to axis 1
+            -2,  # equivalent to axis 1
             array([[[0, 0], [1, 1]], [[0, 0], [1, 1]], [[0, 0], [1, 1]]]),
         ),
         (
             array([[[1, 1], [1, 1]], [[1, 1], [1, 1]], [[1, 1], [1, 1]]]),
-            -3, # equivalent to axis 0
+            -3,  # equivalent to axis 0
             array([[[0, 0], [0, 0]], [[1, 1], [1, 1]], [[2, 2], [2, 2]]]),
         ),
     ],
 )
-def test_norm_decorator_multidimensional_arrays(
-    input_array, axis, expected
-):
+def test_norm_decorator_multidimensional_arrays(input_array, axis, expected):
     """Test the norm decorator with arrays of various dimensions."""
     result = axis_dependent_norm(input_array, axis=axis)
     assert array_equal(result, expected)
@@ -587,7 +587,7 @@ def test_norm_decorator_different_axes(
             3.0,
             2,
             array([5, 8, 11]),
-            "1D_array_multiply_by_3_add_2"
+            "1D_array_multiply_by_3_add_2",
         ),
         (
             array([[1, 2], [3, 4]]),
@@ -595,7 +595,7 @@ def test_norm_decorator_different_axes(
             2.0,
             1,
             array([[3, 5], [7, 9]]),
-            "2D_array_axis_1_multiply_by_2_add_1"
+            "2D_array_axis_1_multiply_by_2_add_1",
         ),
         (
             array([[1, 2], [3, 4]]),
@@ -603,7 +603,7 @@ def test_norm_decorator_different_axes(
             1.5,
             3,
             array([[4.5, 6.0], [7.5, 9.0]]),
-            "2D_array_axis_0_multiply_by_1_5_add_3"
+            "2D_array_axis_0_multiply_by_1_5_add_3",
         ),
         (
             array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]]),
@@ -611,7 +611,7 @@ def test_norm_decorator_different_axes(
             0.5,
             10,
             array([[[10.5, 11.0], [11.5, 12.0]], [[12.5, 13.0], [13.5, 14.0]]]),
-            "3D_array_axis_2_multiply_by_0_5_add_10"
+            "3D_array_axis_2_multiply_by_0_5_add_10",
         ),
         (
             array([1, 2, 3, 4, 5]),
@@ -619,7 +619,7 @@ def test_norm_decorator_different_axes(
             1.0,
             0,
             array([1, 2, 3, 4, 5]),
-            "1D_array_identity_multiply_by_1_add_0"
+            "1D_array_identity_multiply_by_1_add_0",
         ),
     ],
     ids=[
@@ -630,7 +630,9 @@ def test_norm_decorator_different_axes(
         "1D_array_identity_multiply_by_1_add_0",
     ],
 )
-def test_norm_decorator_complex_norm_with_parameters(input_array, axis, multiplier, offset, expected, description):
+def test_norm_decorator_complex_norm_with_parameters(
+    input_array, axis, multiplier, offset, expected, description
+):
     """Test norm decorator with a complex norm function having multiple parameters."""
 
     @norm
@@ -640,58 +642,32 @@ def test_norm_decorator_complex_norm_with_parameters(input_array, axis, multipli
     if axis is None:
         result = complex_norm(input_array, multiplier=multiplier, offset=offset)
     else:
-        result = complex_norm(input_array, axis=axis, multiplier=multiplier, offset=offset)
+        result = complex_norm(
+            input_array, axis=axis, multiplier=multiplier, offset=offset
+        )
     assert array_equal(result, expected)
 
 
 @pytest.mark.parametrize(
     "shape, axis, description",
     [
-        (
-            (5,),
-            None,
-            "1D_array_shape_5_identity_norm_preserves_shape"
-        ),
-        (
-            (3, 4),
-            0,
-            "2D_array_shape_3x4_axis_0_identity_norm_preserves_shape"
-        ),
-        (
-            (3, 4),
-            1,
-            "2D_array_shape_3x4_axis_1_identity_norm_preserves_shape"
-        ),
-        (
-            (2, 3, 4),
-            0,
-            "3D_array_shape_2x3x4_axis_0_identity_norm_preserves_shape"
-        ),
-        (
-            (2, 3, 4),
-            1,
-            "3D_array_shape_2x3x4_axis_1_identity_norm_preserves_shape"
-        ),
-        (
-            (2, 3, 4),
-            2,
-            "3D_array_shape_2x3x4_axis_2_identity_norm_preserves_shape"
-        ),
+        ((5,), None, "1D_array_shape_5_identity_norm_preserves_shape"),
+        ((3, 4), 0, "2D_array_shape_3x4_axis_0_identity_norm_preserves_shape"),
+        ((3, 4), 1, "2D_array_shape_3x4_axis_1_identity_norm_preserves_shape"),
+        ((2, 3, 4), 0, "3D_array_shape_2x3x4_axis_0_identity_norm_preserves_shape"),
+        ((2, 3, 4), 1, "3D_array_shape_2x3x4_axis_1_identity_norm_preserves_shape"),
+        ((2, 3, 4), 2, "3D_array_shape_2x3x4_axis_2_identity_norm_preserves_shape"),
         (
             (2, 2, 2, 2),
             0,
-            "4D_array_shape_2x2x2x2_axis_0_identity_norm_preserves_shape"
+            "4D_array_shape_2x2x2x2_axis_0_identity_norm_preserves_shape",
         ),
         (
             (2, 2, 2, 2),
             3,
-            "4D_array_shape_2x2x2x2_axis_3_identity_norm_preserves_shape"
+            "4D_array_shape_2x2x2x2_axis_3_identity_norm_preserves_shape",
         ),
-        (
-            (6, 7, 8),
-            1,
-            "3D_array_shape_6x7x8_axis_1_identity_norm_preserves_shape"
-        ),
+        ((6, 7, 8), 1, "3D_array_shape_6x7x8_axis_1_identity_norm_preserves_shape"),
     ],
     ids=[
         "1D_array_shape_5_identity_norm_preserves_shape",
@@ -737,7 +713,7 @@ def test_norm_decorator_backward_compatibility():
 @pytest.mark.parametrize("n_axis", list(range(-6, 6)))
 def test_axis_independent_and_dependent_norm_same_output(n_dim, n_axis):
     """Test that axis_independent_norm and axis_dependent_norm have the same output."""
-    data = ones(((5,) * n_dim))
+    data = ones((5,) * n_dim)
 
     # Skip invalid axis values for the given dimensionality
     if n_axis < -n_dim or n_axis >= n_dim:

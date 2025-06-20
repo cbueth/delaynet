@@ -7,7 +7,7 @@
   - **Added:** Complete network reconstruction functionality with the new {func}`~delaynet.network_reconstruction.reconstruct_network` function that applies connectivity measures to pairs of time series to build networks represented by $p$-value and lag matrices.
   - **Enhanced:** Documentation structure with comprehensive individual guides for each method:
     - Dedicated guides for each detrending method with examples and mathematical background
-    - Individual connectivity method guides with detailed explanations and use cases  
+    - Individual connectivity method guides with detailed explanations and use cases
     - New network reconstruction guide with practical examples and custom metric support
     - Network analysis guide for interpreting and working with reconstructed networks
   - **Improved:** Core connectivity framework with better error handling and validation

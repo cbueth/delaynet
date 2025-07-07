@@ -10,10 +10,10 @@ kernelspec:
 The identity "detrending" simply returns the input time series without any modification. It should only be used for testing or if the data is already detrended.
 
 ```python
-from delaynet.norms import identity
+from delaynet.detrending_methods import identity
 
 # Apply identity detrending (no change)
-normalised_ts = identity(time_series)
+detrended_ts = identity(time_series)
 ```
 
 ```{warning}
@@ -22,6 +22,6 @@ The identity function is not a true detrending method. It simply returns the inp
 
 (link_to_method)=
 ```{eval-rst}
-.. automethod:: delaynet.norms.identity
+.. automethod:: delaynet.detrending_methods.identity
     :noindex:
 ```

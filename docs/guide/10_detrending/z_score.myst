@@ -14,13 +14,13 @@ $$Z = \frac{X - \mu}{\sigma}$$
 where $X$ is the data point, $\mu$ is the mean, and $\sigma$ is the standard deviation.
 
 ```python
-from delaynet.norms import z_score
+from delaynet.detrending_methods import z_score
 
 # Apply Z-Score detrending
-normalised_ts = z_score(time_series)
+detrended_ts = z_score(time_series)
 
 # Apply Z-Score detrending with periodicity
-normalised_ts = z_score(time_series, periodicity=24, max_periods=7)
+detrended_ts = z_score(time_series, periodicity=24, max_periods=7)
 ```
 
 The Z-Score detrending in `delaynet` can take into account the periodicity of the time series. This is useful for data with seasonal patterns, such as daily or weekly cycles. The `periodicity` parameter specifies the number of time steps in one period, and the `max_periods` parameter limits the number of periods to consider before and after the current value.
@@ -45,8 +45,8 @@ fmri_data = dn.preparation.data_generator.gen_fmri(
 plt.figure(figsize=(10, 5), dpi=300)
 plt.plot(fmri_data, label='Original FMRI Data')
 plt.title('Original and Z-Score Detrended FMRI Data')
-plt.plot(dn.norms.z_score(fmri_data, periodicity=40), label='Z-Score Detrended FMRI Data with Periodicity=40')
-plt.plot(dn.norms.z_score(fmri_data, periodicity=40, max_periods=3), label='Periodicity=40 + max periods=3')
+plt.plot(dn.detrending_methods.z_score(fmri_data, periodicity=40), label='Z-Score Detrended FMRI Data with Periodicity=40')
+plt.plot(dn.detrending_methods.z_score(fmri_data, periodicity=40, max_periods=3), label='Periodicity=40 + max periods=3')
 plt.legend()
 plt.ylim(-5, 5)
 plt.grid()
@@ -55,6 +55,6 @@ plt.show()
 
 (link_to_method)=
 ```{eval-rst}
-.. automethod:: delaynet.norms.z_score
+.. automethod:: delaynet.detrending_methods.z_score
     :noindex:
 ```

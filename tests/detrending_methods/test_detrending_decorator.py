@@ -1,4 +1,4 @@
-"""Test the norm decorator."""
+"""Test the detrend decorator."""
 
 from sys import version_info
 
@@ -17,12 +17,12 @@ from numpy import (
     random,
 )
 
-from delaynet.decorators import norm
+from delaynet.decorators import detrending_method
 
 
-# Shared norm functions used across multiple tests
-@norm
-def axis_dependent_norm(ts: ndarray, axis: int = -1) -> ndarray:
+# Shared detrend functions used across multiple tests
+@detrending_method
+def axis_dependent_detrend(ts: ndarray, axis: int = -1) -> ndarray:
     """Multiply values by their position index along the specified axis."""
     # Create arange based on the shape along the specified axis
     axis_length = ts.shape[axis]
@@ -36,21 +36,27 @@ def axis_dependent_norm(ts: ndarray, axis: int = -1) -> ndarray:
     return ts * multiplier
 
 
-@norm
-def axis_independent_norm(ts: ndarray) -> ndarray:
-    """Same as axis_dependent_norm, but without the axis parameter."""
+@detrending_method
+def axis_independent_detrend(ts: ndarray) -> ndarray:
+    """Same as axis_dependent_detrend, but without the axis parameter."""
     return ts * arange(ts.shape[0])
 
 
-def test_norm_decorator_simple():
-    """Test the norm decorator by designing a simple norm."""
+@detrending_method
+def simple_detrend(ts: ndarray) -> ndarray:
+    """Increment all values by one."""
+    return ts + 1
 
-    @norm
-    def simple_norm(ts: ndarray) -> ndarray:
+
+def test_detrend_decorator_simple():
+    """Test the detrend decorator by designing a simple detrend."""
+
+    @detrending_method
+    def simple_detrend(ts: ndarray) -> ndarray:
         """Increment all values by one."""
         return ts + 1
 
-    assert array_equal(simple_norm(array([1, 2, 3])), array([2, 3, 4]))
+    assert array_equal(simple_detrend(array([1, 2, 3])), array([2, 3, 4]))
 
 
 @pytest.mark.parametrize(
@@ -63,66 +69,66 @@ def test_norm_decorator_simple():
         (3, [4, 5, 6]),
     ],
 )
-def test_norm_decorator_kwargs(a, expected):
-    """Test the norm decorator by designing a simple norm with kwargs."""
+def test_detrend_decorator_kwargs(a, expected):
+    """Test the detrend decorator by designing a simple detrend with kwargs."""
 
-    @norm
-    def simple_norm(ts: ndarray, a: int = 1) -> ndarray:
+    @detrending_method
+    def simple_detrend(ts: ndarray, a: int = 1) -> ndarray:
         """Increment all values by one."""
         return ts + a
 
-    assert array_equal(simple_norm(array([1, 2, 3]), a=a), array(expected))
+    assert array_equal(simple_detrend(array([1, 2, 3]), a=a), array(expected))
 
 
-def test_norm_decorator_kwargs_unknown():
-    """Test the norm decorator by designing a simple norm with unknown kwargs."""
+def test_detrend_decorator_kwargs_unknown():
+    """Test the detrend decorator by designing a simple detrend with unknown kwargs."""
 
-    @norm
-    def simple_norm(ts: ndarray, a: int = 1) -> ndarray:
+    @detrending_method
+    def simple_detrend(ts: ndarray, a: int = 1) -> ndarray:
         """Increment all values by one."""
         return ts + a
 
     with pytest.raises(TypeError, match="got an unexpected keyword argument 'b'"):
-        simple_norm(array([1, 2, 3]), b=2)
+        simple_detrend(array([1, 2, 3]), b=2)
 
 
-def test_norm_decorator_kwargs_unknown_ignored():
-    """Test the norm decorator by designing a simple norm with unknown kwargs
+def test_detrend_decorator_kwargs_unknown_ignored():
+    """Test the detrend decorator by designing a simple detrend with unknown kwargs
     and kwarg checker off."""
 
-    @norm
-    def simple_norm(ts: ndarray, a: int = 1) -> ndarray:
+    @detrending_method
+    def simple_detrend(ts: ndarray, a: int = 1) -> ndarray:
         """Increment all values by one."""
         return ts + a
 
     assert array_equal(
-        simple_norm(array([1, 2, 3]), check_kwargs=False, b=2), array([2, 3, 4])
+        simple_detrend(array([1, 2, 3]), check_kwargs=False, b=2), array([2, 3, 4])
     )
 
 
-def test_norm_decorator_required_kwonly():
-    """Test the norm decorator by designing a
-    norm with required keyword-only arguments."""
+def test_detrend_decorator_required_kwonly():
+    """Test the detrend decorator by designing a
+    detrend with required keyword-only arguments."""
 
-    @norm
-    def simple_norm(ts: ndarray, *, a: int) -> ndarray:
+    @detrending_method
+    def simple_detrend(ts: ndarray, *, a: int) -> ndarray:
         """Increment all values by one."""
         return ts + a
 
-    assert array_equal(simple_norm(array([1, 2, 3]), a=2), array([3, 4, 5]))
+    assert array_equal(simple_detrend(array([1, 2, 3]), a=2), array([3, 4, 5]))
 
 
 @pytest.mark.parametrize("check_kwargs", [True, False])
-def test_norm_decorator_mixed_args(check_kwargs):
-    """Test the norm decorator with a function that has mixed arguments."""
+def test_detrend_decorator_mixed_args(check_kwargs):
+    """Test the detrend decorator with a function that has mixed arguments."""
 
-    @norm
-    def mixed_args_norm(ts: ndarray, a=1, *, b: int) -> ndarray:
+    @detrending_method
+    def mixed_args_detrend(ts: ndarray, a=1, *, b: int) -> ndarray:
         """Increment all values by a and b."""
         return ts + a + b
 
     # Test with positional and keyword arguments
-    assert array_equal(mixed_args_norm(array([1, 2, 3]), 2, b=3), array([6, 7, 8]))
+    assert array_equal(mixed_args_detrend(array([1, 2, 3]), 2, b=3), array([6, 7, 8]))
 
     error_msg = (
         "missing a required argument: 'b'"
@@ -132,65 +138,65 @@ def test_norm_decorator_mixed_args(check_kwargs):
 
     # Test with missing required keyword argument
     with pytest.raises(TypeError, match=error_msg):
-        mixed_args_norm(array([1, 2, 3]), 2)
+        mixed_args_detrend(array([1, 2, 3]), 2)
 
     # Test with unknown keyword argument
     if check_kwargs:
         with pytest.raises(TypeError, match="got an unexpected keyword argument 'c'"):
-            mixed_args_norm(array([1, 2, 3]), 2, b=3, c=4)
+            mixed_args_detrend(array([1, 2, 3]), 2, b=3, c=4)
     else:
         assert array_equal(
-            mixed_args_norm(array([1, 2, 3]), 2, check_kwargs=check_kwargs, b=3, c=4),
+            mixed_args_detrend(array([1, 2, 3]), 2, check_kwargs=check_kwargs, b=3, c=4),
             array([6, 7, 8]),
         )
         assert array_equal(
-            mixed_args_norm(array([1, 2, 3]), 2, b=3, c=4, check_kwargs=check_kwargs),
+            mixed_args_detrend(array([1, 2, 3]), 2, b=3, c=4, check_kwargs=check_kwargs),
             array([6, 7, 8]),
         )
 
 
-def test_norm_decorator_faulty_input_type():
-    """Test the norm decorator by designing a norm with a non-ndarray input."""
+def test_detrend_decorator_faulty_input_type():
+    """Test the detrend decorator by designing a detrend with a non-ndarray input."""
 
-    @norm
-    def non_ndarray_norm(ts: list) -> ndarray:
+    @detrending_method
+    def non_ndarray_detrend(ts: list) -> ndarray:
         """Increment all values by one."""
         return array(ts) + 1
 
     with pytest.raises(
         TypeError, match="ts must be of type ndarray, not <class 'list'>"
     ):
-        non_ndarray_norm([1, 2, 3])
+        non_ndarray_detrend([1, 2, 3])
 
 
 # when input is ndarray, but output is not ndarray
-def test_norm_decorator_faulty_output_type():
-    """Test the norm decorator by designing a norm with a non-ndarray output."""
+def test_detrend_decorator_faulty_output_type():
+    """Test the detrend decorator by designing a detrend with a non-ndarray output."""
 
-    @norm
-    def non_ndarray_norm(ts: ndarray) -> list:
+    @detrending_method
+    def non_ndarray_detrend(ts: ndarray) -> list:
         """Increment all values by one."""
         return list(ts + 1)
 
     with pytest.raises(
         ValueError,
-        match="Norm function non_ndarray_norm must return an ndarray, "
+        match="Detrending function non_ndarray_detrend must return an ndarray, "
         "not <class 'list'>.",
     ):
-        non_ndarray_norm(array([1, 2, 3]))
+        non_ndarray_detrend(array([1, 2, 3]))
 
 
 @pytest.mark.parametrize(
-    "faulty_norm",
+    "faulty_detrend",
     [
         lambda ts: array([]),
         lambda ts: hstack((ts, ts)),
     ],
 )
-def test_norm_decorator_shape_mismatch(faulty_norm):
-    """Test the norm decorator by designing a norm with a shape mismatch."""
-    with pytest.raises(ValueError, match="Shape of normalised time series"):
-        norm(faulty_norm)(array([1, 2, 3]))
+def test_detrend_decorator_shape_mismatch(faulty_detrend):
+    """Test the detrend decorator by designing a detrend with a shape mismatch."""
+    with pytest.raises(ValueError, match="Shape of detrended time series"):
+        detrending_method(faulty_detrend)(array([1, 2, 3]))
 
 
 @pytest.mark.parametrize("check_nan", [True, False])
@@ -205,11 +211,11 @@ def test_norm_decorator_shape_mismatch(faulty_norm):
         array([inf, 2, nan]),
     ],
 )
-def test_norm_decorator_check_nans(test_ts, check_nan, check_inf, replace):
-    """Test the norm decorator by designing a norm introducing a NaN."""
+def test_detrend_decorator_check_nans(test_ts, check_nan, check_inf, replace):
+    """Test the detrend decorator by designing a detrend introducing a NaN."""
 
-    @norm(check_nan=check_nan, check_inf=check_inf)
-    def norm_with_nans(ts: ndarray) -> ndarray:
+    @detrending_method(check_nan=check_nan, check_inf=check_inf)
+    def detrend_with_nans(ts: ndarray) -> ndarray:
         """Assign the second value NaN."""
         # make array allow NaNs
         ts = ts.astype(float)
@@ -221,7 +227,7 @@ def test_norm_decorator_check_nans(test_ts, check_nan, check_inf, replace):
     if nan_condition or inf_condition:
         with pytest.raises(
             ValueError,
-            match="Normalised time series contains "
+            match="Detrended time series contains "
             + (
                 ", ".join(
                     msg
@@ -232,7 +238,7 @@ def test_norm_decorator_check_nans(test_ts, check_nan, check_inf, replace):
                     if check
                 )
             )
-            # match any normed_ts
+            # match any detrended_ts
             + ": .*"
             + (
                 "Input time series contained "
@@ -251,14 +257,14 @@ def test_norm_decorator_check_nans(test_ts, check_nan, check_inf, replace):
                 )
             ),
         ):
-            norm_with_nans(test_ts)
+            detrend_with_nans(test_ts)
     else:
-        assert norm_with_nans(test_ts) is not None
+        assert detrend_with_nans(test_ts) is not None
 
 
 @pytest.mark.parametrize("check_shape", [True, False])
 @pytest.mark.parametrize(
-    "test_norm, shortening",
+    "test_detrend, shortening",
     [
         (lambda ts: ts, False),  # identity
         (lambda ts: ts[1:], True),  # remove first value
@@ -266,13 +272,13 @@ def test_norm_decorator_check_nans(test_ts, check_nan, check_inf, replace):
         (lambda ts: ts[1:-1], True),  # remove first and last value
     ],
 )
-def test_norm_decorator_check_shape(time_series, test_norm, shortening, check_shape):
-    """Test the norm decorator by designing a norm that shortens the time series."""
+def test_detrend_decorator_check_shape(time_series, test_detrend, shortening, check_shape):
+    """Test the detrend decorator by designing a detrend that shortens the time series."""
 
-    @norm(check_shape=check_shape)
-    def norm_shortening(ts: ndarray) -> ndarray:
+    @detrending_method(check_shape=check_shape)
+    def detrend_shortening(ts: ndarray) -> ndarray:
         """Shorten the time series."""
-        return test_norm(ts)
+        return test_detrend(ts)
 
     # For multidimensional arrays, we need to provide an axis parameter
     kwargs = {}
@@ -282,18 +288,18 @@ def test_norm_decorator_check_shape(time_series, test_norm, shortening, check_sh
     if shortening and check_shape:
         with pytest.raises(
             ValueError,
-            match="Shape of normalised time series",
+            match="Shape of detrended time series",
         ):
-            norm_shortening(time_series, **kwargs)
+            detrend_shortening(time_series, **kwargs)
     else:
-        assert norm_shortening(time_series, **kwargs) is not None
+        assert detrend_shortening(time_series, **kwargs) is not None
 
 
 @pytest.mark.parametrize("dim_diff", [1, 2])
-def test_norm_decorator_check_shape_dimensionality(time_series, dim_diff):
-    """Test the norm decorator by designing a norm that changes the dimensionality."""
+def test_detrend_decorator_check_shape_dimensionality(time_series, dim_diff):
+    """Test the detrend decorator by designing a detrend that changes the dimensionality."""
 
-    @norm(check_shape=False)
+    @detrending_method(check_shape=False)
     def add_dimensions(ts: ndarray) -> ndarray:
         """Add dimensions to the time series."""
         return ts.reshape(ts.shape + (1,) * dim_diff)
@@ -305,7 +311,7 @@ def test_norm_decorator_check_shape_dimensionality(time_series, dim_diff):
 
     with pytest.raises(
         ValueError,
-        match="Dimensionality of normalised time series",
+        match="Dimensionality of detrended time series",
     ):
         add_dimensions(time_series, **kwargs)
 
@@ -370,9 +376,9 @@ def test_norm_decorator_check_shape_dimensionality(time_series, dim_diff):
         ),
     ],
 )
-def test_norm_decorator_multidimensional_arrays(input_array, axis, expected):
-    """Test the norm decorator with arrays of various dimensions."""
-    result = axis_dependent_norm(input_array, axis=axis)
+def test_detrend_decorator_multidimensional_arrays(input_array, axis, expected):
+    """Test the detrend decorator with arrays of various dimensions."""
+    result = axis_dependent_detrend(input_array, axis=axis)
     assert array_equal(result, expected)
 
 
@@ -403,10 +409,10 @@ def test_norm_decorator_multidimensional_arrays(input_array, axis, expected):
         "4D_array_without_axis_parameter_should_raise_error",
     ],
 )
-def test_norm_decorator_multidimensional_missing_axis(input_array, description):
+def test_detrend_decorator_multidimensional_missing_axis(input_array, description):
     """Test that multidimensional arrays require an axis parameter."""
     with pytest.raises(ValueError, match="axis.*kwarg must be specified"):
-        axis_dependent_norm(input_array)
+        axis_dependent_detrend(input_array)
 
 
 @pytest.mark.parametrize(
@@ -444,12 +450,12 @@ def test_norm_decorator_multidimensional_missing_axis(input_array, description):
         "3D_array_axis_2_function_handles_axis_itself",
     ],
 )
-def test_norm_decorator_with_axis_parameter(input_array, axis, expected, description):
-    """Test norm function that has an axis parameter in its signature."""
+def test_detrend_decorator_with_axis_parameter(input_array, axis, expected, description):
+    """Test detrend function that has an axis parameter in its signature."""
 
-    @norm
-    def norm_with_axis(ts: ndarray, axis: int = None) -> ndarray:
-        """Norm function that handles an axis parameter itself."""
+    @detrending_method
+    def detrend_with_axis(ts: ndarray, axis: int = None) -> ndarray:
+        """Detrend function that handles an axis parameter itself."""
         if axis is None:
             return ts + 1
         else:
@@ -457,9 +463,9 @@ def test_norm_decorator_with_axis_parameter(input_array, axis, expected, descrip
             return ts + 1
 
     if axis is None:
-        result = norm_with_axis(input_array)
+        result = detrend_with_axis(input_array)
     else:
-        result = norm_with_axis(input_array, axis=axis)
+        result = detrend_with_axis(input_array, axis=axis)
     assert array_equal(result, expected)
 
 
@@ -498,22 +504,22 @@ def test_norm_decorator_with_axis_parameter(input_array, axis, expected, descrip
         "3D_array_axis_1_decorator_uses_apply_along_axis",
     ],
 )
-def test_norm_decorator_without_axis_parameter(
+def test_detrend_decorator_without_axis_parameter(
     input_array, axis, expected, description
 ):
-    """Test norm function that doesn't have an axis parameter
+    """Test detrend function that doesn't have an axis parameter
     - uses apply_along_axis.
     """
 
-    @norm
-    def norm_without_axis(ts: ndarray) -> ndarray:
-        """Norm function that works on 1D arrays only."""
+    @detrending_method
+    def detrend_without_axis(ts: ndarray) -> ndarray:
+        """Detrend function that works on 1D arrays only."""
         return ts + 1
 
     if axis is None:
-        result = norm_without_axis(input_array)
+        result = detrend_without_axis(input_array)
     else:
-        result = norm_without_axis(input_array, axis=axis)
+        result = detrend_without_axis(input_array, axis=axis)
     assert array_equal(result, expected)
 
 
@@ -566,12 +572,12 @@ def test_norm_decorator_without_axis_parameter(
         "4D_array_axis_3_multiply_by_0_1_2_3_along_last_dimension",
     ],
 )
-def test_norm_decorator_different_axes(
+def test_detrend_decorator_different_axes(
     input_shape, axis, expected_multiplier, description
 ):
-    """Test norm decorator with different axis values."""
+    """Test detrend decorator with different axis values."""
     input_array = ones(input_shape)
-    result = axis_dependent_norm(input_array, axis=axis)
+    result = axis_dependent_detrend(input_array, axis=axis)
     expected = ones(input_shape) * expected_multiplier
 
     assert array_equal(result, expected)
@@ -630,19 +636,19 @@ def test_norm_decorator_different_axes(
         "1D_array_identity_multiply_by_1_add_0",
     ],
 )
-def test_norm_decorator_complex_norm_with_parameters(
+def test_detrend_decorator_complex_detrend_with_parameters(
     input_array, axis, multiplier, offset, expected, description
 ):
-    """Test norm decorator with a complex norm function having multiple parameters."""
+    """Test detrend decorator with a complex detrend function having multiple parameters."""
 
-    @norm
-    def complex_norm(ts: ndarray, multiplier: float = 2.0, offset: int = 1) -> ndarray:
+    @detrending_method
+    def complex_detrend(ts: ndarray, multiplier: float = 2.0, offset: int = 1) -> ndarray:
         return ts * multiplier + offset
 
     if axis is None:
-        result = complex_norm(input_array, multiplier=multiplier, offset=offset)
+        result = complex_detrend(input_array, multiplier=multiplier, offset=offset)
     else:
-        result = complex_norm(
+        result = complex_detrend(
             input_array, axis=axis, multiplier=multiplier, offset=offset
         )
     assert array_equal(result, expected)
@@ -651,68 +657,68 @@ def test_norm_decorator_complex_norm_with_parameters(
 @pytest.mark.parametrize(
     "shape, axis, description",
     [
-        ((5,), None, "1D_array_shape_5_identity_norm_preserves_shape"),
-        ((3, 4), 0, "2D_array_shape_3x4_axis_0_identity_norm_preserves_shape"),
-        ((3, 4), 1, "2D_array_shape_3x4_axis_1_identity_norm_preserves_shape"),
-        ((2, 3, 4), 0, "3D_array_shape_2x3x4_axis_0_identity_norm_preserves_shape"),
-        ((2, 3, 4), 1, "3D_array_shape_2x3x4_axis_1_identity_norm_preserves_shape"),
-        ((2, 3, 4), 2, "3D_array_shape_2x3x4_axis_2_identity_norm_preserves_shape"),
+        ((5,), None, "1D_array_shape_5_identity_detrend_preserves_shape"),
+        ((3, 4), 0, "2D_array_shape_3x4_axis_0_identity_detrend_preserves_shape"),
+        ((3, 4), 1, "2D_array_shape_3x4_axis_1_identity_detrend_preserves_shape"),
+        ((2, 3, 4), 0, "3D_array_shape_2x3x4_axis_0_identity_detrend_preserves_shape"),
+        ((2, 3, 4), 1, "3D_array_shape_2x3x4_axis_1_identity_detrend_preserves_shape"),
+        ((2, 3, 4), 2, "3D_array_shape_2x3x4_axis_2_identity_detrend_preserves_shape"),
         (
             (2, 2, 2, 2),
             0,
-            "4D_array_shape_2x2x2x2_axis_0_identity_norm_preserves_shape",
+            "4D_array_shape_2x2x2x2_axis_0_identity_detrend_preserves_shape",
         ),
         (
             (2, 2, 2, 2),
             3,
-            "4D_array_shape_2x2x2x2_axis_3_identity_norm_preserves_shape",
+            "4D_array_shape_2x2x2x2_axis_3_identity_detrend_preserves_shape",
         ),
-        ((6, 7, 8), 1, "3D_array_shape_6x7x8_axis_1_identity_norm_preserves_shape"),
+        ((6, 7, 8), 1, "3D_array_shape_6x7x8_axis_1_identity_detrend_preserves_shape"),
     ],
     ids=[
-        "1D_array_shape_5_identity_norm_preserves_shape",
-        "2D_array_shape_3x4_axis_0_identity_norm_preserves_shape",
-        "2D_array_shape_3x4_axis_1_identity_norm_preserves_shape",
-        "3D_array_shape_2x3x4_axis_0_identity_norm_preserves_shape",
-        "3D_array_shape_2x3x4_axis_1_identity_norm_preserves_shape",
-        "3D_array_shape_2x3x4_axis_2_identity_norm_preserves_shape",
-        "4D_array_shape_2x2x2x2_axis_0_identity_norm_preserves_shape",
-        "4D_array_shape_2x2x2x2_axis_3_identity_norm_preserves_shape",
-        "3D_array_shape_6x7x8_axis_1_identity_norm_preserves_shape",
+        "1D_array_shape_5_identity_detrend_preserves_shape",
+        "2D_array_shape_3x4_axis_0_identity_detrend_preserves_shape",
+        "2D_array_shape_3x4_axis_1_identity_detrend_preserves_shape",
+        "3D_array_shape_2x3x4_axis_0_identity_detrend_preserves_shape",
+        "3D_array_shape_2x3x4_axis_1_identity_detrend_preserves_shape",
+        "3D_array_shape_2x3x4_axis_2_identity_detrend_preserves_shape",
+        "4D_array_shape_2x2x2x2_axis_0_identity_detrend_preserves_shape",
+        "4D_array_shape_2x2x2x2_axis_3_identity_detrend_preserves_shape",
+        "3D_array_shape_6x7x8_axis_1_identity_detrend_preserves_shape",
     ],
 )
-def test_norm_decorator_preserves_shape(shape, axis, description):
+def test_detrend_decorator_preserves_shape(shape, axis, description):
     """Test that the decorator preserves array shapes correctly."""
 
-    @norm
-    def identity_norm(ts: ndarray) -> ndarray:
+    @detrending_method
+    def identity_detrend(ts: ndarray) -> ndarray:
         return ts
 
     input_array = random.randn(*shape)
 
     if axis is None:
-        result = identity_norm(input_array)
+        result = identity_detrend(input_array)
     else:
-        result = identity_norm(input_array, axis=axis)
+        result = identity_detrend(input_array, axis=axis)
 
     assert result.shape == input_array.shape
     assert array_equal(result, input_array)
 
 
-def test_norm_decorator_backward_compatibility():
+def test_detrend_decorator_backward_compatibility():
     """Test that existing 2D behaviour is preserved when axis=1."""
 
     # Test that 2D array with axis=1 gives an expected axis-dependent result
     input_2d = array([[1, 2, 3], [4, 5, 6]])
-    result = axis_dependent_norm(input_2d, axis=1)
+    result = axis_dependent_detrend(input_2d, axis=1)
     expected = array([[0, 2, 6], [0, 5, 12]])  # [[1*0, 2*1, 3*2], [4*0, 5*1, 6*2]]
     assert array_equal(result, expected)
 
 
 @pytest.mark.parametrize("n_dim", list(range(1, 6)))
 @pytest.mark.parametrize("n_axis", list(range(-6, 6)))
-def test_axis_independent_and_dependent_norm_same_output(n_dim, n_axis):
-    """Test that axis_independent_norm and axis_dependent_norm have the same output."""
+def test_axis_independent_and_dependent_detrend_same_output(n_dim, n_axis):
+    """Test that axis_independent_detrend and axis_dependent_detrend have the same output."""
     data = ones((5,) * n_dim)
 
     # Skip invalid axis values for the given dimensionality
@@ -720,6 +726,73 @@ def test_axis_independent_and_dependent_norm_same_output(n_dim, n_axis):
         return
 
     assert array_equal(
-        axis_independent_norm(data, axis=n_axis),
-        axis_dependent_norm(data, axis=n_axis),
+        axis_independent_detrend(data, axis=n_axis),
+        axis_dependent_detrend(data, axis=n_axis),
     )
+
+
+def test_detrend_decorator_empty_array():
+    """Test that the detrend decorator raises ValueError for empty arrays."""
+
+    @detrending_method
+    def simple_detrend(ts: ndarray) -> ndarray:
+        return ts + 1
+
+    # Test with empty 1D array
+    empty_array = array([])
+    with pytest.raises(ValueError, match="ts must not be empty"):
+        simple_detrend(empty_array)
+
+    # Test with empty 2D array
+    empty_2d_array = array([]).reshape(0, 5)
+    with pytest.raises(ValueError, match="ts must not be empty"):
+        simple_detrend(empty_2d_array, axis=0)
+
+
+@pytest.mark.parametrize(
+    "axis, array_dim",
+    [
+        (1, 1),    # axis=1 for 1D array (valid range: -1 to 0)
+        (-2, 1),   # axis=-2 for 1D array (valid range: -1 to 0)
+        (2, 1),    # axis=2 for 1D array (valid range: -1 to 0)
+    ],
+)
+def test_detrend_decorator_axis_out_of_bounds_1d(axis, array_dim):
+    """Test that the detrend decorator raises ValueError for out of bounds axis on 1D arrays."""
+
+    @detrending_method
+    def simple_detrend(ts: ndarray) -> ndarray:
+        return ts + 1
+
+    test_array = array([1, 2, 3])  # 1D array
+
+    with pytest.raises(
+        ValueError, 
+        match=f"axis {axis} is out of bounds for array of dimension {array_dim}"
+    ):
+        simple_detrend(test_array, axis=axis)
+
+
+@pytest.mark.parametrize(
+    "axis, array_shape, array_dim",
+    [
+        (2, (3, 4), 2),      # axis=2 for 2D array (valid range: -2 to 1)
+        (-3, (3, 4), 2),     # axis=-3 for 2D array (valid range: -2 to 1)
+        (3, (2, 3, 4), 3),   # axis=3 for 3D array (valid range: -3 to 2)
+        (-4, (2, 3, 4), 3),  # axis=-4 for 3D array (valid range: -3 to 2)
+    ],
+)
+def test_detrend_decorator_axis_out_of_bounds_multidimensional(axis, array_shape, array_dim):
+    """Test that the detrend decorator raises ValueError for out of bounds axis on multidimensional arrays."""
+
+    @detrending_method
+    def simple_detrend(ts: ndarray) -> ndarray:
+        return ts + 1
+
+    test_array = ones(array_shape)
+
+    with pytest.raises(
+        ValueError, 
+        match=f"axis {axis} is out of bounds for array of dimension {array_dim}"
+    ):
+        simple_detrend(test_array, axis=axis)

@@ -5,7 +5,7 @@ from .utils.logging import logging
 
 # Expose most common functions
 from .connectivity import connectivity, show_connectivity_metrics
-from .normalisation import normalise, show_norms
+from .detrending import detrend, show_detrending_methods
 from .network_reconstruction import reconstruct_network
 from . import preparation
 

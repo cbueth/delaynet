@@ -15,7 +15,7 @@ The last paragraph presents the {ref}`convenience API <using_detrend_methods>` f
 (using_detrend_methods)=
 ## Using Detrending Methods
 
-`delaynet` provides a consistent interface {py:func}`~delaynet.normalisation.normalise` for all detrending methods.
+`delaynet` provides a consistent interface {py:func}`~delaynet.detrending.detrend` for all detrending methods.
 You can refer to each method by its full name or by its shorthand:
 
 - {ref}`Delta detrending <delta>`: "delta" or "dt"
@@ -23,16 +23,16 @@ You can refer to each method by its full name or by its shorthand:
 - {ref}`Z-Score detrending <z_score>`: "z_score", "z-score", "zs", or "zscore"
 - {ref}`Identity detrending <identity_func>`: "identity" or "id"
 
-The full list can easily be pretty printed using {py:func}`dn.show_connectivity_metrics()<delaynet.connectivity.show_connectivity_metrics>`.
+The full list can easily be pretty printed using {py:func}`dn.show_detrending_methods()<delaynet.detrending.show_detrending_methods>`.
 
 ```python
 import delaynet as dn
 
 # Detrend using the delta method
-normalised_ts = dn.normalise(time_series, method="delta", window_size=10)
+detrended_ts = dn.detrend(time_series, method="delta", window_size=10)
 
 # Detrend using the Z-Score method
-normalised_ts = dn.normalise(time_series, method="zs", periodicity=24)
+detrended_ts = dn.detrend(time_series, method="zs", periodicity=24)
 ```
 
 For details about these detrending methods, see the next subsections.
@@ -42,8 +42,8 @@ the {ref}`connectivity methods <connectivity_sec>`.
 
 ```{toctree}
 :hidden:
-:name: table_of_norms
-:caption: Table of Norms
+:name: table_of_detrending_methods
+:caption: Table of Detrending Methods
 
 delta
 second_difference

@@ -50,7 +50,7 @@
 - 📝 Documentation and README updates (links, badges, citation, Python version).
 - 🏷️ Added Citation, Code of Conduct, and CONTRIBUTING.md.
 - 🧪 General test, CI, and dependency improvements.
-- 🛠️ Minor optimizations to Z-Score norm, COP connectivity, and code cleanup.
+- 🛠️ Minor optimizations to Z-Score detrending, COP connectivity, and code cleanup.
 
 ---
 
@@ -77,11 +77,11 @@
 - 🐛 Fix: Random time series indexing
 - 📈 Z-Score: Added `max_period`, exclude current datapoint
 
-  - Added `max_periods` parameter to Z-Score normalisation function to limit the number of periods considered in calculations.
+  - Added `max_periods` parameter to Z-Score detrending function to limit the number of periods considered in calculations.
   - Excluded the current point from mean and standard deviation calculations.
 
 - 📐 Sig: Make time series positional only
-- 🧪 Test: Add automatic tests for all norms and connectivities
+- 🧪 Test: Add automatic tests for all detrending methods and connectivities
   - Uses generated data
   - Approaches not all functioning yet
 

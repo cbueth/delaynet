@@ -10,7 +10,7 @@ from .utils.bind_args import bind_args
 from .utils.lag_steps import assure_lag_list
 
 Connectivity = Callable[[ndarray, ndarray, ...], tuple[float, int]]
-Norm = Callable[[ndarray, ...], ndarray]
+Detrend = Callable[[ndarray, ...], ndarray]
 
 
 def connectivity(
@@ -112,7 +112,7 @@ def connectivity(
             # Bind args for the connectivity function
             # - makes sure only existing args are passed to it
             bound_args = bind_args(connectivity_func, [ts1, ts2, *args], kwargs)
-            # Call the norm function with the bound arguments
+            # Call the connectivity function with the bound arguments
             conn_value = connectivity_func(*bound_args.args, **bound_args.kwargs)
 
             if not (isinstance(conn_value, tuple) and len(conn_value) == 2):
@@ -137,20 +137,21 @@ def connectivity(
     return connectivity_outer
 
 
-def norm(
+def detrending_method(
     *args,
     check_nan: bool = True,
     check_inf: bool = True,
     check_shape: bool = True,
 ):
-    """Decorator for the norm functions.
+    """Decorator for the detrending functions.
 
-    Input time series can be of any shape. For 1D arrays, the norm is applied directly.
+    Input time series can be of any shape. For 1D arrays,
+    the method is applied directly.
     For higher dimensional arrays, an 'axis' kwarg must be provided to specify along
-    which axis to apply the normalization.
+    which axis to apply the detrending.
 
-    The decorator automatically detects if the norm function has an 'axis' parameter
-    in its signature. If it does, the axis is passed directly to the function.
+    The decorator automatically detects if the detrending function has an 'axis'
+    parameter in its signature. If it does, the axis is passed directly to the function.
     If not, apply_along_axis is used to apply the function along the specified axis.
 
     Input must be non-empty.
@@ -158,8 +159,9 @@ def norm(
     Otherwise, only the dimensionality must remain the same, so the length of the time
     series can change.
 
-    As the norms take different arguments, this decorator is used to make sure that
-    the norms are called with the correct positional and keyword arguments.
+    As the detrending methods take different arguments, this decorator is used to make
+    sure that the detrending methods are called with the correct positional and keyword
+    arguments.
 
     The decorated function only needs to take the ndarray as the first positional
     argument and can take any number of further arguments.
@@ -167,58 +169,58 @@ def norm(
     The decorator checks that all passed keyword arguments exist and that all positional
     arguments are passed.
 
-    :param check_nan: If ``True``, check if the normed time series contains NaNs.
+    :param check_nan: If ``True``, check if the detrended time series contains NaNs.
     :type check_nan: bool
-    :param check_inf: If ``True``, check if the normed time series contains Infs.
+    :param check_inf: If ``True``, check if the detrended time series contains Infs.
     :type check_inf: bool
-    :param check_shape: If ``True``, check if the shape of the normed time series is
+    :param check_shape: If ``True``, check if the shape of the detrended time series is
                         equal to the shape of the input time series.
     :type check_shape: bool
-    :param norm_func: The norm function to decorate.
-    :type norm_func: Callable
+    :param detrend_func: The detrending function to decorate.
+    :type detrend_func: Callable
     :return: The decorated function.
     :rtype: Callable
     """
 
-    def norm_outer(norm_func: Norm) -> Norm:
+    def detrend_outer(detrend_func: Detrend) -> Detrend:
         """Outer function of the decorator.
 
-        :param norm_func: The norm function to decorate.
-        :type norm_func: Callable
-        :return: The decorated norm function.
+        :param detrend_func: The detrend function to decorate.
+        :type detrend_func: Callable
+        :return: The decorated detrend function.
         :rtype: Callable
         """
 
-        @wraps(norm_func)
+        @wraps(detrend_func)
         def wrapper(ts: ndarray, *args, **kwargs) -> ndarray:
-            """Wrapper for the norm functions.
+            """Wrapper for the detrending functions.
 
             If kwargs have a key ``check_kwargs`` with value ``False``,
             the kwargs are not checked for availability.
             This is useful if you want to pass unused keyword.
 
-            :param ts: The time series to normalise.
+            :param ts: The Time series to detrend.
             :type ts: numpy.ndarray of any shape
-            :param args: The args to pass to the norm function.
+            :param args: The args to pass to the detrending function.
             :type args: list
-            :param kwargs: The kwargs to pass to the norm function.
+            :param kwargs: The kwargs to pass to the detrending function.
             :type kwargs: dict
-            :return: The normalised time series.
+            :return: The Detrended time series.
             :rtype: numpy.ndarray
             :raises TypeError: Type of ts is not ndarray.
             :raises ValueError: If the input time series is empty.
             :raises ValueError: If axis kwarg is missing for multidimensional arrays.
             :raises ValueError: If an argument is missing.
             :raises TypeError: If an unknown kwarg is passed.
-            :raises ValueError: If the shape of the norm output is not equal to the
+            :raises ValueError: If the shape of the detrended output is not equal to the
                                 shape of the input time series. Only if ``check_shape``
                                 is ``True``.
-            :raises ValueError: If the dimensionality of the norm output is not equal
-                                to the dimensionality of the input time series.
-            :raises ValueError: If the norm output contains NaNs. Only if ``check_nan``
-                                is ``True``.
-            :raises ValueError: If the norm output contains Infs. Only if ``check_inf``
-                                is ``True``.
+            :raises ValueError: If the dimensionality of the detrended output is not
+                                equal to the dimensionality of the input time series.
+            :raises ValueError: If the detrended output contains NaNs.
+                                Only if ``check_nan`` is ``True``.
+            :raises ValueError: If the detrended output contains Infs.
+                                Only if ``check_inf`` is ``True``.
             """
             # Check if ts is an ndarray
             if not isinstance(ts, ndarray):
@@ -228,11 +230,11 @@ def norm(
             if ts.size == 0:
                 raise ValueError("ts must not be empty.")
 
-            # Check if norm_func has an 'axis' parameter in its signature
-            sig = signature(norm_func)
+            # Check if detrend_func has an 'axis' parameter in its signature
+            sig = signature(detrend_func)
             has_axis_param = "axis" in sig.parameters
 
-            # For 1D arrays, apply norm directly (existing behaviour)
+            # For 1D arrays, apply detrending directly
             if ts.ndim == 1:
                 # Validate axis if provided
                 if "axis" in kwargs:
@@ -244,21 +246,21 @@ def norm(
                         )
 
                 if has_axis_param:
-                    bound_args = bind_args(norm_func, [ts, *args], kwargs)
-                    normed_ts = norm_func(*bound_args.args, **bound_args.kwargs)
+                    bound_args = bind_args(detrend_func, [ts, *args], kwargs)
+                    detrended_ts = detrend_func(*bound_args.args, **bound_args.kwargs)
                 else:
                     # Remove 'axis' from kwargs if function doesn't accept it
                     kwargs_without_axis = {
                         k: v for k, v in kwargs.items() if k != "axis"
                     }
-                    bound_args = bind_args(norm_func, [ts, *args], kwargs_without_axis)
-                    normed_ts = norm_func(*bound_args.args, **bound_args.kwargs)
+                    bound_args = bind_args(detrend_func, [ts, *args], kwargs_without_axis)
+                    detrended_ts = detrend_func(*bound_args.args, **bound_args.kwargs)
             else:
                 # For higher dimensional arrays, require axis kwarg
                 if "axis" not in kwargs:
                     raise ValueError(
                         f"For {ts.ndim}D arrays, 'axis' kwarg must be specified to "
-                        f"indicate along which axis to apply the normalization."
+                        f"indicate along which axis to apply the detrending function."
                     )
 
                 axis = kwargs["axis"]
@@ -270,17 +272,17 @@ def norm(
                     )
 
                 if has_axis_param:
-                    # Pass axis directly to the norm function
-                    bound_args = bind_args(norm_func, [ts, *args], kwargs)
-                    normed_ts = norm_func(*bound_args.args, **bound_args.kwargs)
+                    # Pass axis directly to the detrending function
+                    bound_args = bind_args(detrend_func, [ts, *args], kwargs)
+                    detrended_ts = detrend_func(*bound_args.args, **bound_args.kwargs)
                 else:
-                    # Use apply_along_axis, removing 'axis' from kwargs for the norm function
+                    # Use apply_along_axis, removing 'axis' from kwargs for the detrending function
                     kwargs_without_axis = {
                         k: v for k, v in kwargs.items() if k != "axis"
                     }
-                    bound_args = bind_args(norm_func, [ts, *args], kwargs_without_axis)
-                    normed_ts = apply_along_axis(
-                        norm_func,  # func1d
+                    bound_args = bind_args(detrend_func, [ts, *args], kwargs_without_axis)
+                    detrended_ts = apply_along_axis(
+                        detrend_func,  # func1d
                         axis,  # axis
                         ts,  # arr
                         *bound_args.args[1:],  # args for func1d
@@ -290,23 +292,23 @@ def norm(
             # Get the shape/dimensionality of the input time series
             shape_dim = ts.shape if check_shape else ts.ndim
             # Check output type
-            if not isinstance(normed_ts, ndarray):
+            if not isinstance(detrended_ts, ndarray):
                 raise ValueError(
-                    f"Norm function {norm_func.__name__} must return an ndarray, "
-                    f"not {type(normed_ts)}."
+                    f"Detrending function {detrend_func.__name__} must return an "
+                    f"ndarray, not {type(detrended_ts)}."
                 )
             # Check if the shape of the output time series is equal to the
             # shape of the input time series
-            if shape_dim != (normed_ts.shape if check_shape else normed_ts.ndim):
+            if shape_dim != (detrended_ts.shape if check_shape else detrended_ts.ndim):
                 raise ValueError(
                     (
-                        f"Shape of normalised time series ({normed_ts.shape}) "
+                        f"Shape of detrended time series ({detrended_ts.shape}) "
                         f"does not match shape of input time series ({shape_dim})."
                     )
                     if check_shape
                     else (
-                        f"Dimensionality of normalised time series ({normed_ts.ndim}) "
-                        "does not match dimensionality of input time series "
+                        f"Dimensionality of detrended time series ({detrended_ts.ndim})"
+                        " does not match dimensionality of input time series "
                         f"({shape_dim})."
                     )
                 )
@@ -317,7 +319,7 @@ def norm(
             # keep if key == check_nan and check_nan is True
             checks = {
                 # extend val by result of check
-                key: {**val, "result": val["func"](normed_ts).any()}
+                key: {**val, "result": val["func"](detrended_ts).any()}
                 for key, val in all_checks.items()
                 if val["check"]
             }
@@ -328,20 +330,20 @@ def norm(
                     for key, val in all_checks.items()
                     if val["check"]
                 }
-                norm_val = (val["msg"] for val in checks.values() if val["result"])
+                detrend_val = (val["msg"] for val in checks.values() if val["result"])
                 input_val = (val["msg"] for val in all_checks.values() if val["result"])
                 raise ValueError(
-                    f"Normalised time series contains "
-                    f"{', '.join(norm_val)}: "
-                    f"{normed_ts}. " + f"Input time series contained "
+                    f"Detrended time series contains "
+                    f"{', '.join(detrend_val)}: "
+                    f"{detrended_ts}. " + f"Input time series contained "
                     f"{', '.join(input_val)}."
                 )
-            return normed_ts
+            return detrended_ts
 
         return wrapper
 
-    # Usage without parentheses (@norm)
+    # Usage without parentheses (@detrending_method)
     if args and callable(args[0]):
-        return norm_outer(args[0])
-    # Usage with parentheses (@norm(), @norm(...))
-    return norm_outer
+        return detrend_outer(args[0])
+    # Usage with parentheses (@detrending_method(), @detrending_method(...))
+    return detrend_outer

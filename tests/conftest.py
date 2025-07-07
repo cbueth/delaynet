@@ -5,7 +5,7 @@ from numpy import array
 
 from delaynet.preparation.data_generator import gen_delayed_causal_network, gen_fmri
 from delaynet.connectivities import __all_connectivity_metrics_names_simple__
-from delaynet.norms import __all_norms__
+from delaynet.detrending_methods import __all_detrending__
 
 
 CONN_METRICS = {
@@ -67,10 +67,10 @@ def connectivity_metric_kwargs(request):
 
 @pytest.fixture(
     scope="session",
-    params=__all_norms__,
+    params=__all_detrending__,
 )
-def norm(request):
-    """Return a norm function."""
+def detrending_function(request):
+    """Return a detrending function."""
     return request.param
 
 

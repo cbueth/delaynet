@@ -7,13 +7,15 @@ kernelspec:
 (second_difference)=
 # Second-Order Differentiation
 
-The second difference detrending calculates the difference of differences, which is a common method for detrending time series. This method is particularly useful for removing linear trends.
+The second difference detrending calculates the difference of differences, which is a common method for detrending time series.
+It works by computing the difference between consecutive first differences, effectively _removing both constant offsets and linear trends_ from the data.
+Just as acceleration represents the change in velocity, the second difference captures the change in the rate of change of the time series.
 
 ```python
-from delaynet.norms import second_difference
+from delaynet.detrending_methods import second_difference
 
 # Apply second difference detrending
-normalised_ts = second_difference(time_series)
+detrended_ts = second_difference(time_series)
 ```
 
 Note that the length of the time series is reduced by 2 after applying this detrending.
@@ -38,7 +40,7 @@ fmri_data = dn.preparation.data_generator.gen_fmri(
 plt.figure(figsize=(10, 4), dpi=300)
 plt.plot(fmri_data, label='Original FMRI Data')
 plt.title('Original and Second Difference Detrended FMRI Data')
-plt.plot(dn.norms.second_difference(fmri_data), label='Second Difference Detrended Data')
+plt.plot(dn.detrending_methods.second_difference(fmri_data), label='Second Difference Detrended Data')
 plt.legend()
 plt.grid()
 plt.show()
@@ -46,6 +48,6 @@ plt.show()
 
 (link_to_method)=
 ```{eval-rst}
-.. automethod:: delaynet.norms.second_difference
+.. automethod:: delaynet.detrending_methods.second_difference
     :noindex:
 ```

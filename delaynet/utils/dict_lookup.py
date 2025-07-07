@@ -1,4 +1,4 @@
-"""Dict lookup function, used for metrics and norms."""
+"""Dict lookup function, used for metrics and detrending methods."""
 
 
 def dict_lookup(lookup: dict) -> dict:

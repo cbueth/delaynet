@@ -3,14 +3,13 @@
 import numpy as np
 from numba import njit, prange
 
-from .granger import gt_multi_lag
-
 from ..decorators import connectivity
+from .granger import gt_multi_lag
 
 
 @connectivity
 def random_patterns(
-    ts1, ts2, p_size=5, num_rnd_patterns=50, linear=True, max_lag_steps=5
+    ts1, ts2, p_size=5, num_rnd_patterns=50, linear=True, lag_steps: int | list = None
 ):
     """
     Continuous Ordinal Patterns (COP) connectivity metric.
@@ -25,18 +24,21 @@ def random_patterns(
     :type num_rnd_patterns: int
     :param linear: Start with the identity pattern.
     :type linear: bool
-    :param max_lag_steps: Maximum time lag to consider.
-    :type max_lag_steps: int
-    :return: Mutual information value and time lag.
+    :param lag_steps: Time lags to consider.
+                      Can be a single integer or a list of integers.
+                      An integer will consider lags [1, ..., lag_steps].
+                      A list will consider the specified values as lags.
+    :type lag_steps: int | list
+    :return: Best *p*-value and corresponding lag.
     :rtype: tuple[float, int]
     """
-    if p_size + max_lag_steps - 1 > ts1.shape[0]:
+    if p_size + max(lag_steps) - 1 > ts1.shape[0]:
         raise ValueError(
-            "Pattern size + max lag steps cannot be larger than the time series length."
+            "Pattern size + max-lag-step cannot be larger than the time series length."
         )
 
     if linear:
-        best_pv, best_lag = gt_multi_lag(ts1, ts2, max_lag_steps=max_lag_steps)
+        best_pv, best_lag = gt_multi_lag(ts1, ts2, lag_steps=lag_steps)
     else:
         best_pv, best_lag = np.inf, 0
 
@@ -50,9 +52,7 @@ def random_patterns(
     t_ts2 = pattern_transform(np.copy(ts2), rnd_patterns)
 
     for i in range(num_rnd_patterns):
-        p_v, pv_idx = gt_multi_lag(
-            t_ts1[i, :], t_ts2[i, :], max_lag_steps=max_lag_steps
-        )
+        p_v, pv_idx = gt_multi_lag(t_ts1[i, :], t_ts2[i, :], lag_steps=lag_steps)
         if best_pv > p_v:
             best_pv = p_v
             best_lag = pv_idx
@@ -149,7 +149,7 @@ def norm_windows(ts: np.ndarray, window_size: int) -> np.ndarray:  # pragma: no 
     )
     normed_windows = np.zeros_like(windows)
     # Normalise each window to [-1, 1]
-    for i in prange(windows.shape[0]):  # pylint: disable=not-an-iterable
+    for i in prange(windows.shape[0]):
         normed_windows[i] = norm_window(windows[i])
     return normed_windows
 
@@ -168,8 +168,8 @@ def pattern_distance(
     :rtype: numpy.ndarray
     """
     distances = np.zeros(windows.shape[0])
-    for i in prange(windows.shape[0]):  # pylint: disable=not-an-iterable
-        for j in prange(pattern.shape[0]):  # pylint: disable=not-an-iterable
+    for i in prange(windows.shape[0]):
+        for j in prange(pattern.shape[0]):
             distances[i] += np.abs(windows[i, j] - pattern[j])
     return distances / pattern.shape[0] / 2.0
     # equiv. to np.sum(np.abs(windows - pattern), axis=1) / pattern.shape[0] / 2.0

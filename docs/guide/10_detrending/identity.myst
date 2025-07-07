@@ -1,0 +1,27 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(identity_func)=
+# Identity
+
+The identity "detrending" simply returns the input time series without any modification. It should only be used for testing or if the data is already detrended.
+
+```python
+from delaynet.detrending_methods import identity
+
+# Apply identity detrending (no change)
+detrended_ts = identity(time_series)
+```
+
+```{warning}
+The identity function is not a true detrending method. It simply returns the input time series unchanged.
+```
+
+(link_to_method)=
+```{eval-rst}
+.. automethod:: delaynet.detrending_methods.identity
+    :noindex:
+```

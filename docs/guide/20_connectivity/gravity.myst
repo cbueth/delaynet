@@ -1,0 +1,32 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(gravity_sec)=
+# Gravity
+
+The Gravity connectivity metric calculates a measure of interaction between two time series based on the product of their exponential sums.
+
+
+```{warning}
+This is a toy metric that may not have practical applications but can serve as an educational tool.
+```
+
+```python
+import delaynet as dn
+
+# Calculate gravity
+result = dn.connectivity(ts1, ts2, metric="gravity", lag_steps=5)
+```
+
+Parameters:
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
+- `n_tests`: Number of iterations or resamples to perform within the hypothesis test. Default is 20.
+- `rng`: Random number generator for resampling. If None, a default generator will be used.
+
+```{eval-rst}
+.. automethod:: delaynet.connectivities.gravity
+    :noindex:
+```

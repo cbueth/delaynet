@@ -100,5 +100,5 @@ intersphinx_mapping = {
     "numba": ("https://numba.readthedocs.io/en/stable", None),
     "statsmodels": ("https://www.statsmodels.org/stable", None),
     "sklearn": ("https://scikit-learn.org/stable", None),
-    "infomeasure": ("https://infomeasure.readthedocs.io/en/stable", None),
+    "infomeasure": ("https://infomeasure.readthedocs.io/en/latest", None),
 }

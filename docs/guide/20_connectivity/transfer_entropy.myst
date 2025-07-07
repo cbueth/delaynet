@@ -1,0 +1,30 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(transfer_entropy)=
+# Transfer Entropy
+
+Transfer Entropy (TE) measures the amount of directed transfer of information between two random processes.
+
+```python
+import delaynet as dn
+
+# Calculate transfer entropy
+result = dn.connectivity(ts1, ts2, metric="transfer_entropy", approach="discrete")
+```
+
+Parameters:
+- `approach`: The approach to use for estimating transfer entropy.
+  For available approaches, find the string in {func}`infomeasure.transfer_entropy`.
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
+- `hypothesis_type`: Type of hypothesis test to use ('permutation_test' or 'bootstrap'). Default is 'permutation_test'.
+- `n_tests`: Number of iterations or resamples to perform within the hypothesis test. Default is 20.
+- `te_kwargs`: Additional keyword arguments for the transfer entropy estimator.
+
+```{eval-rst}
+.. automethod:: delaynet.connectivities.transfer_entropy
+    :noindex:
+```

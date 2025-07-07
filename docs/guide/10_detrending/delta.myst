@@ -5,15 +5,15 @@ kernelspec:
 ---
 
 (delta)=
-# Delta Norm
+# Delta Detrending
 
 The delta detrending method performs local mean subtraction. For each value in the time series, it subtracts the mean of a window of values centered around that point. (**CITE**)
 
 ```python
-from delaynet.norms import delta
+from delaynet.detrending_methods import delta
 
 # Apply delta detrending with a window size of 10
-normalised_ts = delta(time_series, window_size=10)
+detrended_ts = delta(time_series, window_size=10)
 ```
 
 Mathematically, the delta detrending is defined as:
@@ -43,9 +43,9 @@ fmri_data = dn.preparation.data_generator.gen_fmri(
 plt.figure(figsize=(10, 4), dpi=300)
 plt.plot(fmri_data, label='Original FMRI Data')
 plt.title('Original and Delta Detrended FMRI Data')
-plt.plot(dn.norms.delta(fmri_data, window_size=5), label=r'Delta Detrended $5$ Window')
-plt.plot(dn.norms.delta(fmri_data, window_size=15), label=r'Delta Detrended $15$ Window')
-plt.plot(dn.norms.delta(fmri_data, window_size=30), label=r'Delta Detrended $30$ Window')
+plt.plot(dn.detrending_methods.delta(fmri_data, window_size=5), label=r'Delta Detrended $5$ Window')
+plt.plot(dn.detrending_methods.delta(fmri_data, window_size=15), label=r'Delta Detrended $15$ Window')
+plt.plot(dn.detrending_methods.delta(fmri_data, window_size=30), label=r'Delta Detrended $30$ Window')
 plt.legend()
 plt.grid()
 plt.show()
@@ -53,6 +53,6 @@ plt.show()
 
 (link_to_method)=
 ```{eval-rst}
-.. automethod:: delaynet.norms.delta
+.. automethod:: delaynet.detrending_methods.delta
     :noindex:
 ```

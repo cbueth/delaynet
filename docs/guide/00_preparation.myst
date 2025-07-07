@@ -41,16 +41,16 @@ data = pd.DataFrame(
 data
 ```
 
+### Data cleaning
+Before performing any {ref}`detrending <detrending_sec>` and {ref}`connectivity analysis <connectivity_sec>`,
+it's crucial to clean the data. This includes handling missing values and outliers.
+
 ```{attention}
 When working with time series data, it's important to check for NaN values and missing data before analysis.
 `delaynet` currently doesn't provide specific functions for handling NaN values or missing data.
 When preprocessing your data, make sure you choose a method that best suits your dataset and research question,
 e.g. replacing NaNs with zeros, mean, median imputation, or using interpolation methods.
 ```
-
-### Data cleaning
-Before performing any {ref}`detrending <detrending_sec>` and {ref}`connectivity analysis <connectivity_sec>`,
-it's crucial to clean the data. This includes handling missing values and outliers.
 
 #### Handling Missing Values
 
@@ -79,12 +79,7 @@ If you already have a dataset, you can advance to the {ref}`next section <detren
 
 Both methods are accessible through the convenient {py:func}`dn.preparation.gen_data()<delaynet.preparation.data_generator.gen_data>` function, which serves as a unified interface for all data generation approaches:
 
-```{code-cell}
-:tags: [hide-input]
-import delaynet as dn
-help(dn.preparation.gen_data)
-```
-
+(dcn_generation)=
 ### 1. Delayed Causal Network Generation
 
 The delayed causal network generation process follows these steps:
@@ -104,6 +99,7 @@ The delayed causal network generation process follows these steps:
 This approach creates time series with causal relationships that have both magnitude (weight) and temporal (lag) components, making it suitable for testing delay network reconstruction algorithms.
 
 ```{code-cell}
+import delaynet as dn
 from numpy.random import default_rng
 
 # Generate random data
@@ -132,6 +128,7 @@ plt.grid()
 plt.show()
 ```
 
+(fmri_generation)=
 ### 2. fMRI Data Generation
 
 The functional Magnetic Resonance Imaging (fMRI) data generation process simulates realistic functional MRI signals by modeling both the underlying neural activity and the hemodynamic response. This approach is based on studies by Roebroeck *et al.* and Rajapakse and Zhou {cite:p}`roebroeckMappingDirectedInfluence2005,rajapakseLearningEffectiveBrain2007`.
@@ -142,8 +139,8 @@ The functional Magnetic Resonance Imaging (fMRI) data generation process simulat
 The generation process follows these steps:
 
 1. **Initial Time Series Generation**: Creates coupled time series representing underlying neural activity:
-   - For a single node (`gen_fmri()`): Generates two coupled time series with a specified coupling strength
-   - For multiple nodes (`gen_fmri_multiple()`): Creates a network where the first node influences all other nodes with the specified coupling strength
+   - For a single node {py:func}`~delaynet.preparation.data_generator.gen_fmri()`: Generates two coupled time series with a specified coupling strength
+   - For multiple nodes {py:func}`~delaynet.preparation.data_generator.gen_fmri_multiple()`: Creates a network where the first node influences all other nodes with the specified coupling strength
 
 2. **Hemodynamic Response Function (HRF) Application**: Convolves the neural activity with a hemodynamic response function:
    - The HRF is modeled using gamma distributions with both peak and undershoot components

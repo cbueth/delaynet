@@ -23,6 +23,9 @@ It is possible to either test for all delays up to a certain maximum delay,
 or to test for specific delays.
 The best delay value and it's corresponding $p$-value are returned.
 
+To visualize this, we generate synthetic time series data using a {ref}`delayed causal network (DCN) <dcn_generation>` model. The data consists of 8 interconnected nodes with 1000 time points each, where causal relationships exist between different time series with varying delays. We extract two specific time series from this network and apply Granger causality to find the optimal lag that produces the strongest causal relationship. The algorithm tests all possible lags from 1 to 50 time steps and identifies the lag that yields the minimum p-value, indicating the most significant causal connection.
+
+
 ```{code-cell}
 :tags: [hide-input]
 import delaynet as dn
@@ -68,7 +71,9 @@ plt.grid(True)
 plt.show()
 ```
 
-*How the best lag is determined using p-values:* The plot shows p-values calculated for each lag, with the minimum occurring around lag 7, after which the p-values increase. The algorithm selects this minimum as the best lag. In one line:
+*How the best lag is determined using p-values:* The plot shows p-values calculated for each lag, with the minimum occurring around lag 7, after which the p-values increase. The algorithm selects this minimum as the best lag.
+
+In one line:
 
 ```{code-cell}
 dn.connectivity(ts1, ts2, "gc", lag_steps=max_lag)
@@ -77,7 +82,7 @@ dn.connectivity(ts1, ts2, "gc", lag_steps=max_lag)
 ## Using Connectivity Measures
 
 `delaynet` provides a unified interface for all connectivity measures through the {py:func}`~delaynet.connectivity.connectivity` function.
-`delaynet` provides a diverse set of connectivity metrics to analyze relationships between time series data. Each metric offers different approaches to detecting connections, from simple correlations to complex causality measures. You can refer to each method by its full name or by its shorthand:
+A diverse set of connectivity metrics to analyze relationships between time series data are available. Each metric offers different approaches to detecting connections, from simple correlations to complex causality measures. You can refer to each method by its full name or by its shorthand:
 
 - {ref}`Granger Causality <granger_causality>`: Statistical concept of causality based on prediction
     * `gc`, `granger causality`, or `gt_multi_lag`
@@ -118,8 +123,10 @@ from delaynet.connectivity import show_connectivity_metrics
 show_connectivity_metrics()
 ```
 
+Analysing the same time series data from the earlier example, switching between connectivity metrics is really simple:
 
 ```{code-cell}
+max_lag = 40
 (dn.connectivity(ts1, ts2, "gc", lag_steps=max_lag),
 dn.connectivity(ts1, ts2, "mi", lag_steps=max_lag, approach="metric"),
 dn.connectivity(ts1, ts2, "te", lag_steps=max_lag, approach="metric"),
@@ -128,6 +135,8 @@ dn.connectivity(ts1, ts2, "rc", lag_steps=max_lag),
 dn.connectivity(ts1, ts2, "cop", lag_steps=max_lag),
 dn.connectivity(ts1, ts2, "gv", lag_steps=max_lag))
 ```
+
+For some connectivity measures the optimal lags agree with each other, but they generally vary, especially the _p_-values, as each of these approaches covers a different type of connectivity.
 
 For details about these connectivity methods, see the next subsections.
 

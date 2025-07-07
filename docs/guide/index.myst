@@ -6,11 +6,7 @@ This guide provides comprehensive documentation for the `delaynet` package, a Py
 Reconstruction can be performed using various building blocks and connectivities,
 e.g. by detecting causality relationships with granger causality tests or transfer entropy,
 among others.
-
-## Sections
-
-`delaynet` offers a suite of tools for analyzing time series data and reconstructing delay networks from time series.
-The package is designed to be flexible and extensible, allowing users to apply various methods for preprocessing, detrending, and connectivity analysis.
+The package offers a suite of tools for analyzing time series data and reconstructing delay networks, designed to be flexible and extensible, allowing users to apply various methods for preprocessing, detrending, and connectivity analysis.
 
 ## What You'll Find in This Guide
 

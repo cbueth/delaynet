@@ -69,6 +69,7 @@ def transfer_entropy(
             prop_time=lag,
             **kwargs,
         )
-        return est.p_value(method=hypothesis_type, n_tests=n_tests)
+        test = est.statistical_test(method=hypothesis_type, n_tests=n_tests)
+        return test.p_value
 
     return find_optimal_lag(te_p_value, ts1, ts2, lag_steps, **te_kwargs)

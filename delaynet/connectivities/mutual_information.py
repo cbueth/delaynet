@@ -69,6 +69,7 @@ def mutual_information(
             prop_time=lag,
             **kwargs,
         )
-        return est.p_value(method=hypothesis_type, n_tests=n_tests)
+        test = est.statistical_test(method=hypothesis_type, n_tests=n_tests)
+        return test.p_value
 
     return find_optimal_lag(mi_p_value, ts1, ts2, lag_steps, **mi_kwargs)

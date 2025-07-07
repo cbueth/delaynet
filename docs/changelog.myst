@@ -13,12 +13,31 @@
   - **Improved:** Core connectivity framework with better error handling and validation
   - **Streamlined:** Documentation organization by consolidating scattered guides into focused, method-specific documentation that's easier to navigate and understand
 
+- 🔄 **API Refactoring: Normalization → Detrending** 
+
+  - **Breaking Change:** Renamed all "normalization/norm" terminology to "detrending/detrend" for semantic accuracy
+  - **Renamed:** Main API function from `normalise()` to `detrend()` and `show_norms()` to `show_detrending_methods()`
+  - **Renamed:** Decorator from `@norm` to `@detrending_method` for consistency with functionality
+  - **Renamed:** Package structure from `delaynet/norms/` to `delaynet/detrending_methods/`
+  - **Updated:** All documentation, tests, and examples to use the new detrending terminology
+  - **Rationale:** These methods perform detrending (trend removal) rather than mathematical normalization, making the new naming more theoretically accurate
+
 - 🔄 **Connectivity Framework Unification** (`bbbe265`)
 
   - **Unified:** All connectivity measures now return consistent $p$-values for statistical significance testing
   - **Added:** Universal $p$-value support across all connectivity methods for standardized output
   - **Streamlined:** Unified `lag_steps` parameter handling across all connectivity measures
   - **Removed:** Ordinal Patterns Connectivity and Bi-Granger due to unclear $p$-value
+
+- 📦 Updated infomeasure dependency to v0.5.0 and replaced deprecated p_value usage.
+- 🌐 Consistently applied British English conventions across all files (behavior → behaviour, normalize → normalise).
+- 🚀 Added parallel execution support for network reconstruction.
+- 🔧 Enhanced norm decorator to support multi-dimensional arrays with axis parameter.
+- 📊 Unified connectivity output format to return tuple[float, int] and replaced `offset` with `prop_time`.
+- 🧪 Fixed test assertion issues and improved code formatting.
+- 🖥️ Added Windows and macOS test runners for better cross-platform compatibility.
+- 🐛 Fixed gt_bi_multi_lag returning non-optimal index and improved integer type checking for Windows compatibility.
+- 📦 Refactored DelayNet → delaynet naming convention and optimized COP connectivity performance.
 
 - 🗑️ **Symbolization Removal** (`a4db41c`)
 

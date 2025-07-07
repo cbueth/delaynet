@@ -1,4 +1,4 @@
-"""Function to bind args for the decorators of the connectivity and norm functions."""
+"""Function to bind args for the decorators of the connectivity and detrend functions."""
 
 from inspect import signature, BoundArguments
 

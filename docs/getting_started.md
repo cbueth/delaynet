@@ -28,7 +28,7 @@ It is recommended to use a virtual environment, e.g., using
 the [`conda-forge`](https://anaconda.org/conda-forge/delaynet) channel.
 
 ```bash
-conda create -n delay_net -c conda-forge python=3.13
+conda create -n delay_net -c conda-forge python
 conda activate delay_net
 conda install -c conda-forge delaynet
 ```
@@ -36,13 +36,13 @@ conda install -c conda-forge delaynet
 ## Usage
 
 The package can be used as a library. The most common functions are exposed in the
-top-level namespace, e.g. {py:func}`~delaynet.normalisation.normalise` and
+top-level namespace, e.g. {py:func}`~delaynet.detrending.detrend` and
 {py:func}`~delaynet.connectivity.connectivity`. For example:
 
 ```python
 import delaynet as dn
 
-ts_norm = dn.normalise(ts, norm='Z-Score')
+ts_detrend = dn.detrend(ts, method='Z-Score')
 conn = dn.connectivity(ts1, ts2, metric='Granger Causality')
 ```
 
@@ -52,15 +52,15 @@ import delaynet as dn
 ```
 
 To quickly find the string specifiers for these functions, use the
-{py:func}`~delaynet.normalisation.show_norms` and
+{py:func}`~delaynet.detrending.show_detrending_methods` and
 {py:func}`~delaynet.connectivity.show_connectivity_metrics` functions.
 These are case-insensitive.
 Each documentation of these methods can be found in a respective submodule,
-{py:mod}`delaynet.norms` or {py:mod}`delaynet.connectivities`.
+{py:mod}`delaynet.detrending_methods` or {py:mod}`delaynet.connectivities`.
 
 ```{code-cell}
 :tags: [scroll-output]
-dn.show_norms()
+dn.show_detrending_methods()
 dn.show_connectivity_metrics()
 ```
 
@@ -77,7 +77,7 @@ After cloning the repository, navigate to the root folder and
 create the environment with the desired python version and the dependencies.
 
 ```bash
-micromamba create -n delay_net -c conda-forge python=3.13
+micromamba create -n delay_net -c conda-forge python
 micromamba activate delay_net
 ```
 

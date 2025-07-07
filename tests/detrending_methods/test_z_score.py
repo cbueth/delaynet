@@ -1,35 +1,67 @@
-"""Tests for the Z-Score norm."""
+"""Tests for the Z-Score detrending."""
 
 import pytest
-from numpy import array, array_equal
+from numpy import array
+from numpy.testing import assert_allclose
 
-from delaynet import normalise, logging
+from delaynet import detrend, logging
 
 
 @pytest.mark.parametrize(
     "ts, periodicity, max_periods, expected",
     [
         ([0, 0, 0], 1, 1, [0, 0, 0]),  # zero
-        ([1, 1, 1], 1, 1, [1, 1, 1]),  # constant
-        ([-1, -1, -1], 1, 1, [-1, -1, -1]),  # constant
+        ([1, 1, 1], 1, 1, [0, 0, 0]),  # constant
+        ([-1, -1, -1], 1, 1, [0, 0, 0]),  # constant
         ([1, -1, 1, -1, 1, -1], 1, 1, [1, -1, 1, -1, 1, -1]),  # alternating
         ([1, -1, 1, -1, 1, -1], 1, 2, [1, -1, 1, -1, 1, -1]),  # alternating
         ([1, -1, 1, -1, 1, -1], 1, -1, [1, -1, 1, -1, 1, -1]),  # alternating
         ([1, 0, 0, 1, 0, 0, 1, 0, 0], 3, 1, [1, 0, 0, 1, 0, 0, 1, 0, 0]),  # periodic
         ([4, 0, 0, 4, 0, 0, 4, 0, 0], 3, 1, [4, 0, 0, 4, 0, 0, 4, 0, 0]),  # periodic
-        ([4, 0, 0, 4, 0, 0, 4, 0, 0], 1, 1, [4, -1, -1, 4, -1, -1, 4, -1, 0]),
+        (
+            [4, 0, 0, 4, 0, 0, 4, 0, 0],
+            1,
+            1,
+            [
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+            ],
+        ),  # periodic
+        (
+            [9, 0, 0, 9, 0, 0, 9, 0, 0],
+            1,
+            1,
+            [
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+                1.41421356,
+                -0.70710678,
+                -0.70710678,
+            ],
+        ),  # periodic
         ([-1, 0, -1, 0, -1, 0], 2, 1, [-1, 0, -1, 0, -1, 0]),  # periodic, negative
     ],
 )
 def test_z_score(ts, periodicity, max_periods, expected):
-    """Test the Z-Score norm by design."""
-    result = normalise(
+    """Test the Z-Score detrending by design."""
+    result = detrend(
         array(ts),
-        norm="z_score",
+        method="z_score",
         periodicity=periodicity,
         max_periods=max_periods,
     )
-    assert array_equal(result, array(expected))
+    assert_allclose(result, array(expected))
 
 
 @pytest.mark.parametrize(
@@ -43,9 +75,9 @@ def test_z_score(ts, periodicity, max_periods, expected):
     ],
 )
 def test_faulty_kwargs(time_series, param, val):
-    """Test the Z-Score norm with faulty kwargs."""
+    """Test the Z-Score detrending with faulty kwargs."""
     with pytest.raises(ValueError):
-        normalise(time_series, "z_score", **{param: val})
+        detrend(time_series, "z_score", **{param: val})
 
 
 @pytest.mark.parametrize(
@@ -61,10 +93,10 @@ def test_faulty_kwargs(time_series, param, val):
     ],
 )
 def test_all_period_detection(ts_len, period, max_periods, max_periods_larger, caplog):
-    """Test the Z-Score norm detection that
+    """Test the Z-Score detrending detection that
     max_periods is larger than available periods."""
     time_series = array(range(ts_len))
-    normalise(time_series, "z_score", periodicity=period, max_periods=max_periods)
+    detrend(time_series, "z_score", periodicity=period, max_periods=max_periods)
     logging.getLogger().setLevel(logging.DEBUG)
     assert (
         "is larger than or equal to the available periods" in caplog.text
@@ -83,10 +115,10 @@ def test_all_period_detection(ts_len, period, max_periods, max_periods_larger, c
     ],
 )
 def test_periodicity_too_large(ts_len, period, raises):
-    """Test the Z-Score norm with periodicity too large."""
+    """Test the Z-Score detrending with periodicity too large."""
     time_series = array(range(ts_len))
     if raises:
         with pytest.raises(ValueError):
-            normalise(time_series, "z_score", periodicity=period)
+            detrend(time_series, "z_score", periodicity=period)
     else:
-        normalise(time_series, "z_score", periodicity=period)
+        detrend(time_series, "z_score", periodicity=period)

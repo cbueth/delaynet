@@ -11,36 +11,39 @@ def test_connectivity_with_string_metric(two_time_series):
     connectivities/test_all_connectivities.py.
     """
     ts1, ts2 = two_time_series
-    result = connectivity(ts1, ts2, "lc")
-    assert isinstance(result, (float, tuple))
+    result = connectivity(ts1, ts2, "lc", lag_steps=5)
+    assert isinstance(result, tuple)
+    assert len(result) == 2
 
 
 @pytest.mark.parametrize(
     "metric",
     [
-        lambda ts1, ts2: corrcoef(ts1, ts2)[0, 1],
-        lambda ts1, ts2: 1.0,
-        lambda ts1, ts2: (1.0, 1),
+        lambda ts1, ts2, lag_steps=None: (corrcoef(ts1, ts2)[0, 1], 2),
+        lambda ts1, ts2, lag_steps=None: (1.0, 1),
     ],
 )
 def test_connectivity_with_valid_metric(two_time_series, metric):
     """Test connectivity and pass metric as function."""
     ts1, ts2 = two_time_series
-    result = connectivity(ts1, ts2, metric)
-    assert isinstance(result, (float, tuple))
+    result = connectivity(ts1, ts2, metric, lag_steps=5)
+    assert isinstance(result, tuple)
+    assert len(result) == 2
 
 
 @pytest.mark.parametrize(
     "invalid_metric",
     [
         # Callable
-        lambda ts1, ts2: "invalid",  # valid shape, wrong type
-        lambda ts1, ts2: 123,  # valid shape, wrong type
-        lambda ts1, ts2: (123, 123),  # valid shape, wrong type
-        lambda ts1, ts2: (1, 1, 1),  # invalid shape
-        lambda ts1, ts2: [1, 1],  # valid shape, wrong type
-        lambda ts1, ts2: [0.1, 0.1],  # valid shape, wrong type
-        lambda ts1, ts2: [1],  # invalid shape
+        lambda ts1, ts2, lag_steps=None: "invalid",  # invalid shape, wrong type
+        lambda ts1, ts2, lag_steps=None: 123,  # invalid shape, wrong type
+        lambda ts1, ts2, lag_steps=None: 1.0,  # invalid shape, wrong type
+        lambda ts1, ts2, lag_steps=None: (123, 123),  # valid shape, wrong type
+        lambda ts1, ts2, lag_steps=None: (123, 1.0),  # valid shape, wrong type
+        lambda ts1, ts2, lag_steps=None: (1, 1, 1),  # invalid shape
+        lambda ts1, ts2, lag_steps=None: [1, 1],  # valid shape, wrong type
+        lambda ts1, ts2, lag_steps=None: [0.1, 0.1],  # valid shape, wrong type
+        lambda ts1, ts2, lag_steps=None: [1],  # invalid shape
         # Unknown string
         "invalid",
         # Not-Callable
@@ -53,27 +56,26 @@ def test_connectivity_with_invalid_metric(two_time_series, invalid_metric):
     ts1, ts2 = two_time_series
 
     with pytest.raises(ValueError):
-        connectivity(ts1, ts2, invalid_metric)
+        connectivity(ts1, ts2, invalid_metric, lag_steps=5)
 
 
 def test_connectivity_ts_positional_only(two_time_series):
     """Test connectivity with time series as keyword arguments."""
-    # pylint: disable = kwarg-superseded-by-positional-arg, no-value-for-parameter
     ts1, ts2 = two_time_series
 
     with pytest.raises(
         TypeError, match="missing 1 required positional argument: 'ts2'"
     ):
-        connectivity(ts1, ts2=ts2, metric="lc")
+        connectivity(ts1, ts2=ts2, metric="lc", lag_steps=5)
     with pytest.raises(
         TypeError, match="missing 1 required positional argument: 'ts2'"
     ):
-        connectivity(ts2, ts1=ts1, metric="lc")
+        connectivity(ts2, ts1=ts1, metric="lc", lag_steps=5)
     with pytest.raises(
         TypeError, match="missing 2 required positional arguments: 'ts1' and 'ts2'"
     ):
-        connectivity(metric="lc")
+        connectivity(metric="lc", lag_steps=5)
     with pytest.raises(
         TypeError, match="missing 2 required positional arguments: 'ts1' and 'ts2'"
     ):
-        connectivity(metric="lc", ts1=ts1, ts2=ts2)
+        connectivity(metric="lc", ts1=ts1, ts2=ts2, lag_steps=5)

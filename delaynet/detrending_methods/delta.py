@@ -1,13 +1,13 @@
-"""Delta norm."""
+"""Delta detrending."""
 
 from numpy import copy, ravel, size, mean
 
-from ..decorators import norm
+from ..decorators import detrending_method
 
 
-@norm
+@detrending_method
 def delta(ts, window_size: int = 10):
-    r"""Delta norm.
+    r"""Delta detrending.
 
     Local mean subtraction.
     Subtract the local mean, mean([x_{t - w}, ..., x_{t + w}]), from each value x_t.
@@ -15,11 +15,11 @@ def delta(ts, window_size: int = 10):
     .. math::
         x_t' = x_t - \left(2w + 1\right)^{-1} \sum_{k = t - w}^{t + w} x_k
 
-    :param ts: Time series to normalise.
+    :param ts: Time series to detrend.
     :type ts: numpy.ndarray
     :param window_size: Window size to use for calculating the mean.
     :type window_size: int
-    :return: Normalised time series.
+    :return: Detrended time series.
     :rtype: numpy.ndarray
     """
     ts2 = copy(ts)

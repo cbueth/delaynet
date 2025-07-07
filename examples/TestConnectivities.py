@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import delaynet as dnet
+import delaynet as dn
 from delaynet.preparation import gen_data
 
 
@@ -32,7 +32,7 @@ def calculate_approaches(num_it, l_coupl, methods):
             ts[2:, 1] += l_coupl * coupling * ts[:-2, 0]
 
             for m, method in enumerate(methods):
-                p_val, _ = dnet.connectivity(ts[:, 0], ts[:, 1], method)
+                p_val, _ = dn.connectivity(ts[:, 0], ts[:, 1], method)
                 all_res[c_index, m + 1] += p_val < 0.01
 
     all_res[:, 1:] /= float(num_it)

@@ -5,7 +5,7 @@ from numpy import array
 
 from delaynet.preparation.data_generator import gen_delayed_causal_network, gen_fmri
 from delaynet.connectivities import __all_connectivity_metrics_names_simple__
-from delaynet.norms import __all_norms__
+from delaynet.detrending_methods import __all_detrending__
 
 
 CONN_METRICS = {
@@ -16,20 +16,14 @@ CONN_METRICS = {
     for name, value in __all_connectivity_metrics_names_simple__.items()
 }
 CONN_METRICS["mutual_information"]["additional_kwargs"] = [
-    {
-        "approach": "discrete",
-        "symbolic_conversion": {"method": "quantize", "max_symbols": 50},
-    },
+    {"approach": "discrete"},
+    {"approach": "metric"},
     {"approach": "kernel", "mi_kwargs": {"bandwidth": 0.3, "kernel": "box"}},
     {"approach": "renyi", "mi_kwargs": {"alpha": 1.0}},
 ]
 CONN_METRICS["transfer_entropy"]["additional_kwargs"] = [
-    {
-        "approach": "discrete",
-        "symbolic_conversion": {"method": "quantize", "max_symbols": 50},
-    },
-    {"approach": "kernel", "te_kwargs": {"bandwidth": 0.3, "kernel": "box"}},
-    {"approach": "renyi", "te_kwargs": {"alpha": 1.0}},
+    {"approach": "discrete"},
+    {"approach": "metric"},
 ]
 # list of all shorthands, only testing the first set of kwargs
 CONN_METRICS_SHORTHANDS = [
@@ -73,10 +67,10 @@ def connectivity_metric_kwargs(request):
 
 @pytest.fixture(
     scope="session",
-    params=__all_norms__,
+    params=__all_detrending__,
 )
-def norm(request):
-    """Return a norm function."""
+def detrending_function(request):
+    """Return a detrending function."""
     return request.param
 
 
@@ -97,7 +91,6 @@ def two_random_time_series():
 @pytest.fixture(scope="session")
 def random_time_series(two_random_time_series):
     """Return random time series."""
-    # pylint: disable = redefined-outer-name
     return two_random_time_series[0]
 
 
@@ -122,7 +115,6 @@ def two_fmri_time_series():
 @pytest.fixture(scope="session")
 def fmri_time_series(two_fmri_time_series):
     """Return fMRI time series."""
-    # pylint: disable = redefined-outer-name
     return two_fmri_time_series[0]
 
 
@@ -147,6 +139,6 @@ def time_series(request):
 @pytest.fixture(scope="module")
 def two_time_series():
     """Return two time series."""
-    ts1 = array([1, 2, 3, 4, 5])
-    ts2 = array([5, 4, 3, 2, 1])
+    ts1 = array([1, 2, 3, 4, 5, 6, 7, 8])
+    ts2 = array([8, 7, 6, 5, 4, 3, 2, 1])
     return ts1, ts2

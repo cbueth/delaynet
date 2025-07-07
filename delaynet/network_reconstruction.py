@@ -31,7 +31,9 @@ def _compute_pair_connectivity_shared(args):
     ts_j = time_series[:, j]
 
     # Compute connectivity
-    result = connectivity(ts_i, ts_j, connectivity_measure, lag_steps=lag_steps, **kwargs)
+    result = connectivity(
+        ts_i, ts_j, connectivity_measure, lag_steps=lag_steps, **kwargs
+    )
 
     existing_shm.close()  # Don't unlink, main process will do that
     return i, j, result[0], result[1]
@@ -145,7 +147,9 @@ def reconstruct_network(
         # Parallel execution using shared memory
         # Create shared memory once
         shm = shared_memory.SharedMemory(create=True, size=time_series.nbytes)
-        shared_array = np.ndarray(time_series.shape, dtype=time_series.dtype, buffer=shm.buf)
+        shared_array = np.ndarray(
+            time_series.shape, dtype=time_series.dtype, buffer=shm.buf
+        )
         shared_array[:] = time_series[:]  # Copy data to shared memory once
 
         try:
@@ -154,8 +158,18 @@ def reconstruct_network(
             for i in range(n_nodes):
                 for j in range(n_nodes):
                     if i != j:
-                        jobs.append((i, j, shm.name, time_series.shape, time_series.dtype,
-                                   connectivity_measure, lag_steps, kwargs))
+                        jobs.append(
+                            (
+                                i,
+                                j,
+                                shm.name,
+                                time_series.shape,
+                                time_series.dtype,
+                                connectivity_measure,
+                                lag_steps,
+                                kwargs,
+                            )
+                        )
 
             # Execute in parallel
             with ProcessPoolExecutor(max_workers=workers) as executor:

@@ -416,7 +416,10 @@ def test_reconstruct_network_parallel_with_different_metrics(two_random_time_ser
         )
 
         # Results should be identical
-        assert_array_equal(weights_seq, weights_par), f"Weights differ for metric {metric}"
+        (
+            assert_array_equal(weights_seq, weights_par),
+            f"Weights differ for metric {metric}",
+        )
         assert_array_equal(lags_seq, lags_par), f"Lags differ for metric {metric}"
 
 

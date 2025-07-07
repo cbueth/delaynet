@@ -253,7 +253,9 @@ def detrending_method(
                     kwargs_without_axis = {
                         k: v for k, v in kwargs.items() if k != "axis"
                     }
-                    bound_args = bind_args(detrend_func, [ts, *args], kwargs_without_axis)
+                    bound_args = bind_args(
+                        detrend_func, [ts, *args], kwargs_without_axis
+                    )
                     detrended_ts = detrend_func(*bound_args.args, **bound_args.kwargs)
             else:
                 # For higher dimensional arrays, require axis kwarg
@@ -280,7 +282,9 @@ def detrending_method(
                     kwargs_without_axis = {
                         k: v for k, v in kwargs.items() if k != "axis"
                     }
-                    bound_args = bind_args(detrend_func, [ts, *args], kwargs_without_axis)
+                    bound_args = bind_args(
+                        detrend_func, [ts, *args], kwargs_without_axis
+                    )
                     detrended_ts = apply_along_axis(
                         detrend_func,  # func1d
                         axis,  # axis

@@ -50,7 +50,9 @@ def test_all_metrics(n_nodes: int = 15, l_dens: float = 0.5, ts_len: int = 1000)
             for n2 in range(n_nodes):
                 if n1 == n2:
                     continue
-                result = connectivity(ts1=detrended_ts[n1], ts2=detrended_ts[n2], metric=metric)
+                result = connectivity(
+                    ts1=detrended_ts[n1], ts2=detrended_ts[n2], metric=metric
+                )
                 if isinstance(result, (float, floating)):
                     rec_net[n1, n2] = result
                 elif isinstance(result, tuple) and len(result) == 2:

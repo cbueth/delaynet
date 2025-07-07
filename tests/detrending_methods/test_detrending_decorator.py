@@ -146,11 +146,15 @@ def test_detrend_decorator_mixed_args(check_kwargs):
             mixed_args_detrend(array([1, 2, 3]), 2, b=3, c=4)
     else:
         assert array_equal(
-            mixed_args_detrend(array([1, 2, 3]), 2, check_kwargs=check_kwargs, b=3, c=4),
+            mixed_args_detrend(
+                array([1, 2, 3]), 2, check_kwargs=check_kwargs, b=3, c=4
+            ),
             array([6, 7, 8]),
         )
         assert array_equal(
-            mixed_args_detrend(array([1, 2, 3]), 2, b=3, c=4, check_kwargs=check_kwargs),
+            mixed_args_detrend(
+                array([1, 2, 3]), 2, b=3, c=4, check_kwargs=check_kwargs
+            ),
             array([6, 7, 8]),
         )
 
@@ -272,7 +276,9 @@ def test_detrend_decorator_check_nans(test_ts, check_nan, check_inf, replace):
         (lambda ts: ts[1:-1], True),  # remove first and last value
     ],
 )
-def test_detrend_decorator_check_shape(time_series, test_detrend, shortening, check_shape):
+def test_detrend_decorator_check_shape(
+    time_series, test_detrend, shortening, check_shape
+):
     """Test the detrend decorator by designing a detrend that shortens the time series."""
 
     @detrending_method(check_shape=check_shape)
@@ -450,7 +456,9 @@ def test_detrend_decorator_multidimensional_missing_axis(input_array, descriptio
         "3D_array_axis_2_function_handles_axis_itself",
     ],
 )
-def test_detrend_decorator_with_axis_parameter(input_array, axis, expected, description):
+def test_detrend_decorator_with_axis_parameter(
+    input_array, axis, expected, description
+):
     """Test detrend function that has an axis parameter in its signature."""
 
     @detrending_method
@@ -642,7 +650,9 @@ def test_detrend_decorator_complex_detrend_with_parameters(
     """Test detrend decorator with a complex detrend function having multiple parameters."""
 
     @detrending_method
-    def complex_detrend(ts: ndarray, multiplier: float = 2.0, offset: int = 1) -> ndarray:
+    def complex_detrend(
+        ts: ndarray, multiplier: float = 2.0, offset: int = 1
+    ) -> ndarray:
         return ts * multiplier + offset
 
     if axis is None:
@@ -752,9 +762,9 @@ def test_detrend_decorator_empty_array():
 @pytest.mark.parametrize(
     "axis, array_dim",
     [
-        (1, 1),    # axis=1 for 1D array (valid range: -1 to 0)
-        (-2, 1),   # axis=-2 for 1D array (valid range: -1 to 0)
-        (2, 1),    # axis=2 for 1D array (valid range: -1 to 0)
+        (1, 1),  # axis=1 for 1D array (valid range: -1 to 0)
+        (-2, 1),  # axis=-2 for 1D array (valid range: -1 to 0)
+        (2, 1),  # axis=2 for 1D array (valid range: -1 to 0)
     ],
 )
 def test_detrend_decorator_axis_out_of_bounds_1d(axis, array_dim):
@@ -767,8 +777,8 @@ def test_detrend_decorator_axis_out_of_bounds_1d(axis, array_dim):
     test_array = array([1, 2, 3])  # 1D array
 
     with pytest.raises(
-        ValueError, 
-        match=f"axis {axis} is out of bounds for array of dimension {array_dim}"
+        ValueError,
+        match=f"axis {axis} is out of bounds for array of dimension {array_dim}",
     ):
         simple_detrend(test_array, axis=axis)
 
@@ -776,13 +786,15 @@ def test_detrend_decorator_axis_out_of_bounds_1d(axis, array_dim):
 @pytest.mark.parametrize(
     "axis, array_shape, array_dim",
     [
-        (2, (3, 4), 2),      # axis=2 for 2D array (valid range: -2 to 1)
-        (-3, (3, 4), 2),     # axis=-3 for 2D array (valid range: -2 to 1)
-        (3, (2, 3, 4), 3),   # axis=3 for 3D array (valid range: -3 to 2)
+        (2, (3, 4), 2),  # axis=2 for 2D array (valid range: -2 to 1)
+        (-3, (3, 4), 2),  # axis=-3 for 2D array (valid range: -2 to 1)
+        (3, (2, 3, 4), 3),  # axis=3 for 3D array (valid range: -3 to 2)
         (-4, (2, 3, 4), 3),  # axis=-4 for 3D array (valid range: -3 to 2)
     ],
 )
-def test_detrend_decorator_axis_out_of_bounds_multidimensional(axis, array_shape, array_dim):
+def test_detrend_decorator_axis_out_of_bounds_multidimensional(
+    axis, array_shape, array_dim
+):
     """Test that the detrend decorator raises ValueError for out of bounds axis on multidimensional arrays."""
 
     @detrending_method
@@ -792,7 +804,7 @@ def test_detrend_decorator_axis_out_of_bounds_multidimensional(axis, array_shape
     test_array = ones(array_shape)
 
     with pytest.raises(
-        ValueError, 
-        match=f"axis {axis} is out of bounds for array of dimension {array_dim}"
+        ValueError,
+        match=f"axis {axis} is out of bounds for array of dimension {array_dim}",
     ):
         simple_detrend(test_array, axis=axis)

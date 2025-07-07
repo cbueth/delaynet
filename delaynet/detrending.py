@@ -4,7 +4,10 @@ from collections.abc import Callable
 
 from numpy import ndarray
 
-from .detrending_methods import __all_detrending_names__, __all_detrending_names_simple__
+from .detrending_methods import (
+    __all_detrending_names__,
+    __all_detrending_names_simple__,
+)
 from .decorators import detrending_method
 
 

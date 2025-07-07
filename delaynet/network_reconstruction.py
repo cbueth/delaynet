@@ -6,14 +6,42 @@ by applying connectivity measures to pairs of time series.
 
 import numpy as np
 from numpy import ndarray
+from concurrent.futures import ProcessPoolExecutor
+from multiprocessing import shared_memory
 
 from .connectivity import connectivity, Metric
+
+
+def _compute_pair_connectivity_shared(args):
+    """Compute connectivity for a single (i,j) pair using shared memory.
+
+    :param args: Tuple containing (i, j, shm_name, shape, dtype, connectivity_measure, lag_steps, kwargs)
+    :type args: tuple
+    :return: Tuple containing (i, j, p_value, optimal_lag)
+    :rtype: tuple[int, int, float, int]
+    """
+    i, j, shm_name, shape, dtype, connectivity_measure, lag_steps, kwargs = args
+
+    # Attach to shared memory
+    existing_shm = shared_memory.SharedMemory(name=shm_name)
+    time_series = np.ndarray(shape, dtype=dtype, buffer=existing_shm.buf)
+
+    # Extract the required time series (these are views of shared memory)
+    ts_i = time_series[:, i]
+    ts_j = time_series[:, j]
+
+    # Compute connectivity
+    result = connectivity(ts_i, ts_j, connectivity_measure, lag_steps=lag_steps, **kwargs)
+
+    existing_shm.close()  # Don't unlink, main process will do that
+    return i, j, result[0], result[1]
 
 
 def reconstruct_network(
     time_series: ndarray,
     connectivity_measure: Metric,
     lag_steps: int | list[int] | None = None,
+    workers: int = None,
     **kwargs,
 ) -> tuple[ndarray, ndarray]:
     """
@@ -35,6 +63,8 @@ def reconstruct_network(
     :param lag_steps: The number of lag steps to consider. Required.
                       Can be integer for [1, ..., num], or a list of integers.
     :type lag_steps: int | list[int] | None
+    :param workers: Number of workers to use for parallel computation.
+    :type workers: int | None
     :param kwargs: Additional keyword arguments passed to the connectivity measure.
     :type kwargs: dict
     :return: Tuple containing:
@@ -95,19 +125,49 @@ def reconstruct_network(
     lag_matrix = np.zeros((n_nodes, n_nodes), dtype=int)
 
     # Compute connectivity for all pairs
-    for i in range(n_nodes):
-        for j in range(n_nodes):
-            if i != j:  # Skip self-connections - perfect correlation (p=0) at lag 0
-                # Compute connectivity
-                result = connectivity(
-                    time_series[:, i],
-                    time_series[:, j],
-                    connectivity_measure,
-                    lag_steps=lag_steps,
-                    **kwargs,
-                )
-                # Connectivity measure returns (p_value, lag)
-                weight_matrix[i, j] = result[0]
-                lag_matrix[i, j] = result[1]
+    if workers is None or workers == 1:
+        # Sequential execution (current implementation)
+        for i in range(n_nodes):
+            for j in range(n_nodes):
+                if i != j:  # Skip self-connections - perfect correlation (p=0) at lag 0
+                    # Compute connectivity
+                    result = connectivity(
+                        time_series[:, i],
+                        time_series[:, j],
+                        connectivity_measure,
+                        lag_steps=lag_steps,
+                        **kwargs,
+                    )
+                    # Connectivity measure returns (p_value, lag)
+                    weight_matrix[i, j] = result[0]
+                    lag_matrix[i, j] = result[1]
+    else:
+        # Parallel execution using shared memory
+        # Create shared memory once
+        shm = shared_memory.SharedMemory(create=True, size=time_series.nbytes)
+        shared_array = np.ndarray(time_series.shape, dtype=time_series.dtype, buffer=shm.buf)
+        shared_array[:] = time_series[:]  # Copy data to shared memory once
+
+        try:
+            # Prepare jobs: only pass indices and shared memory info
+            jobs = []
+            for i in range(n_nodes):
+                for j in range(n_nodes):
+                    if i != j:
+                        jobs.append((i, j, shm.name, time_series.shape, time_series.dtype,
+                                   connectivity_measure, lag_steps, kwargs))
+
+            # Execute in parallel
+            with ProcessPoolExecutor(max_workers=workers) as executor:
+                results = executor.map(_compute_pair_connectivity_shared, jobs)
+
+            # Populate matrices from results
+            for i, j, weight, lag in results:
+                weight_matrix[i, j] = weight
+                lag_matrix[i, j] = lag
+
+        finally:
+            shm.close()
+            shm.unlink()  # Clean up shared memory
 
     return weight_matrix, lag_matrix

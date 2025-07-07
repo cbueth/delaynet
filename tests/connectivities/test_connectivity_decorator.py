@@ -14,11 +14,11 @@ def test_connectivity_decorator_simple():
         """Return the sum of the two time series."""
         return np_sum(ts1) + np_sum(ts2), lag_steps[0]
 
-    assert (
-        simple_connectivity(array([1.0, 2.0, 3.0]), array([4.0, 5.0, 6.0]), lag_steps=5)
-        == 21.0,
-        1,
+    res = simple_connectivity(
+        array([1.0, 2.0, 3.0]), array([4.0, 5.0, 6.0]), lag_steps=5
     )
+    assert res[0] == 21.0
+    assert res[1] == 1
 
 
 @pytest.mark.parametrize(

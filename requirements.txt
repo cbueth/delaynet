@@ -4,6 +4,7 @@ infomeasure>=0.5.0
 statsmodels
 scikit-learn
 numba
+igraph
 # Code Quality
 pre-commit
 ruff

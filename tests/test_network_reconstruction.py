@@ -46,9 +46,11 @@ def test_reconstruct_network_basic_functionality(two_time_series):
     assert weights.shape == (2, 2)
     assert lags.shape == (2, 2)
 
-    # Check diagonal elements (self-connections should be 0)
-    assert_array_equal(weights, [[0.0, 0.0], [0.0, 0.0]])
-    assert_array_equal(lags, [[0, 1], [1, 0]])
+    # Check diagonal elements (self-connections should be 1.0 - no significant connection)
+    assert weights[0, 0] == 1.0
+    assert weights[1, 1] == 1.0
+    assert lags[0, 0] == 0
+    assert lags[1, 1] == 0
 
 
 def test_reconstruct_network_with_random_data(two_random_time_series):
@@ -64,8 +66,8 @@ def test_reconstruct_network_with_random_data(two_random_time_series):
     assert weights.shape == (3, 3)
     assert lags.shape == (3, 3)
 
-    # Check diagonal is zero
-    assert_array_equal(diag(weights), [0.0, 0.0, 0.0])
+    # Check diagonal is 1.0 (no significant self-connection)
+    assert_array_equal(diag(weights), [1.0, 1.0, 1.0])
     assert_array_equal(diag(lags), [0, 0, 0])
 
     # Check that weights are valid p-values (between 0 and 1)
@@ -95,7 +97,7 @@ def test_reconstruct_network_with_different_measures(
 
     assert weights.shape == (2, 2)
     assert lags.shape == (2, 2)
-    assert diag(weights).tolist() == [0.0, 0.0]
+    assert diag(weights).tolist() == [1.0, 1.0]
     assert diag(lags).tolist() == [0, 0]
 
 
@@ -118,7 +120,7 @@ def test_reconstruct_network_with_connectivity_kwargs(two_random_time_series):
 
     assert weights.shape == (2, 2)
     assert lags.shape == (2, 2)
-    assert diag(weights).tolist() == [0.0, 0.0]
+    assert diag(weights).tolist() == [1.0, 1.0]
 
 
 def test_reconstruct_network_input_validation():
@@ -154,7 +156,7 @@ def test_reconstruct_network_edge_cases():
 
     assert weights.shape == (2, 2)
     assert lags.shape == (2, 2)
-    assert diag(weights).tolist() == [0.0, 0.0]
+    assert diag(weights).tolist() == [1.0, 1.0]
     assert diag(lags).tolist() == [0, 0]
 
 
@@ -192,8 +194,8 @@ def test_reconstruct_network_symmetry_properties():
 
     weights, lags = reconstruct_network(time_series, "linear_correlation", lag_steps=5)
 
-    # Check that diagonal is zero
-    assert allclose(diag(weights), 0.0)
+    # Check that diagonal is one
+    assert allclose(diag(weights), 1.0)
     assert allclose(diag(lags), 0)
 
     # Check that matrices have correct shape
@@ -225,7 +227,7 @@ def test_reconstruct_network_with_connectivity_returning_single_value():
     # Verify the structure is correct
     assert weights.shape == (3, 3)
     assert lags.shape == (3, 3)
-    assert diag(weights).tolist() == [0.0, 0.0, 0.0]
+    assert diag(weights).tolist() == [1.0, 1.0, 1.0]
     assert diag(lags).tolist() == [0, 0, 0]
 
 
@@ -245,7 +247,7 @@ def test_reconstruct_network_different_sizes(n_time, n_nodes):
 
     assert weights.shape == (n_nodes, n_nodes)
     assert lags.shape == (n_nodes, n_nodes)
-    assert allclose(diag(weights), 0.0)
+    assert allclose(diag(weights), 1.0)
     assert allclose(diag(lags), 0)
 
 
@@ -267,7 +269,7 @@ def test_reconstruct_network_integration_with_connectivity_fixtures(
 
         assert weights.shape == (3, 3)
         assert lags.shape == (3, 3)
-        assert allclose(diag(weights), 0.0)
+        assert allclose(diag(weights), 1.0)
         assert allclose(diag(lags), 0)
 
     except Exception as e:
@@ -303,8 +305,8 @@ def test_reconstruct_network_with_callable_metric(two_time_series, callable_metr
     assert isinstance(weights, ndarray)
     assert isinstance(lags, ndarray)
 
-    # Check diagonal elements are zero (no self-connections)
-    assert diag(weights).tolist() == [0.0, 0.0]
+    # Check diagonal elements are 1.0 (no significant self-connections)
+    assert diag(weights).tolist() == [1.0, 1.0]
     assert diag(lags).tolist() == [0, 0]
 
     # Check that off-diagonal elements have valid values
@@ -384,7 +386,7 @@ def test_reconstruct_network_parallel_vs_sequential(two_random_time_series, work
     # Verify basic properties
     assert weights_seq.shape == (4, 4)
     assert lags_seq.shape == (4, 4)
-    assert allclose(diag(weights_seq), 0.0)
+    assert allclose(diag(weights_seq), 1.0)
     assert allclose(diag(lags_seq), 0)
 
 
@@ -500,5 +502,5 @@ def test_reconstruct_network_parallel_large_dataset():
     # Verify properties
     assert weights_seq.shape == (6, 6)
     assert lags_seq.shape == (6, 6)
-    assert allclose(diag(weights_seq), 0.0)
+    assert allclose(diag(weights_seq), 1.0)
     assert allclose(diag(lags_seq), 0)

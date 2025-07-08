@@ -106,7 +106,8 @@ def reconstruct_network(
 
     Note:
     -----
-    The diagonal elements of the weight matrix are set to zero by default.
+    The diagonal elements of the weight matrix are set to 1.0 by default,
+    indicating no significant self-connection.
     """
     # Validate input
     if time_series.ndim != 2:
@@ -125,6 +126,9 @@ def reconstruct_network(
     # Initialize output matrices
     weight_matrix = np.zeros((n_nodes, n_nodes), dtype=float)
     lag_matrix = np.zeros((n_nodes, n_nodes), dtype=int)
+
+    # Set diagonal elements to p=1.0 (no significant self-connection)
+    np.fill_diagonal(weight_matrix, 1.0)
 
     # Compute connectivity for all pairs
     if workers is None or workers == 1:

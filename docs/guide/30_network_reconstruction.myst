@@ -245,3 +245,7 @@ print(f"Custom metric p-values:\n{weights_custom}")
 ```{eval-rst}
 .. autofunction:: delaynet.network_reconstruction.reconstruct_network
 ```
+
+## Next Steps
+
+After reconstructing a network, the next step is typically to analyze its properties and extract meaningful insights. The {ref}`network_analysis` section provides tools for pruning networks based on statistical significance and calculating various network metrics such as centrality measures, link density, and global efficiency.

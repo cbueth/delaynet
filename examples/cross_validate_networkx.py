@@ -131,7 +131,9 @@ def cross_validate_metrics(adj_matrix, directed=True):
     # 5. Eigenvector Centrality
     try:
         delaynet_ec = eigenvector_centrality(adj_matrix, directed=directed)
-        networkx_ec = np.array(list(nx.eigenvector_centrality(G, max_iter=1000).values()))
+        networkx_ec = np.array(
+            list(nx.eigenvector_centrality(G, max_iter=1000).values())
+        )
         ec_diff = np.abs(delaynet_ec - networkx_ec).mean()
         print(f"Eigenvector Centrality - Mean Absolute Difference: {ec_diff:.6f}")
     except:
@@ -142,8 +144,12 @@ def cross_validate_metrics(adj_matrix, directed=True):
     delaynet_in_outbound = isolated_nodes_outbound(adj_matrix)
 
     # NetworkX equivalent for isolated nodes (count)
-    networkx_in_inbound = sum(1 for i in G.nodes() if G.in_degree(i) == 0) if directed else 0
-    networkx_in_outbound = sum(1 for i in G.nodes() if G.out_degree(i) == 0) if directed else 0
+    networkx_in_inbound = (
+        sum(1 for i in G.nodes() if G.in_degree(i) == 0) if directed else 0
+    )
+    networkx_in_outbound = (
+        sum(1 for i in G.nodes() if G.out_degree(i) == 0) if directed else 0
+    )
 
     in_inbound_diff = abs(delaynet_in_inbound - networkx_in_inbound)
     in_outbound_diff = abs(delaynet_in_outbound - networkx_in_outbound)
@@ -152,11 +158,21 @@ def cross_validate_metrics(adj_matrix, directed=True):
     print(f"Isolated Nodes Outbound - Count Difference: {in_outbound_diff}")
 
 
-def benchmark_single_metric(metric_name, delaynet_func, networkx_func, n_nodes_list, 
-                           density=0.3, directed=True, n_runs=5, n_repeat=3):
+def benchmark_single_metric(
+    metric_name,
+    delaynet_func,
+    networkx_func,
+    n_nodes_list,
+    density=0.3,
+    directed=True,
+    n_runs=5,
+    n_repeat=3,
+):
     """Benchmark performance of a single metric between delaynet and NetworkX."""
     print(f"\n=== Performance Benchmark: {metric_name} ===")
-    print(f"Density: {density}, Directed: {directed}, Runs per size: {n_runs}, Repeats per run: {n_repeat}")
+    print(
+        f"Density: {density}, Directed: {directed}, Runs per size: {n_runs}, Repeats per run: {n_repeat}"
+    )
 
     results = []
 
@@ -172,13 +188,18 @@ def benchmark_single_metric(metric_name, delaynet_func, networkx_func, n_nodes_l
             G = convert_to_networkx(adj_matrix, directed)
 
             # Benchmark delaynet using timeit
-            delaynet_time = timeit.timeit(lambda: delaynet_func(adj_matrix, directed), 
-                                         number=n_repeat) / n_repeat
+            delaynet_time = (
+                timeit.timeit(
+                    lambda: delaynet_func(adj_matrix, directed), number=n_repeat
+                )
+                / n_repeat
+            )
             delaynet_times.append(delaynet_time)
 
             # Benchmark NetworkX using timeit
-            networkx_time = timeit.timeit(lambda: networkx_func(G), 
-                                         number=n_repeat) / n_repeat
+            networkx_time = (
+                timeit.timeit(lambda: networkx_func(G), number=n_repeat) / n_repeat
+            )
             networkx_times.append(networkx_time)
 
         # Calculate average times
@@ -189,12 +210,14 @@ def benchmark_single_metric(metric_name, delaynet_func, networkx_func, n_nodes_l
         print(f"Average NetworkX time: {avg_networkx_time:.6f} seconds")
         print(f"Speedup factor: {avg_networkx_time / avg_delaynet_time:.2f}x")
 
-        results.append({
-            'n_nodes': n_nodes,
-            'delaynet_time': avg_delaynet_time,
-            'networkx_time': avg_networkx_time,
-            'speedup': avg_networkx_time / avg_delaynet_time
-        })
+        results.append(
+            {
+                "n_nodes": n_nodes,
+                "delaynet_time": avg_delaynet_time,
+                "networkx_time": avg_networkx_time,
+                "speedup": avg_networkx_time / avg_delaynet_time,
+            }
+        )
 
     return results
 
@@ -205,17 +228,23 @@ def main():
 
     # Cross-validate with a small network
     print("\nCross-validating with a small network...")
-    small_adj_matrix = generate_random_network(n_nodes=20, density=0.3, directed=True, seed=42)
+    small_adj_matrix = generate_random_network(
+        n_nodes=20, density=0.3, directed=True, seed=42
+    )
     cross_validate_metrics(small_adj_matrix, directed=True)
 
     # Cross-validate with a medium network
     print("\nCross-validating with a medium network...")
-    medium_adj_matrix = generate_random_network(n_nodes=50, density=0.2, directed=True, seed=42)
+    medium_adj_matrix = generate_random_network(
+        n_nodes=50, density=0.2, directed=True, seed=42
+    )
     cross_validate_metrics(medium_adj_matrix, directed=True)
 
     # Cross-validate with an undirected network
     print("\nCross-validating with an undirected network...")
-    undirected_adj_matrix = generate_random_network(n_nodes=30, density=0.25, directed=False, seed=42)
+    undirected_adj_matrix = generate_random_network(
+        n_nodes=30, density=0.25, directed=False, seed=42
+    )
     cross_validate_metrics(undirected_adj_matrix, directed=False)
 
     # Benchmark performance with different network sizes for each metric
@@ -225,29 +254,28 @@ def main():
 
     # Define metric pairs (name, delaynet_func, networkx_func)
     metrics = [
-        ("Betweenness Centrality", 
-         lambda adj, directed: betweenness_centrality(adj, directed=directed), 
-         lambda G: nx.betweenness_centrality(G, normalized=True)),
-
-        ("Link Density", 
-         lambda adj, directed: link_density(adj, directed=directed), 
-         nx.density),
-
-        ("Transitivity", 
-         lambda adj, directed: transitivity(adj), 
-         nx.transitivity),
-
-        ("Reciprocity", 
-         lambda adj, directed: reciprocity(adj), 
-         nx.reciprocity),
-
-        ("Global Efficiency", 
-         lambda adj, directed: global_efficiency(adj, directed=directed), 
-         lambda G: nx.global_efficiency(G) if not directed else None),
-
-        ("Eigenvector Centrality", 
-         lambda adj, directed: eigenvector_centrality(adj, directed=directed), 
-         lambda G: nx.eigenvector_centrality(G, max_iter=1000)),
+        (
+            "Betweenness Centrality",
+            lambda adj, directed: betweenness_centrality(adj, directed=directed),
+            lambda G: nx.betweenness_centrality(G, normalized=True),
+        ),
+        (
+            "Link Density",
+            lambda adj, directed: link_density(adj, directed=directed),
+            nx.density,
+        ),
+        ("Transitivity", lambda adj, directed: transitivity(adj), nx.transitivity),
+        ("Reciprocity", lambda adj, directed: reciprocity(adj), nx.reciprocity),
+        (
+            "Global Efficiency",
+            lambda adj, directed: global_efficiency(adj, directed=directed),
+            lambda G: nx.global_efficiency(G) if not directed else None,
+        ),
+        (
+            "Eigenvector Centrality",
+            lambda adj, directed: eigenvector_centrality(adj, directed=directed),
+            lambda G: nx.eigenvector_centrality(G, max_iter=1000),
+        ),
     ]
 
     all_results = {}
@@ -262,13 +290,20 @@ def main():
             # Skip global efficiency for directed graphs in NetworkX
             if name == "Global Efficiency" and directed:
                 print(f"\n=== Performance Benchmark: {name} ===")
-                print("Skipping: NetworkX does not support directed graphs for this metric")
+                print(
+                    "Skipping: NetworkX does not support directed graphs for this metric"
+                )
                 continue
 
             results = benchmark_single_metric(
-                name, delaynet_func, networkx_func, 
-                n_nodes_list, density=0.2, directed=directed, 
-                n_runs=3, n_repeat=3
+                name,
+                delaynet_func,
+                networkx_func,
+                n_nodes_list,
+                density=0.2,
+                directed=directed,
+                n_runs=3,
+                n_repeat=3,
             )
             all_results[name] = results
         except Exception as e:
@@ -281,10 +316,14 @@ def main():
         print("Network Size | Delaynet Time (s) | NetworkX Time (s) | Speedup")
         print("---------------------------------------------------------------")
         for result in results:
-            print(f"{result['n_nodes']:11d} | {result['delaynet_time']:16.6f} | {result['networkx_time']:15.6f} | {result['speedup']:7.2f}x")
+            print(
+                f"{result['n_nodes']:11d} | {result['delaynet_time']:16.6f} | {result['networkx_time']:15.6f} | {result['speedup']:7.2f}x"
+            )
 
+    print(
+        "The results for NetworkX do not include the time converting the adjacency matrix to a graph."
+    )
 
-    print("The results for NetworkX do not include the time converting the adjacency matrix to a graph.")
 
 if __name__ == "__main__":
     main()

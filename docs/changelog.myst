@@ -2,7 +2,18 @@
 
 ## Version 0.3.0 (2025-0X-XX)
 
-- 🏗️ **Network Reconstruction and Documentation Overhaul**
+- ⏲️ **Network Analysis and Benchmarking**
+
+  - **Added:** Comprehensive network analysis module with metrics for evaluating network properties:
+    - Network pruning with statistical significance testing and multiple comparison corrections
+    - Centrality measures (betweenness, eigenvector) to identify important nodes
+    - Global network metrics (link density, global efficiency, transitivity, reciprocity)
+    - Node isolation detection (inbound/outbound)
+  - **Added:** Cross-validation and benchmarking tools comparing delaynet with NetworkX, demonstrating 3-10x performance improvements
+  - **Enhanced:** Integration with python-igraph for efficient network computations
+  - **Improved:** Weight matrix diagonal defaults and related test coverage
+
+- 🏗 **Network Reconstruction and Documentation Overhaul**
 
   - **Added:** Complete network reconstruction functionality with the new {func}`~delaynet.network_reconstruction.reconstruct_network` function that applies connectivity measures to pairs of time series to build networks represented by $p$-value and lag matrices.
   - **Enhanced:** Documentation structure with comprehensive individual guides for each method:
@@ -13,7 +24,7 @@
   - **Improved:** Core connectivity framework with better error handling and validation
   - **Streamlined:** Documentation organization by consolidating scattered guides into focused, method-specific documentation that's easier to navigate and understand
 
-- 🔄 **API Refactoring: Normalization → Detrending** 
+- 🔄 **API Refactoring: Normalization → Detrending**
 
   - **Breaking Change:** Renamed all "normalization/norm" terminology to "detrending/detrend" for semantic accuracy
   - **Renamed:** Main API function from `normalise()` to `detrend()` and `show_norms()` to `show_detrending_methods()`

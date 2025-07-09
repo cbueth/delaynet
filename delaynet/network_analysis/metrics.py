@@ -319,24 +319,38 @@ def global_efficiency(weight_matrix: ndarray, directed: bool = True) -> float:
     return total_efficiency / pair_count
 
 
-def transitivity(weight_matrix: ndarray, directed: bool = True) -> float:
-    """
+def transitivity(weight_matrix: ndarray) -> float:
+    r"""
     Compute the transitivity (global clustering coefficient) of the network.
 
     Transitivity measures the fraction of all possible triangles present in the graph.
     Following the NetworkX definition, transitivity is calculated as:
-    transitivity = 3 * #triangles / #triads
+
+    .. math::
+
+        T = 3 \frac{\text{number of triangles}}{\text{number of triads}}
+
+
     where triads are sets of 3 nodes with at least 2 edges between them.
 
-    This implementation uses igraph's Graph.transitivity_undirected() method,
+    This implementation uses igraph's
+    :doc:`Graph.transitivity_undirected() <igraph:analysis>` method,
     which correctly implements the above definition. For directed graphs,
     the network is first converted to undirected before calculation.
+
+    Note that for directed networks, the direction of edges is ignored when
+    calculating transitivity, as the concept of triangles is defined for
+    undirected graphs. For directed networks, consider using :func:`reciprocity`
+    to measure the tendency of vertex pairs to form mutual connections.
+
+    Due to the way NetworkX handles directed networks when calculating transitivity,
+    transitivity calculated with this method differs on undirected graphs.
+    This implementation collapses the directed network into an undirected network
+    and calculates transitivity using igraph's method.
 
     :param weight_matrix: Matrix of connection weights. Non-zero values
                           indicate connections.
     :type weight_matrix: numpy.ndarray, shape (n_nodes, n_nodes)
-    :param directed: If True, treat the network as directed.
-    :type directed: bool
     :return: Transitivity value between 0 and 1.
     :rtype: float
     :raises ValueError: If weight_matrix is not square.
@@ -369,15 +383,88 @@ def transitivity(weight_matrix: ndarray, directed: bool = True) -> float:
     # Always create as directed first to handle non-symmetric matrices
     g = Graph.Weighted_Adjacency(weight_matrix.tolist(), mode="directed")
 
-    # Calculate transitivity using igraph
-    if directed:
-        # For directed networks, use transitivity on the directed graph
-        # (igraph's transitivity_undirected works on directed graphs too)
-        result = g.transitivity_undirected()
-    else:
-        # For undirected networks, convert to undirected first
-        g_undirected = g.as_undirected(mode="collapse")
-        result = g_undirected.transitivity_undirected()
+    # Always convert to undirected for transitivity calculation
+    g_undirected = g.as_undirected(mode="collapse")
+    result = g_undirected.transitivity_undirected()
+
+    # Handle case where igraph returns nan (no edges)
+    if isnan(result):
+        return 0.0
+
+    return float(result)
+
+
+def reciprocity(weight_matrix: ndarray) -> float:
+    r"""
+    Compute the reciprocity of a directed network.
+
+    Reciprocity measures the tendency of vertex pairs to form mutual connections.
+    It is defined as the fraction of edges that are reciprocated in a directed
+    network. Formally, the reciprocity is calculated as:
+
+    .. math::
+
+        R = \frac{1}{m} \sum_{i,j} A_{i,j} A_{j,i} = \frac{1}{m} \mathrm{Tr} \, A^2
+
+    where :math:`m` is the number of edges and :math:`A` is the adjacency matrix
+    of the graph. Note that :math:`A_{i,j} A_{j,i} = 1` if and only if :math:`i`
+    links to :math:`j` and vice versa.
+
+    This implementation uses igraph's :doc:`Graph.reciprocity() <igraph:analysis>`
+    method.
+
+    For undirected networks, reciprocity is not defined and this function will
+    raise a ValueError.
+
+    :param weight_matrix: Matrix of connection weights. Non-zero values
+                          indicate connections.
+    :type weight_matrix: numpy.ndarray, shape (n_nodes, n_nodes)
+    :return: Reciprocity value between 0 and 1.
+    :rtype: float
+    :raises ValueError: If weight_matrix is not square or if the network is undirected.
+
+    Example:
+    --------
+    >>> import numpy as np
+    >>> from delaynet.network_analysis.metrics import reciprocity
+    >>> # Example directed adjacency matrix
+    >>> weights = np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]])
+    >>> recip = reciprocity(weights)
+    >>> isinstance(recip, float)
+    True
+
+    References:
+    -----------
+    .. [1] https://www.sci.unich.it/~francesc/teaching/network/transitivity.html
+    """
+    # Validate input
+    if weight_matrix.shape[0] != weight_matrix.shape[1]:
+        raise ValueError(
+            f"weight_matrix must be square, got shape {weight_matrix.shape}"
+        )
+
+    n_nodes = weight_matrix.shape[0]
+
+    # Handle special cases
+    if n_nodes <= 1:
+        return 0.0
+
+    # Check if the network is undirected (symmetric matrix)
+    if np_all(weight_matrix == weight_matrix.T):
+        raise ValueError(
+            "Reciprocity is only defined for directed networks. "
+            "For undirected networks, all connections are reciprocal by definition."
+        )
+
+    # Check if there are any connections
+    if np_all(weight_matrix == 0):
+        return 0.0
+
+    # Create igraph graph from weight matrix
+    g = Graph.Weighted_Adjacency(weight_matrix.tolist(), mode="directed")
+
+    # Calculate reciprocity using igraph
+    result = g.reciprocity()
 
     # Handle case where igraph returns nan (no edges)
     if isnan(result):
@@ -389,8 +476,6 @@ def transitivity(weight_matrix: ndarray, directed: bool = True) -> float:
 def eigenvector_centrality(
     weight_matrix: ndarray,
     directed: bool = True,
-    max_iter: int = 1000,
-    tol: float = 1e-6,
 ) -> ndarray:
     """
     Compute eigenvector centrality for each node in the network.
@@ -405,10 +490,6 @@ def eigenvector_centrality(
     :type weight_matrix: numpy.ndarray, shape (n_nodes, n_nodes)
     :param directed: If True, treat the network as directed.
     :type directed: bool
-    :param max_iter: Maximum number of iterations for the power method.
-    :type max_iter: int
-    :param tol: Tolerance for convergence.
-    :type tol: float
     :return: Array of eigenvector centrality values for each node.
     :rtype: numpy.ndarray, shape (n_nodes,)
     :raises ValueError: If weight_matrix is not square.

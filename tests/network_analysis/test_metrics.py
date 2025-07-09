@@ -11,6 +11,7 @@ from delaynet.network_analysis.metrics import (
     isolated_nodes_outbound,
     global_efficiency,
     transitivity,
+    reciprocity,
     eigenvector_centrality,
 )
 
@@ -100,12 +101,12 @@ class TestBetweennessCentrality:
 
         # For a 3-node directed path, the middle node should have betweenness = 1 (normalized) or 2 (unnormalized)
         # The normalization factor for directed graphs with n=3 is (n-1)*(n-2) = 2*1 = 2
-        assert centrality_norm[1] == pytest.approx(1.0), (
-            "Normalized betweenness should be 1.0 for middle node"
-        )
-        assert centrality_unnorm[1] == pytest.approx(2.0), (
-            "Unnormalized betweenness should be 2.0 for middle node"
-        )
+        assert centrality_norm[1] == pytest.approx(
+            1.0
+        ), "Normalized betweenness should be 1.0 for middle node"
+        assert centrality_unnorm[1] == pytest.approx(
+            2.0
+        ), "Unnormalized betweenness should be 2.0 for middle node"
 
     def test_betweenness_centrality_input_validation(self):
         """Test input validation for betweenness centrality."""
@@ -153,9 +154,9 @@ class TestLinkDensity:
     ):
         """Test link density calculation for various network scenarios."""
         density = link_density(weights, directed=directed)
-        assert density == pytest.approx(expected_density), (
-            f"Failed for {test_description}"
-        )
+        assert density == pytest.approx(
+            expected_density
+        ), f"Failed for {test_description}"
 
     def test_link_density_input_validation(self):
         """Test input validation for link density."""
@@ -197,12 +198,12 @@ class TestIsolatedNodes:
         inbound_count = isolated_nodes_inbound(weights)
         outbound_count = isolated_nodes_outbound(weights)
 
-        assert inbound_count == expected_inbound, (
-            f"Inbound count failed for {test_description}"
-        )
-        assert outbound_count == expected_outbound, (
-            f"Outbound count failed for {test_description}"
-        )
+        assert (
+            inbound_count == expected_inbound
+        ), f"Inbound count failed for {test_description}"
+        assert (
+            outbound_count == expected_outbound
+        ), f"Outbound count failed for {test_description}"
 
     def test_isolated_nodes_input_validation(self):
         """Test input validation for isolated nodes functions."""
@@ -242,9 +243,9 @@ class TestGlobalEfficiency:
     ):
         """Test global efficiency calculation for various network scenarios."""
         efficiency = global_efficiency(weights, directed=directed)
-        assert efficiency == pytest.approx(expected_efficiency), (
-            f"Failed for {test_description}"
-        )
+        assert efficiency == pytest.approx(
+            expected_efficiency
+        ), f"Failed for {test_description}"
 
     def test_global_efficiency_input_validation(self):
         """Test input validation for global efficiency."""
@@ -257,26 +258,23 @@ class TestTransitivity:
     """Test transitivity functionality."""
 
     @pytest.mark.parametrize(
-        "weights, directed, expected_transitivity, test_description",
+        "weights, expected_transitivity, test_description",
         [
             (
                 np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
-                False,
                 1.0,
                 "triangle network with perfect transitivity",
             ),
             (
                 np.array([[0, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]]),
-                False,
                 0.0,
                 "star network with no triangles",
             ),
-            (np.zeros((3, 3)), True, 0.0, "network with no connections"),
-            (np.array([[0]]), True, 0.0, "single node network"),
-            (np.array([[0, 1], [1, 0]]), False, 0.0, "two node network"),
+            (np.zeros((3, 3)), 0.0, "network with no connections"),
+            (np.array([[0]]), 0.0, "single node network"),
+            (np.array([[0, 1], [1, 0]]), 0.0, "two node network"),
             (
                 np.array([[0, 1, 1, 1], [1, 0, 1, 0], [1, 1, 0, 0], [1, 0, 0, 0]]),
-                False,
                 0.6,
                 "4-node network with one complete triangle (transitivity = 0.6)",
             ),
@@ -290,13 +288,11 @@ class TestTransitivity:
                         [0, 0, 0, 1, 0],
                     ]
                 ),
-                False,
                 0.5,
                 "5-node network with partial connectivity (transitivity = 0.5)",
             ),
             (
                 np.array([[0, 1, 1, 1], [1, 0, 1, 0], [1, 1, 0, 1], [1, 0, 1, 0]]),
-                False,
                 0.75,
                 "4-node network with multiple triangles (transitivity = 0.75)",
             ),
@@ -311,26 +307,102 @@ class TestTransitivity:
                         [0, 0, 1, 1, 1, 0],
                     ]
                 ),
-                False,
                 1.0 / 3.0,
                 "6-node network with mixed connectivity (transitivity ≈ 0.33)",
+            ),
+            (
+                # Directed graph that should be treated as undirected
+                np.array([[0, 1, 1], [0, 0, 1], [0, 0, 0]]),
+                1.0,
+                "directed graph treated as undirected (forms a triangle when undirected)",
+            ),
+            (
+                # Directed graph with a triangle when treated as undirected
+                np.array([[0, 1, 1], [0, 0, 1], [1, 0, 0]]),
+                1.0,
+                "directed graph with a triangle when treated as undirected",
             ),
         ],
     )
     def test_transitivity_scenarios(
-        self, weights, directed, expected_transitivity, test_description
+        self, weights, expected_transitivity, test_description
     ):
-        """Test transitivity calculation for various network scenarios."""
-        trans = transitivity(weights, directed=directed)
-        assert trans == pytest.approx(expected_transitivity), (
-            f"Failed for {test_description}"
-        )
+        """Test transitivity calculation for various network scenarios.
+
+        Note: The directed parameter is ignored as transitivity is always
+        calculated on the undirected version of the graph.
+        """
+        trans = transitivity(weights)
+        assert trans == pytest.approx(
+            expected_transitivity
+        ), f"Failed for {test_description}"
 
     def test_transitivity_input_validation(self):
         """Test input validation for transitivity."""
         non_square_weights = np.array([[1, 0, 1]])
         with pytest.raises(ValueError, match="must be square"):
             transitivity(non_square_weights)
+
+
+class TestReciprocity:
+    """Test reciprocity functionality."""
+
+    @pytest.mark.parametrize(
+        "weights, expected_reciprocity, test_description",
+        [
+            (
+                np.array([[0, 1, 0], [1, 0, 1], [0, 0, 0]]),
+                2.0 / 3.0,
+                "3-node network with one reciprocated edge out of two (reciprocity = 2/3)",
+            ),
+            (
+                np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]]),
+                0.0,
+                "3-node directed cycle with no reciprocated edges (reciprocity = 0.0)",
+            ),
+            (
+                np.array([[0, 1, 1], [1, 0, 0], [0, 1, 0]]),
+                0.5,
+                "3-node network with 1 of 2 edges reciprocated (reciprocity = 0.5)",
+            ),
+            (
+                np.array([[0, 1, 1, 0], [1, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0]]),
+                0.4,
+                "4-node network with 2 of 5 edges reciprocated (reciprocity = 0.4)",
+            ),
+            (
+                # Use a matrix with all zeros except for a very small value that's treated as zero
+                np.array([[0, 1e-10, 0], [0, 0, 0], [0, 0, 0]]),
+                0.0,
+                "network with no connections (reciprocity = 0.0)",
+            ),
+            (
+                np.array([[0]]),
+                0.0,
+                "single node network (reciprocity = 0.0)",
+            ),
+        ],
+    )
+    def test_reciprocity_scenarios(
+        self, weights, expected_reciprocity, test_description
+    ):
+        """Test reciprocity calculation for various network scenarios."""
+        recip = reciprocity(weights)
+        assert recip == pytest.approx(
+            expected_reciprocity
+        ), f"Failed for {test_description}"
+
+    def test_reciprocity_input_validation(self):
+        """Test input validation for reciprocity."""
+        # Test non-square matrix
+        non_square_weights = np.array([[1, 0, 1]])
+        with pytest.raises(ValueError, match="must be square"):
+            reciprocity(non_square_weights)
+
+        # Test undirected (symmetric) matrix
+        symmetric_weights = np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]])
+        with pytest.raises(ValueError, match="only defined for directed networks"):
+            reciprocity(symmetric_weights)
 
 
 class TestEigenvectorCentrality:

@@ -14,4 +14,5 @@ from .metrics import (
     global_efficiency,
     transitivity,
     eigenvector_centrality,
+    reciprocity,
 )

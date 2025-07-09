@@ -101,4 +101,5 @@ intersphinx_mapping = {
     "statsmodels": ("https://www.statsmodels.org/stable", None),
     "sklearn": ("https://scikit-learn.org/stable", None),
     "infomeasure": ("https://infomeasure.readthedocs.io/en/latest", None),
+    "igraph": ("https://python.igraph.org/en/stable/", None),
 }

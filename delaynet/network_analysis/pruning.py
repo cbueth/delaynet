@@ -25,7 +25,7 @@ def statistical_pruning(
     :type alpha:               float
     :param correction:         Name of the correction method to use. Must be one
                               of the methods supported by
-                              {func}`statsmodels.stats.multitest.multipletests`
+                              :func:`statsmodels.stats.multitest.multipletests`
                               (e.g. 'bonferroni', 'sidak', 'holm',
                               'fdr_bh', 'fdr_by', 'fdr_tsbh', etc.).
                               If None, no correction is applied.

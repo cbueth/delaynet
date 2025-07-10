@@ -13,9 +13,7 @@ The Linear Correlation (LC) connectivity metric calculates the Pearson correlati
 import delaynet as dn
 
 # Calculate linear correlation
-result = dn.connectivity(
-    ts1, ts2, metric="linear_correlation", lag_steps=5, return_abs=True
-)
+result = dn.connectivity(ts1, ts2, metric="linear_correlation", lag_steps=5)
 ```
 
 Parameters:

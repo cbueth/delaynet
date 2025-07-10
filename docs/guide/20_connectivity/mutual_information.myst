@@ -17,6 +17,22 @@ result = dn.connectivity(
     ts1, ts2, metric="mutual_information", approach="kernel", lag_steps=5
 )
 ```
+or more involved with ordinal mutual information
+```python
+import delaynet as dn
+
+# Calculate transfer entropy
+result = dn.connectivity(
+    ts1,
+    ts2,
+    metric="mutual_information",
+    approach='ordinal',
+    lag_steps=5,
+    te_kwargs={
+        'embedding_dim': 3
+    }
+)
+```
 
 Parameters:
 - `approach`: The approach to use for estimating mutual information.

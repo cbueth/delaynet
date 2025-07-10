@@ -13,7 +13,25 @@ Transfer Entropy (TE) measures the amount of directed transfer of information be
 import delaynet as dn
 
 # Calculate transfer entropy
-result = dn.connectivity(ts1, ts2, metric="transfer_entropy", approach="discrete")
+result = dn.connectivity(
+    ts1, ts2, metric="transfer_entropy", approach="discrete", lag_steps=5
+)
+```
+or more involved with ordinal transfer entropy
+```python
+import delaynet as dn
+
+# Calculate transfer entropy
+result = dn.connectivity(
+    ts1,
+    ts2,
+    metric="transfer_entropy",
+    approach='ordinal',
+    lag_steps=5,
+    te_kwargs={
+        'embedding_dim': 3
+    }
+)
 ```
 
 Parameters:

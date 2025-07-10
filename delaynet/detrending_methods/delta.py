@@ -1,6 +1,6 @@
 """Delta detrending."""
 
-from numpy import copy, ravel, size, mean
+from numpy import copy, size, mean, integer
 
 from ..decorators import detrending_method
 
@@ -17,11 +17,16 @@ def delta(ts, window_size: int = 10):
 
     :param ts: Time series to detrend.
     :type ts: numpy.ndarray
-    :param window_size: Window size to use for calculating the mean.
+    :param window_size: Window size to use for calculating the mean. Must be a positive integer.
     :type window_size: int
     :return: Detrended time series.
     :rtype: numpy.ndarray
+    :raises ValueError: If the window_size is not a positive integer.
     """
+    # Validate window_size
+    if not isinstance(window_size, (int, integer)) or window_size <= 0:
+        raise ValueError(f"window_size must be a positive integer, not {window_size}.")
+
     ts2 = copy(ts)
     for k in range(size(ts)):
         off1 = k - window_size

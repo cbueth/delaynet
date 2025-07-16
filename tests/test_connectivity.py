@@ -1,8 +1,10 @@
 """Tests for the connectivity function."""
 
 import pytest
+import io
+import sys
 from numpy import corrcoef
-from delaynet.connectivity import connectivity
+from delaynet.connectivity import connectivity, show_connectivity_metrics
 
 
 def test_connectivity_with_string_metric(two_time_series):
@@ -79,3 +81,26 @@ def test_connectivity_ts_positional_only(two_time_series):
         TypeError, match="missing 2 required positional arguments: 'ts1' and 'ts2'"
     ):
         connectivity(metric="lc", ts1=ts1, ts2=ts2, lag_steps=5)
+
+
+def test_show_connectivity_metrics():
+    """Test the show_connectivity_metrics function."""
+    # Capture stdout
+    captured_output = io.StringIO()
+    sys.stdout = captured_output
+
+    # Call the function
+    show_connectivity_metrics()
+
+    # Restore stdout
+    sys.stdout = sys.__stdout__
+
+    # Check the output
+    output = captured_output.getvalue()
+    assert "Available connectivity metrics:" in output
+    assert "Metric:" in output
+    assert "Aliases:" in output
+
+    # Check for some common metrics
+    assert "linear_correlation" in output or "lc" in output
+    assert "mutual_information" in output or "mi" in output

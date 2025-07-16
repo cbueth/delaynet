@@ -33,3 +33,14 @@ def test_mutual_information(approach, mi_kwargs):
     # Assert that the function returns expected format
     assert isinstance(result, tuple), "Result should be a tuple"
     assert len(result) == 2, "Result should contain two elements"
+
+
+def test_mutual_information_missing_approach():
+    """Test mutual information with missing approach."""
+    with pytest.raises(ValueError, match="The approach parameter must be given."):
+        connectivity(
+            np.ones(40),
+            np.ones(40),
+            metric="mutual_information",
+            lag_steps=2,
+        )

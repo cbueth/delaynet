@@ -253,7 +253,7 @@ def __initial_ts(
     noise: float,
     coupling_matrix: ndarray[float],
     rng: Generator,
-):
+):  # pragma: no cover
     """
     Generate initial time series.
 
@@ -317,7 +317,7 @@ def __initial_ts_var_num_nodes(
     noise: float,
     coupling_matrix: ndarray[float],
     rng: Generator,
-):
+):  # pragma: no cover
     """
     Generate initial time series for multiple nodes.
     :param ts_len: Length of time series.

@@ -1,14 +1,15 @@
 """Tests for the continuous ordinal patterns connectivity measure."""
 
-import numba
 import pytest
-from numpy import array, allclose, linspace
+from numpy import array, allclose, linspace, random, roll
 
+from delaynet import connectivity
 from delaynet.connectivities.continuous_ordinal_patterns import (
     norm_window,
     norm_windows,
     pattern_distance,
     pattern_transform,
+    random_patterns,
 )
 
 
@@ -120,3 +121,37 @@ def test_pattern_distance(windows, pattern, expected):
 def test_pattern_transform(ts, patterns, expected):
     """Test the transformation of time series using patterns."""
     assert allclose(pattern_transform(array(ts), array(patterns)), array(expected))
+
+def test_random_patterns_too_large():
+    """Test Pattern size + lag-steps larger than the time series length"""
+    with pytest.raises(ValueError, match="Pattern size \+ lag-steps"):
+        random_patterns(array([1, 2, 3]), array([1, 2, 3]), lag_steps=10)
+
+
+@pytest.mark.parametrize("p_size,num_rnd_patterns", [(5, 3), (2, 10)])
+@pytest.mark.parametrize("linear", [True, False])
+def test_random_patterns(p_size, num_rnd_patterns, linear):
+    # Generate some test time series data
+    random.seed(24567)
+    ts1 = random.normal(0, 1, size=100)
+    ts2 = roll(ts1, 2) + random.normal(0, 0.1, size=100)  # Create causally related series
+
+    # Test the connectivity with default parameters
+    result = connectivity(
+        ts1,
+        ts2,
+        metric="random_patterns",
+        lag_steps=5,
+        p_size=p_size,
+        num_rnd_patterns=num_rnd_patterns,
+        linear=linear,
+    )
+
+    # Assert that the function returns expected format
+    assert isinstance(result, tuple), "Result should be a tuple"
+    assert len(result) == 2, "Result should contain two elements"
+
+    # Test with expected value
+    # The lag should be 2 since we created ts2 by rolling ts1 by 2
+    p_value, lag = result
+    assert lag == 2, f"Expected lag to be 2, got {lag}"

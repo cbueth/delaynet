@@ -34,7 +34,7 @@ def random_patterns(
     """
     if p_size + max(lag_steps) - 1 > ts1.shape[0]:
         raise ValueError(
-            "Pattern size + max-lag-step cannot be larger than the time series length."
+            "Pattern size + lag-steps cannot be larger than the time series length."
         )
 
     if linear:

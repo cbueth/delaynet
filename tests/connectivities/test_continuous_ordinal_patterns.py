@@ -124,7 +124,7 @@ def test_pattern_transform(ts, patterns, expected):
 
 def test_random_patterns_too_large():
     """Test Pattern size + lag-steps larger than the time series length"""
-    with pytest.raises(ValueError, match="Pattern size \+ lag-steps"):
+    with pytest.raises(ValueError, match=r"Pattern size \+ lag-steps"):
         random_patterns(array([1, 2, 3]), array([1, 2, 3]), lag_steps=10)
 
 

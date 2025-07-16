@@ -3,11 +3,13 @@
 This module provides functionality to reconstruct networks from time series data
 by applying connectivity measures to pairs of time series.
 """
+from time import time
+from sys import stdout
 
 import numpy as np
 from numpy import ndarray
 from concurrent.futures import ProcessPoolExecutor
-from multiprocessing import shared_memory
+from multiprocessing import shared_memory, Manager
 
 from .connectivity import connectivity, Metric
 
@@ -130,9 +132,13 @@ def reconstruct_network(
     # Set diagonal elements to p=1.0 (no significant self-connection)
     np.fill_diagonal(weight_matrix, 1.0)
 
+    total_pairs = n_nodes * (n_nodes - 1)  # Total number of pairs to process
+    start_time = time()
+
     # Compute connectivity for all pairs
     if workers is None or workers == 1:
-        # Sequential execution (current implementation)
+        # Sequential execution
+        pairs_processed = 0
         for i in range(n_nodes):
             for j in range(n_nodes):
                 if i != j:  # Skip self-connections - perfect correlation (p=0) at lag 0
@@ -147,6 +153,10 @@ def reconstruct_network(
                     # Connectivity measure returns (p_value, lag)
                     weight_matrix[i, j] = result[0]
                     lag_matrix[i, j] = result[1]
+                    pairs_processed += 1
+                    print_progress(pairs_processed, total_pairs, start_time,
+                                 prefix='Sequential: ')
+        print()  # New line after completion
     else:
         # Parallel execution using shared memory
         # Create shared memory once
@@ -157,35 +167,98 @@ def reconstruct_network(
         shared_array[:] = time_series[:]  # Copy data to shared memory once
 
         try:
-            # Prepare jobs: only pass indices and shared memory info
-            jobs = []
-            for i in range(n_nodes):
-                for j in range(n_nodes):
-                    if i != j:
-                        jobs.append(
-                            (
-                                i,
-                                j,
-                                shm.name,
-                                time_series.shape,
-                                time_series.dtype,
-                                connectivity_measure,
-                                lag_steps,
-                                kwargs,
-                            )
-                        )
+            # Create a shared counter and lock for progress tracking
+            with Manager() as manager:
+                counter = manager.Value('i', 0)
+                lock = manager.Lock()
 
-            # Execute in parallel
-            with ProcessPoolExecutor(max_workers=workers) as executor:
-                results = executor.map(_compute_pair_connectivity_shared, jobs)
+                # Prepare jobs: only pass indices and shared memory info
+                jobs = []
+                for i in range(n_nodes):
+                    for j in range(n_nodes):
+                        if i != j:
+                            jobs.append((
+                                i, j, shm.name, time_series.shape, time_series.dtype,
+                                connectivity_measure, lag_steps, kwargs,
+                            ))
 
-            # Populate matrices from results
-            for i, j, weight, lag in results:
-                weight_matrix[i, j] = weight
-                lag_matrix[i, j] = lag
+                # Execute in parallel with progress tracking
+                results_list = []
+                with ProcessPoolExecutor(max_workers=workers) as executor:
+                    futures = [
+                        executor.submit(
+                            _compute_with_progress,
+                            job,
+                            counter,
+                            lock,
+                            total_pairs,
+                            start_time
+                        ) for job in jobs
+                    ]
+
+                    for future in futures:
+                        result = future.result()
+                        results_list.append(result)
+
+                print()  # New line after completion
+
+                # Populate matrices from results
+                for i, j, weight, lag in results_list:
+                    weight_matrix[i, j] = weight
+                    lag_matrix[i, j] = lag
 
         finally:
             shm.close()
             shm.unlink()  # Clean up shared memory
 
     return weight_matrix, lag_matrix
+
+def format_time(seconds):
+    """Format time in appropriate units (seconds, minutes, hours)."""
+    if seconds < 60:
+        return f"{seconds:.1f}s"
+    elif seconds < 3600:
+        minutes = seconds / 60
+        return f"{minutes:.1f}m"
+    else:
+        hours = seconds / 3600
+        return f"{hours:.1f}h"
+
+def print_progress(current, total, start_time, prefix=''):
+    """Print progress bar with percentage, counts, and estimated time remaining."""
+    progress = current / total
+    bar_length = 30
+    filled_length = int(bar_length * progress)
+    bar = '#' * filled_length + '-' * (bar_length - filled_length)
+
+    # Calculate elapsed time and estimate remaining time
+    elapsed = time() - start_time
+
+    # Show elapsed time when at 100%, otherwise show ETA
+    if current >= total:
+        time_str = f"Time: {format_time(elapsed)}"
+    elif progress > 0:
+        eta = elapsed * (total / current - 1)
+        time_str = f"ETA: {format_time(eta)}"
+    else:
+        time_str = "ETA: ..."
+
+    # Create the progress line with both percentage and counts
+    percent = progress * 100
+    line = f'\r{prefix}[{bar}] {current}/{total} ({percent:.1f}%) {time_str}'
+    stdout.write(line)
+    stdout.flush()
+
+def update_progress(counter, total, start_time, prefix):
+    """Update progress from worker processes"""
+    print_progress(counter.value, total, start_time, prefix)
+    stdout.flush()
+
+def _compute_with_progress(job, counter, lock, total_pairs, start_time):
+    """Wrapper function to compute connectivity and update progress."""
+    result = _compute_pair_connectivity_shared(job)
+    with lock:
+        counter.value += 1
+        # Only update progress inside the lock to prevent race conditions
+        print_progress(counter.value, total_pairs, start_time, 'Parallel:   ')
+    return result

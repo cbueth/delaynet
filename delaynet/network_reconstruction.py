@@ -9,7 +9,7 @@ from sys import stdout
 import numpy as np
 from numpy import ndarray
 from concurrent.futures import ProcessPoolExecutor
-from multiprocessing import shared_memory, Manager
+from multiprocessing import shared_memory, Manager, get_context
 
 from .connectivity import connectivity, Metric
 
@@ -184,7 +184,9 @@ def reconstruct_network(
 
                 # Execute in parallel with progress tracking
                 results_list = []
-                with ProcessPoolExecutor(max_workers=workers) as executor:
+                # Use 'spawn' start method to avoid fork() warnings in multi-threaded processes
+                mp_context = get_context('spawn')
+                with ProcessPoolExecutor(max_workers=workers, mp_context=mp_context) as executor:
                     futures = [
                         executor.submit(
                             _compute_with_progress,

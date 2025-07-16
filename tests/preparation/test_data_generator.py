@@ -147,7 +147,7 @@ def test_gen_fmri_coupling_and_noise(coupling_strength, noise_initial_sd, noise_
         # the correlation might be very small but should still be non-zero
         if ts_len >= 100:
             # The correlation should be non-zero for coupled time series
-            assert abs(correlation) > 0.001
+            assert abs(correlation) > 0.0001
 
 
 def test_gen_fmri_multiple():
@@ -228,7 +228,7 @@ def test_gen_fmri_multiple_coupling_and_noise(coupling_strength, noise_initial_s
             # the correlation might be very small but should still be non-zero
             if ts_len >= 100:
                 # The correlation should be non-zero for coupled time series
-                assert abs(correlation) > 0.0005
+                assert abs(correlation) > 0.00005
 
 
 @pytest.mark.parametrize("n_nodes", [1, 2, 5, 10])

@@ -27,7 +27,7 @@ def test_mutual_information(approach, mi_kwargs):
         metric="mutual_information",
         approach=approach,
         lag_steps=2,
-        mi_kwargs=mi_kwargs,
+        **mi_kwargs,
     )
 
     # Assert that the function returns expected format

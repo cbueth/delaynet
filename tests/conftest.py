@@ -18,8 +18,8 @@ CONN_METRICS = {
 CONN_METRICS["mutual_information"]["additional_kwargs"] = [
     {"approach": "discrete"},
     {"approach": "metric"},
-    {"approach": "kernel", "mi_kwargs": {"bandwidth": 0.3, "kernel": "box"}},
-    {"approach": "renyi", "mi_kwargs": {"alpha": 1.0}},
+    {"approach": "kernel", "bandwidth": 0.3, "kernel": "box"},
+    {"approach": "renyi", "alpha": 1.0},
 ]
 CONN_METRICS["transfer_entropy"]["additional_kwargs"] = [
     {"approach": "discrete"},

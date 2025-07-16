@@ -17,7 +17,7 @@ def mutual_information(
     lag_steps: int | list = None,
     hypothesis_type: str = "permutation_test",
     n_tests: int = 20,
-    mi_kwargs=None,
+    **mi_kwargs,
 ):
     r"""Mutual Information (MI) connectivity metric.
 
@@ -42,7 +42,6 @@ def mutual_information(
                     test.
     :type n_tests: int
     :param mi_kwargs: Additional keyword arguments for the mutual information estimator.
-    :type mi_kwargs: dict
     :return: Best *p*-value and corresponding lag.
     :rtype: tuple[float, int]
     :raises ValueError: If ``approach`` is not given.
@@ -56,9 +55,6 @@ def mutual_information(
             "See `infomeasure.mutual_information` for available approaches. \n"
             f"help(infomeasure.mutual_information):\n{im_mi.__doc__}"
         )
-
-    if mi_kwargs is None:
-        mi_kwargs = {}
 
     def mi_p_value(x, y, lag, **kwargs):
         est = estimator(

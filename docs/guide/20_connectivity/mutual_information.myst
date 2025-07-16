@@ -28,9 +28,7 @@ result = dn.connectivity(
     metric="mutual_information",
     approach='ordinal',
     lag_steps=5,
-    te_kwargs={
-        'embedding_dim': 3
-    }
+    embedding_dim=3
 )
 ```
 
@@ -40,7 +38,7 @@ Parameters:
 - `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
 - `hypothesis_type`: Type of hypothesis test to use ('permutation_test' or 'bootstrap'). Default is 'permutation_test'.
 - `n_tests`: Number of iterations or resamples to perform within the hypothesis test. Default is 20.
-- `mi_kwargs`: Additional keyword arguments for the mutual information estimator.
+- Additional keyword arguments are passed directly to the mutual information estimator.
 
 ```{eval-rst}
 .. automethod:: delaynet.connectivities.mutual_information

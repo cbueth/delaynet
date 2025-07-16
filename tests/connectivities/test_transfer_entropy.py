@@ -27,7 +27,7 @@ def test_transfer_entropy(approach, te_kwargs):
         metric="transfer_entropy",
         approach=approach,
         lag_steps=2,
-        te_kwargs=te_kwargs,
+        **te_kwargs,
     )
 
     # Assert that the function returns expected format

@@ -3,6 +3,7 @@
 This module provides functionality to reconstruct networks from time series data
 by applying connectivity measures to pairs of time series.
 """
+
 from os import environ
 from time import time
 from sys import stdout
@@ -157,8 +158,13 @@ def reconstruct_network(
                     weight_matrix[i, j] = result[0]
                     lag_matrix[i, j] = result[1]
                     pairs_processed += 1
-                    print_progress(pairs_processed, total_pairs, start_time,
-                                 prefix='Sequential: ', sphinx_mode=is_sphinx)
+                    print_progress(
+                        pairs_processed,
+                        total_pairs,
+                        start_time,
+                        prefix="Sequential: ",
+                        sphinx_mode=is_sphinx,
+                    )
     else:
         # Parallel execution using shared memory
         # Create shared memory once
@@ -171,7 +177,7 @@ def reconstruct_network(
         try:
             # Create a shared counter and lock for progress tracking
             with Manager() as manager:
-                counter = manager.Value('i', 0)
+                counter = manager.Value("i", 0)
                 lock = manager.Lock()
 
                 # Prepare jobs: only pass indices and shared memory info
@@ -179,16 +185,26 @@ def reconstruct_network(
                 for i in range(n_nodes):
                     for j in range(n_nodes):
                         if i != j:
-                            jobs.append((
-                                i, j, shm.name, time_series.shape, time_series.dtype,
-                                connectivity_measure, lag_steps, kwargs,
-                            ))
+                            jobs.append(
+                                (
+                                    i,
+                                    j,
+                                    shm.name,
+                                    time_series.shape,
+                                    time_series.dtype,
+                                    connectivity_measure,
+                                    lag_steps,
+                                    kwargs,
+                                )
+                            )
 
                 # Execute in parallel with progress tracking
                 results_list = []
                 # Use 'spawn' start method to avoid fork() warnings in multi-threaded processes
-                mp_context = get_context('spawn')
-                with ProcessPoolExecutor(max_workers=workers, mp_context=mp_context) as executor:
+                mp_context = get_context("spawn")
+                with ProcessPoolExecutor(
+                    max_workers=workers, mp_context=mp_context
+                ) as executor:
                     futures = [
                         executor.submit(
                             _compute_with_progress,
@@ -197,8 +213,9 @@ def reconstruct_network(
                             lock,
                             total_pairs,
                             start_time,
-                            sphinx_mode=is_sphinx
-                        ) for job in jobs
+                            sphinx_mode=is_sphinx,
+                        )
+                        for job in jobs
                     ]
 
                     for future in futures:
@@ -220,6 +237,7 @@ def reconstruct_network(
 
     return weight_matrix, lag_matrix
 
+
 def format_time(seconds):
     """Format time in appropriate units (seconds, minutes, hours)."""
     if seconds < 60:
@@ -235,9 +253,10 @@ def format_time(seconds):
 def is_sphinx_build():
     """Check if the code is running in a Sphinx build environment."""
     # Check for SPHINX_MYST_NB_BUILD and read the docs variables
-    return environ.get('SPHINX_MYST_NB_BUILD') == '1' or 'READTHEDOCS' in environ
+    return environ.get("SPHINX_MYST_NB_BUILD") == "1" or "READTHEDOCS" in environ
 
-def print_progress(current, total, start_time, prefix='', sphinx_mode=None):
+
+def print_progress(current, total, start_time, prefix="", sphinx_mode=None):
     """Print progress bar with percentage, counts, and estimated time remaining.
 
     :param current: Current progress value
@@ -258,7 +277,7 @@ def print_progress(current, total, start_time, prefix='', sphinx_mode=None):
     progress = current / total
     bar_length = 30
     filled_length = int(bar_length * progress)
-    bar = '#' * filled_length + '-' * (bar_length - filled_length)
+    bar = "#" * filled_length + "-" * (bar_length - filled_length)
 
     # Calculate elapsed time and estimate remaining time
     elapsed = time() - start_time
@@ -276,7 +295,7 @@ def print_progress(current, total, start_time, prefix='', sphinx_mode=None):
     percent = progress * 100
 
     # Always use carriage return for terminal-friendly output
-    line = f'\r{prefix}[{bar}] {current}/{total} ({percent:.1f}%) {time_str}'
+    line = f"\r{prefix}[{bar}] {current}/{total} ({percent:.1f}%) {time_str}"
 
     stdout.write(line)
     stdout.flush()
@@ -294,7 +313,10 @@ def update_progress(counter, total, start_time, prefix, sphinx_mode=None):
     print_progress(counter.value, total, start_time, prefix, sphinx_mode)
     stdout.flush()
 
-def _compute_with_progress(job, counter, lock, total_pairs, start_time, sphinx_mode=None):
+
+def _compute_with_progress(
+    job, counter, lock, total_pairs, start_time, sphinx_mode=None
+):
     """Wrapper function to compute connectivity and update progress.
 
     :param job: Job parameters for connectivity computation
@@ -309,5 +331,7 @@ def _compute_with_progress(job, counter, lock, total_pairs, start_time, sphinx_m
     with lock:
         counter.value += 1
         # Only update progress inside the lock to prevent race conditions
-        print_progress(counter.value, total_pairs, start_time, 'Parallel:   ', sphinx_mode)
+        print_progress(
+            counter.value, total_pairs, start_time, "Parallel:   ", sphinx_mode
+        )
     return result

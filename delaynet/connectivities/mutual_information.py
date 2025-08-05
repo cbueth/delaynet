@@ -1,6 +1,5 @@
 """Mutual information (MI) connectivity metric."""
 
-from PIL.ImageChops import offset
 from infomeasure import estimator
 
 from ..decorators import connectivity

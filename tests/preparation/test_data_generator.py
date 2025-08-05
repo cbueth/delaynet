@@ -113,8 +113,12 @@ def test_gen_fmri_parameters(ts_len, downsampling_factor, time_resolution):
     assert ts.shape[1] == 2
 
     # Check that the length is reasonable
-    expected_min_length = (ts_len + int(30 / time_resolution) - 10) // downsampling_factor
-    expected_max_length = (ts_len + int(30 / time_resolution) + 10) // downsampling_factor
+    expected_min_length = (
+        ts_len + int(30 / time_resolution) - 10
+    ) // downsampling_factor
+    expected_max_length = (
+        ts_len + int(30 / time_resolution) + 10
+    ) // downsampling_factor
 
     assert expected_min_length <= ts.shape[0] <= expected_max_length
     assert not np.isnan(ts).any()  # No NaN values
@@ -124,7 +128,9 @@ def test_gen_fmri_parameters(ts_len, downsampling_factor, time_resolution):
 @pytest.mark.parametrize("coupling_strength", [0.0, 1.0, 2.0, 5.0])
 @pytest.mark.parametrize("noise_initial_sd", [0.1, 1.0, 2.0])
 @pytest.mark.parametrize("noise_final_sd", [0.01, 0.1, 0.5])
-def test_gen_fmri_coupling_and_noise(coupling_strength, noise_initial_sd, noise_final_sd):
+def test_gen_fmri_coupling_and_noise(
+    coupling_strength, noise_initial_sd, noise_final_sd
+):
     """Test gen_fmri with different coupling and noise parameters."""
     ts_len = 100  # Shorter length for faster tests
 
@@ -191,8 +197,12 @@ def test_gen_fmri_multiple_parameters(ts_len, n_nodes, downsampling_factor):
 
     # Check that the length is reasonable
     time_resolution = 0.2  # Default value
-    expected_min_length = (ts_len + int(30 / time_resolution) - 10) // downsampling_factor
-    expected_max_length = (ts_len + int(30 / time_resolution) + 10) // downsampling_factor
+    expected_min_length = (
+        ts_len + int(30 / time_resolution) - 10
+    ) // downsampling_factor
+    expected_max_length = (
+        ts_len + int(30 / time_resolution) + 10
+    ) // downsampling_factor
 
     assert expected_min_length <= ts.shape[1] <= expected_max_length
     assert not np.isnan(ts).any()  # No NaN values
@@ -202,7 +212,9 @@ def test_gen_fmri_multiple_parameters(ts_len, n_nodes, downsampling_factor):
 @pytest.mark.parametrize("coupling_strength", [0.0, 1.0, 2.0, 5.0])
 @pytest.mark.parametrize("noise_initial_sd", [0.1, 1.0, 2.0])
 @pytest.mark.parametrize("noise_final_sd", [0.01, 0.1, 0.5])
-def test_gen_fmri_multiple_coupling_and_noise(coupling_strength, noise_initial_sd, noise_final_sd):
+def test_gen_fmri_multiple_coupling_and_noise(
+    coupling_strength, noise_initial_sd, noise_final_sd
+):
     """Test gen_fmri_multiple with different coupling and noise parameters."""
     ts_len = 100  # Shorter length for faster tests
     n_nodes = 3
@@ -312,7 +324,9 @@ def test_hrf_indirectly(time_resolution):
     assert ts.shape[1] == 2
 
     # Check that the length is reasonable
-    expected_min_length = (ts_len + int(30 / time_resolution) - 10) // 2  # Default downsampling_factor is 2
+    expected_min_length = (
+        ts_len + int(30 / time_resolution) - 10
+    ) // 2  # Default downsampling_factor is 2
     expected_max_length = (ts_len + int(30 / time_resolution) + 10) // 2
 
     assert expected_min_length <= ts.shape[0] <= expected_max_length

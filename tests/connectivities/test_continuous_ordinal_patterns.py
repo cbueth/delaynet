@@ -122,6 +122,7 @@ def test_pattern_transform(ts, patterns, expected):
     """Test the transformation of time series using patterns."""
     assert allclose(pattern_transform(array(ts), array(patterns)), array(expected))
 
+
 def test_random_patterns_too_large():
     """Test Pattern size + lag-steps larger than the time series length"""
     with pytest.raises(ValueError, match=r"Pattern size \+ lag-steps"):
@@ -134,7 +135,9 @@ def test_random_patterns(p_size, num_rnd_patterns, linear):
     # Generate some test time series data
     random.seed(24567)
     ts1 = random.normal(0, 1, size=100)
-    ts2 = roll(ts1, 2) + random.normal(0, 0.1, size=100)  # Create causally related series
+    ts2 = roll(ts1, 2) + random.normal(
+        0, 0.1, size=100
+    )  # Create causally related series
 
     # Test the connectivity with default parameters
     result = connectivity(

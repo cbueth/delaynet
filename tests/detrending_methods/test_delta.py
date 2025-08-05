@@ -58,13 +58,15 @@ def test_window_larger_than_series():
     # So each point is compared with all points from 0 to the end of the array
 
     # Calculate expected result manually
-    expected = array([
-        ts[0] - mean(ts[0:10]),  # ts[0:5] in practice
-        ts[1] - mean(ts[0:11]),  # ts[0:5] in practice
-        ts[2] - mean(ts[0:12]),  # ts[0:5] in practice
-        ts[3] - mean(ts[0:13]),  # ts[0:5] in practice
-        ts[4] - mean(ts[0:14]),  # ts[0:5] in practice
-    ])
+    expected = array(
+        [
+            ts[0] - mean(ts[0:10]),  # ts[0:5] in practice
+            ts[1] - mean(ts[0:11]),  # ts[0:5] in practice
+            ts[2] - mean(ts[0:12]),  # ts[0:5] in practice
+            ts[3] - mean(ts[0:13]),  # ts[0:5] in practice
+            ts[4] - mean(ts[0:14]),  # ts[0:5] in practice
+        ]
+    )
 
     assert_allclose(result, expected)
 
@@ -77,7 +79,7 @@ def test_delta_with_trend():
 
     # Add small noise
     rng = default_rng(12345)
-    ts += rng.normal(0., 0.1, ts_length)
+    ts += rng.normal(0.0, 0.1, ts_length)
 
     # Apply Delta detrending with different window sizes
     for window_size in [5, 10, 20]:
@@ -103,7 +105,7 @@ def test_delta_with_seasonal_data():
 
     # Add small noise
     rng = default_rng(67890)
-    ts += rng.normal(0., 0.1, ts_length)
+    ts += rng.normal(0.0, 0.1, ts_length)
 
     # Apply Delta detrending with window size equal to seasonal period
     ts_detrended = detrend(ts, method="delta", window_size=seasonal_period)

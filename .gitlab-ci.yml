@@ -1,5 +1,5 @@
 variables:
-  UV_VERSION: "0.5"
+  UV_VERSION: "0.8.4"
   PYTHON_VERSION: "3.13"
   BASE_LAYER: bookworm-slim
   # GitLab CI creates a separate mountpoint for the build directory,
@@ -27,7 +27,9 @@ stages:
 .pythonVersions:
   parallel:
     matrix:
-      - PY_VERSION: [ "3.13", "3.12", "3.11", "3.10" ]
+      - PY_VERSION: [ "3.14", "3.13", "3.12", "3.11" ]
+        allow_failure:
+          - PY_VERSION: "3.14"
   maxVersion:
     matrix:
       - PY_VERSION: [ "3.13" ]

@@ -5,22 +5,38 @@ kernelspec:
 ---
 
 (network_analysis)=
+
 # Network Analysis
 
-Network analysis involves studying the structural properties of networks to understand their organization, robustness, and function. This analysis can reveal important features such as centrality of nodes, network efficiency, and connection patterns. The `delaynet` package provides a set of tools for analyzing reconstructed networks, including functions for pruning networks and calculating various network metrics.
+Network analysis involves studying the structural properties of networks to understand
+their organization, robustness, and function. This analysis can reveal important
+features such as centrality of nodes, network efficiency, and connection patterns. The
+`delaynet` package provides a set of tools for analyzing reconstructed networks,
+including functions for pruning networks and calculating various network metrics.
 
-This guide demonstrates how to use the network analysis functionality in `delaynet` to extract meaningful insights from reconstructed networks.
+This guide demonstrates how to use the network analysis functionality in `delaynet` to
+extract meaningful insights from reconstructed networks.
 
 ## Network Pruning
 
-Network pruning is the process of simplifying a complex network by removing weak or insignificant connections. This is an important step in network analysis as it helps to focus on the most important relationships and reduce noise. This can also support science communication by highlighting the most important relationships in a network.
+Network pruning is the process of simplifying a complex network by removing weak or
+insignificant connections. This is an important step in network analysis as it helps to
+focus on the most important relationships and reduce noise. This can also support
+science communication by highlighting the most important relationships in a network.
 
-As described in the {ref}`network_reconstruction` section, the weight matrix in network reconstruction represents a matrix of $p$-values, where lower values indicate stronger connections. Network pruning methods typically remove connections with $p$-values above a certain threshold, retaining only the strongest and most significant connections.
+As described in the {ref}`network_reconstruction` section, the weight matrix in network
+reconstruction represents a matrix of $p$-values, where lower values indicate stronger
+connections. Network pruning methods typically remove connections with $p$-values above
+a certain threshold, retaining only the strongest and most significant connections.
 
 ### Statistical Pruning
 
-The `delaynet` package provides the {func}`~delaynet.network_analysis.pruning.statistical_pruning` function for pruning networks based on statistical significance. This function takes a matrix of $p$-values and returns a boolean mask indicating which connections are statistically significant.
-For this example, we are using the same network as from the previous page, but with an added node with random data.
+The `delaynet` package provides the {func}
+`~delaynet.network_analysis.pruning.statistical_pruning` function for pruning networks
+based on statistical significance. This function takes a matrix of $p$-values and
+returns a boolean mask indicating which connections are statistically significant.
+For this example, we are using the same network as from the previous page, but with an
+added node with random data.
 
 ```{code-cell}
 import numpy as np
@@ -69,7 +85,8 @@ plt.tight_layout()
 plt.show()
 ```
 
-Lower p-values (darker colors) indicate stronger connections between nodes. To focus on the most significant connections, we can apply statistical pruning:
+Lower p-values (darker colors) indicate stronger connections between nodes. To focus on
+the most significant connections, we can apply statistical pruning:
 
 ```{code-cell}
 # Apply statistical pruning with a significance level of 0.05
@@ -82,9 +99,8 @@ print(f"Shape of pruned matrix: {significant_connections.shape}")
 print(f"Number of significant connections: {np.sum(significant_connections)}")
 ```
 
-
-
-The pruning function returns a boolean mask where `True` indicates a significant connection. We can visualize this pruned network:
+The pruning function returns a boolean mask where `True` indicates a significant
+connection. We can visualize this pruned network:
 
 ```{code-cell}
 :tags: [hide-input]
@@ -96,7 +112,6 @@ ax.set_ylabel('Source Node')
 plt.tight_layout()
 plt.show()
 ```
-
 
 ```{admonition} Multiple Comparison Correction
 :class: note
@@ -117,23 +132,33 @@ Additional available methods include:
 Choose the appropriate correction method based on your specific requirements, the characteristics of your data, and whether your tests can be assumed to be independent.
 ```
 
-
-
 ## Network Metrics
 
-Once we have a pruned network, we can calculate various metrics to analyze its properties. The {mod}`delaynet.network_analysis` module provides several functions for calculating network metrics.
-Before diving into the calculation of network metrics, it's important to understand what each metric represents and how it can be interpreted in the context of transportation networks.
+Once we have a pruned network, we can calculate various metrics to analyze its
+properties. The {mod}`delaynet.network_analysis` module provides several functions for
+calculating network metrics.
+Before diving into the calculation of network metrics, it's important to understand what
+each metric represents and how it can be interpreted in the context of transportation
+networks.
 
 ### Link Density
 
-{func}`~delaynet.network_analysis.metrics.link_density` quantifies how densely connected a network is by calculating the proportion of actual connections relative to the maximum possible connections.
+{func}`~delaynet.network_analysis.metrics.link_density` quantifies how densely connected
+a network is by calculating the proportion of actual connections relative to the maximum
+possible connections.
 For a network with $n$ nodes, link density is calculated as:
+
 - Directed networks: $\text{density} = \frac{E}{n(n-1)}$
 - Undirected networks: $\text{density} = \frac{2E}{n(n-1)}$
 
 where $E$ is the number of edges (connections) in the network.
-Values range from 0 (no connections) to 1 (fully connected) where higher values indicate more densely connected networks.
-In transportation networks, higher density often suggests more redundant pathways and _potentially_ more resilience to disruptions.
+Values range from 0 (no connections) to 1 (fully connected) where higher values indicate
+more densely connected networks.
+In transportation networks, higher density often suggests more redundant pathways and
+_potentially_ more resilience to disruptions.
+As we measure delay propagation, this "efficiency" is regarding delays propagating.
+A transport network resilient to delay propagation must be characterised by a lower
+global efficiency for the delay propagation network.
 
 ```{code-cell}
 # Convert boolean mask to binary adjacency matrix
@@ -146,10 +171,16 @@ print(f"Link density: {density:.4f}")
 
 ### Isolated Nodes
 
-These metrics identify nodes that are disconnected from the rest of the network in terms of incoming or outgoing connections.
-Nodes with no incoming connections {func}`~delaynet.network_analysis.metrics.isolated_nodes_inbound` don't receive delays from other nodes.
-Nodes with no outgoing connections {func}`~delaynet.network_analysis.metrics.isolated_nodes_outbound` don't propagate delays to other nodes.
-In transportation networks, isolated nodes may represent stations or airports that operate independently of the broader network.
+These metrics identify nodes that are disconnected from the rest of the network in terms
+of incoming or outgoing connections.
+Nodes with no incoming connections {func}
+`~delaynet.network_analysis.metrics.isolated_nodes_inbound` don't receive delays from
+other nodes.
+Nodes with no outgoing connections {func}
+`~delaynet.network_analysis.metrics.isolated_nodes_outbound` don't propagate delays to
+other nodes.
+In transportation networks, isolated nodes may represent stations or airports that
+operate independently of the broader network.
 
 ```{code-cell}
 # Find isolated nodes
@@ -166,18 +197,27 @@ Centrality measures help identify the most important or influential nodes in a n
 
 #### Betweenness Centrality
 
-{func}`~delaynet.network_analysis.metrics.betweenness_centrality` is a prominent measure of centrality which tries to measure the importance of a node or edge in a network by counting the number of shortest paths that lead through it {cite:p}`brandesVariantsShortestpathBetweenness2008`.
+{func}`~delaynet.network_analysis.metrics.betweenness_centrality` is a prominent measure
+of centrality which tries to measure the importance of a node or edge in a network by
+counting the number of shortest paths that lead through it {cite:p}
+`brandesVariantsShortestpathBetweenness2008`.
 Nodes with high betweenness centrality act as bridges or bottlenecks in the network.
 These nodes control information flow between different parts of the network.
-In transportation networks, high betweenness nodes are critical junctions where many routes pass through.
+In transportation networks, high betweenness nodes are critical junctions where many
+routes pass through.
 Disruptions at these nodes can have widespread effects throughout the network.
+For delay networks, high betweenness nodes can be nodes that hand through delays.
 
 #### Eigenvector Centrality
 
-{func}`~delaynet.network_analysis.metrics.eigenvector_centrality` measures a node's influence based on the principle that connections to high-scoring nodes contribute more to the score than connections to low-scoring nodes.
+{func}`~delaynet.network_analysis.metrics.eigenvector_centrality` measures a node's
+influence based on the principle that connections to high-scoring nodes contribute more
+to the score than connections to low-scoring nodes.
 Nodes with high eigenvector centrality are connected to other important nodes.
-This metric captures the concept that "importance" is recursive - a node is important if it's connected to other important nodes.
-In transportation networks, high eigenvector centrality may identify hubs that connect to other major hubs.
+This metric captures the concept that "importance" is recursive - a node is important if
+it's connected to other important nodes.
+In transportation networks, high eigenvector centrality may identify hubs that connect
+to other major hubs.
 
 ```{code-cell}
 # Calculate betweenness centrality
@@ -215,10 +255,16 @@ plt.show()
 
 ### Global Efficiency
 
-{func}`~delaynet.network_analysis.metrics.global_efficiency` quantifies how efficiently information can flow through the network, calculated as the average of the inverse shortest path lengths between all pairs of nodes {cite:p}`latoraEfficientBehaviorSmallWorld2001`.
-Values range from 0 (completely disconnected) to 1 (perfectly efficient), where higher values indicate more efficient networks with shorter paths between nodes.
-In transportation networks, higher efficiency suggests better connectivity and potentially faster travel times.
-Networks with high global efficiency are often more resilient to random failures but may be vulnerable to targeted attacks on high-centrality nodes.
+{func}`~delaynet.network_analysis.metrics.global_efficiency` quantifies how efficiently
+information can flow through the network, calculated as the average of the inverse
+shortest path lengths between all pairs of nodes {cite:p}
+`latoraEfficientBehaviorSmallWorld2001`.
+Values range from 0 (completely disconnected) to 1 (perfectly efficient), where higher
+values indicate more efficient networks with shorter paths between nodes.
+In transportation networks, higher efficiency suggests better connectivity and
+potentially faster travel times.
+Networks with high global efficiency are often more resilient to random failures but may
+be vulnerable to targeted attacks on high-centrality nodes.
 
 ```{code-cell}
 # Calculate global efficiency
@@ -228,12 +274,20 @@ print(f"Global efficiency: {efficiency:.4f}")
 
 ### Transitivity (Clustering Coefficient)
 
-{func}`~delaynet.network_analysis.metrics.transitivity` measures the tendency of the network to form clusters, calculated as the fraction of all possible triangles present in the graph.
-Values range from 0 (no clustering) to 1 (fully clustered), where higher values indicate more clustering, where neighbors of a node tend to be connected to each other.
-In transportation networks, high transitivity may indicate regional clusters with good local connectivity.
-Networks with high transitivity often have redundant paths within clusters but may have bottlenecks between clusters.
+{func}`~delaynet.network_analysis.metrics.transitivity` measures the tendency of the
+network to form clusters, calculated as the fraction of all possible triangles present
+in the graph.
+Values range from 0 (no clustering) to 1 (fully clustered), where higher values indicate
+more clustering, where neighbors of a node tend to be connected to each other.
+In transportation networks, high transitivity may indicate regional clusters with good
+local connectivity.
+Networks with high transitivity often have redundant paths within clusters but may have
+bottlenecks between clusters.
 
-Note that transitivity is defined for undirected graphs. For directed networks, the direction of edges is ignored when calculating transitivity, as the concept of triangles is defined for undirected graphs. For directed networks, consider using reciprocity (see below) to measure the tendency of vertex pairs to form mutual connections.
+Note that transitivity is defined for undirected graphs. For directed networks, the
+direction of edges is ignored when calculating transitivity, as the concept of triangles
+is defined for undirected graphs. For directed networks, consider using reciprocity (see
+below) to measure the tendency of vertex pairs to form mutual connections.
 
 ```{code-cell}
 # Calculate transitivity
@@ -243,15 +297,21 @@ print(f"Transitivity: {trans:.4f}")
 
 ### Reciprocity
 
-{func}`~delaynet.network_analysis.metrics.reciprocity` measures the tendency of vertex pairs to form mutual connections in a directed network. It is defined as the fraction of edges that are reciprocated.
+{func}`~delaynet.network_analysis.metrics.reciprocity` measures the tendency of vertex
+pairs to form mutual connections in a directed network. It is defined as the fraction of
+edges that are reciprocated.
 
 Formally, the reciprocity is calculated as:
 
 $$R = \frac{1}{m} \sum_{i,j} A_{i,j} A_{j,i} = \frac{1}{m} \mathrm{Tr} \, A^2$$
 
-where $m$ is the number of edges and $A$ is the adjacency matrix of the graph. Note that $A_{i,j} A_{j,i} = 1$ if and only if $i$ links to $j$ and vice versa.
-Values range from 0 (no reciprocated edges) to 1 (all edges are reciprocated). In transportation networks, high reciprocity may indicate bidirectional routes or mutual dependencies between locations.
-Reciprocity is only defined for directed networks. For undirected networks, all connections are reciprocal by definition.
+where $m$ is the number of edges and $A$ is the adjacency matrix of the graph. Note
+that $A_{i,j} A_{j,i} = 1$ if and only if $i$ links to $j$ and vice versa.
+Values range from 0 (no reciprocated edges) to 1 (all edges are reciprocated). In
+transportation networks, high reciprocity may indicate bidirectional routes or mutual
+dependencies between locations.
+Reciprocity is only defined for directed networks. For undirected networks, all
+connections are reciprocal by definition.
 
 ```{code-cell}
 # Calculate reciprocity (only for directed networks)
@@ -311,20 +371,49 @@ When working with p-values from network reconstruction, you may want to transfor
 
 ## Understanding Network Analysis Results
 
-The metrics used in transportation network analysis provide valuable insights into network structure, efficiency, and vulnerability. Understanding how to interpret these results is crucial for making informed decisions about network management and development.
+The metrics used in transportation network analysis provide valuable insights into
+network structure, efficiency, and vulnerability. Understanding how to interpret these
+results is crucial for making informed decisions about network management and
+development.
 
-In transportation networks, critical nodes are points whose disruption would significantly impact overall network performance. These can be identified in several ways. Nodes with high betweenness centrality typically represent critical junctions or transfer points, such as major train stations, airport hubs, or highway intersections. These are locations where many shortest paths converge. Similarly, nodes with high eigenvector centrality are usually well-connected to other important nodes, often forming major hubs that connect to other hubs and create the backbone of the network. Additionally, nodes that would significantly decrease global efficiency if removed are considered critical for maintaining efficient operations across the network.
+In transportation networks, critical nodes are points whose disruption would
+significantly impact overall network performance. These can be identified in several
+ways. Nodes with high betweenness centrality typically represent critical junctions or
+transfer points, such as major train stations, airport hubs, or highway intersections.
+These are locations where many shortest paths converge. Similarly, nodes with high
+eigenvector centrality are usually well-connected to other important nodes, often
+forming major hubs that connect to other hubs and create the backbone of the network.
+Additionally, nodes that would significantly decrease global efficiency if removed are
+considered critical for maintaining efficient operations across the network.
 
-Network resilience, which describes a network's ability to maintain functionality during disruptions, can be assessed through several characteristics. A high link density typically suggests the presence of redundant pathways, offering alternative routes when disruptions occur. High transitivity or clustering indicates good local connectivity, which helps contain the impact of disruptions within specific regions. However, it's important to maintain a balance between efficiency and redundancy, as highly efficient networks with minimal redundancy may become vulnerable to targeted disruptions.
+Network resilience, which describes a network's ability to maintain functionality during
+disruptions, can be assessed through several characteristics. A high link density
+typically suggests the presence of redundant pathways, offering alternative routes when
+disruptions occur. High transitivity or clustering indicates good local connectivity,
+which helps contain the impact of disruptions within specific regions. However, it's
+important to maintain a balance between efficiency and redundancy, as highly efficient
+networks with minimal redundancy may become vulnerable to targeted disruptions.
 
-Communities within transportation networks typically manifest as regional clusters with strong internal connectivity. These can be identified through various indicators. Areas showing high transitivity often represent community structures where nodes are densely connected within groups. Between these communities, bottlenecks can be identified by nodes with high betweenness centrality that serve as connections between different clusters. While not directly implemented in delaynet, community detection algorithms available in libraries like NetworkX or igraph can formally identify these structures.
+Communities within transportation networks typically manifest as regional clusters with
+strong internal connectivity. These can be identified through various indicators. Areas
+showing high transitivity often represent community structures where nodes are densely
+connected within groups. Between these communities, bottlenecks can be identified by
+nodes with high betweenness centrality that serve as connections between different
+clusters. While not directly implemented in delaynet, community detection algorithms
+available in libraries like NetworkX or igraph can formally identify these structures.
 
-When examining how networks evolve over time or comparing different networks, several patterns may emerge. Changes in centrality measures often indicate shifting importance of different nodes within the network. An increase in global efficiency might point to infrastructure improvements or optimization efforts. Meanwhile, changes in transitivity could suggest evolving community structures or regional development patterns. These temporal comparisons provide valuable insights into network evolution and development trends.
-
+When examining how networks evolve over time or comparing different networks, several
+patterns may emerge. Changes in centrality measures often indicate shifting importance
+of different nodes within the network. An increase in global efficiency might point to
+infrastructure improvements or optimization efforts. Meanwhile, changes in transitivity
+could suggest evolving community structures or regional development patterns. These
+temporal comparisons provide valuable insights into network evolution and development
+trends.
 
 ## Comparing Networks
 
-Network metrics can be used to compare different networks or the same network under different conditions:
+Network metrics can be used to compare different networks or the same network under
+different conditions:
 
 ```{code-cell}
 # Generate a random network with the same number of nodes and edges

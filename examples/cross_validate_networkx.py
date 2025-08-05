@@ -224,7 +224,7 @@ def benchmark_single_metric(
 
 def main():
     """Main function to run cross-validation and benchmarking."""
-    print("=== Delaynet vs NetworkX Cross-validation and Benchmarking ===")
+    print("=== `delaynet` vs NetworkX Cross-validation and Benchmarking ===")
 
     # Cross-validate with a small network
     print("\nCross-validating with a small network...")
@@ -313,7 +313,7 @@ def main():
     print("\n=== Summary ===")
     for metric_name, results in all_results.items():
         print(f"\n{metric_name}:")
-        print("Network Size | Delaynet Time (s) | NetworkX Time (s) | Speedup")
+        print("Network Size | delaynet Time (s) | NetworkX Time (s) | Speedup")
         print("---------------------------------------------------------------")
         for result in results:
             print(

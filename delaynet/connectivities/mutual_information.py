@@ -19,8 +19,8 @@ def mutual_information(
     n_tests: int = 20,
     **mi_kwargs,
 ):
-    r"""Mutual Information (MI) connectivity metric.
-
+    r"""Mutual Information (MI) connectivity metric
+    :cite:p:`buthInfomeasureComprehensivePython2025`.
 
     :param ts1: First time series.
     :type ts1: numpy.ndarray

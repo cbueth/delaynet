@@ -12,7 +12,7 @@ religion, or nationality.
 
 Examples of unacceptable behaviour by participants include:
 
-* The use of sexualized language or imagery
+* The use of sexualised language or imagery
 * Personal attacks
 * Trolling or insulting/derogatory comments
 * Public or private harassment

@@ -19,7 +19,8 @@ def transfer_entropy(
     **te_kwargs,
 ):
     r"""
-    Transfer Entropy (TE) connectivity metric.
+    Transfer Entropy (TE) connectivity metric
+    :cite:p:`schreiberMeasuringInformationTransfer2000,buthInfomeasureComprehensivePython2025`.
 
     :param ts1: First time series.
     :type ts1: numpy.ndarray

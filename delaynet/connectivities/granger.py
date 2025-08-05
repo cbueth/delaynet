@@ -7,7 +7,7 @@ The Granger causality test operates on a simple and intuitive assumption:
 if element B is causing element A,
 then the past of B should contain information that aids in predicting the future of A.
 In other words, B has a role in shaping the future of A.
-:cite:p:`grangerInvestigatingCausalRelations1969,dieboldElementsForecasting1997`
+:cite:p:`grangerInvestigatingCausalRelations1969,dieboldElementsForecasting1997,kirchgassnerIntroductionModernTime2013`
 
 Since its inception, the Granger causality test has found wide-ranging applications
 in various fields such as economics, engineering, sociology, biology, and neuroscience.

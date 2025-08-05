@@ -18,7 +18,9 @@ def test_transfer_entropy(approach, te_kwargs):
     # Generate some test time series data
     np.random.seed(24567)
     ts1 = np.random.normal(0, 1, size=100)
-    ts2 = np.roll(ts1, 2) + np.random.normal(0, 0.1, size=100)  # Create causally related series
+    ts2 = np.roll(ts1, 2) + np.random.normal(
+        0, 0.1, size=100
+    )  # Create causally related series
 
     # Test the connectivity with specified parameters
     result = connectivity(

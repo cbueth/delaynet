@@ -34,13 +34,21 @@ pip install delaynet  # or `micromamba install delaynet` when on conda-forge
 
 ## Development Setup
 
-For development, we recommend using `micromamba` to create a virtual
-environment and installing the package in editable mode.
+For development, we recommend using [`uv`](https://docs.astral.sh/uv/)  or `micromamba`
+to create a virtual environment.
 After cloning the repository, navigate to the root folder and
-create the environment with the wished python version and the dependencies.
+create the environment.
+When using `uv`, the environment can be created with the following command:
 
 ```bash
-micromamba create -n delay_net -c conda-forge python
+uv sync
+```
+
+Or, if you prefer to use `micromamba`,
+with the wished python version and the dependencies.
+
+```bash
+micromamba create -n delay_net -c conda-forge -f requirements.txt
 micromamba activate delay_net
 ```
 

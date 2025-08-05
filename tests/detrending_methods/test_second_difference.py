@@ -45,25 +45,25 @@ def test_second_difference_with_polynomial():
     x = arange(100, dtype=float)
 
     # Linear trend: f(x) = 2x + 3
-    linear = 2*x + 3
+    linear = 2 * x + 3
     linear_detrended = detrend(linear, method="second_difference")
     # Second difference of linear should be zeros
-    assert_allclose(linear_detrended, zeros(len(linear)-2), atol=1e-10)
+    assert_allclose(linear_detrended, zeros(len(linear) - 2), atol=1e-10)
 
     # Quadratic trend: f(x) = x^2 + 2x + 3
-    quadratic = x**2 + 2*x + 3
+    quadratic = x**2 + 2 * x + 3
     quadratic_detrended = detrend(quadratic, method="second_difference")
     # Second difference of quadratic should be constant (2)
-    assert_allclose(quadratic_detrended, 2*ones(len(quadratic)-2), atol=1e-10)
+    assert_allclose(quadratic_detrended, 2 * ones(len(quadratic) - 2), atol=1e-10)
 
     # Cubic trend: f(x) = x^3 + x^2 + 2x + 3
-    cubic = x**3 + x**2 + 2*x + 3
+    cubic = x**3 + x**2 + 2 * x + 3
     cubic_detrended = detrend(cubic, method="second_difference")
 
     # Based on the observed pattern in the actual output, the second difference
     # of the cubic function appears to increase by 6 for each step, starting at 8
     # This suggests the formula: 6*arange(len(cubic)-2) + 8
-    expected = 6*arange(len(cubic)-2) + 8
+    expected = 6 * arange(len(cubic) - 2) + 8
     assert_allclose(cubic_detrended, expected, atol=1e-10)
 
 
@@ -76,7 +76,7 @@ def test_second_difference_with_noise():
 
     # Add noise
     rng = default_rng(54321)
-    noise = rng.normal(0., 10.0, ts_length)
+    noise = rng.normal(0.0, 10.0, ts_length)
     ts += noise
 
     # Apply Second Difference detrending

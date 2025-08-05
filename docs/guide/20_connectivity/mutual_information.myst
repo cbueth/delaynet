@@ -5,9 +5,11 @@ kernelspec:
 ---
 
 (mutual_information)=
+
 # Mutual Information
 
-Mutual Information (MI) measures the amount of information obtained about one random variable through observing another random variable.
+Mutual Information (MI) measures the amount of information obtained about one random
+variable through observing another random variable.
 
 ```python
 import delaynet as dn
@@ -17,7 +19,9 @@ result = dn.connectivity(
     ts1, ts2, metric="mutual_information", approach="kernel", lag_steps=5
 )
 ```
+
 or more involved with ordinal mutual information
+
 ```python
 import delaynet as dn
 
@@ -33,11 +37,15 @@ result = dn.connectivity(
 ```
 
 Parameters:
+
 - `approach`: The approach to use for estimating mutual information.
   For available approaches, find the string in {func}`infomeasure.mutual_information`.
-- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
-- `hypothesis_type`: Type of hypothesis test to use ('permutation_test' or 'bootstrap'). Default is 'permutation_test'.
-- `n_tests`: Number of iterations or resamples to perform within the hypothesis test. Default is 20.
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps].
+  Passing a list will consider the specified values as lags.
+- `hypothesis_type`: Type of hypothesis test to use ('permutation_test' or 'bootstrap').
+  Default is 'permutation_test'.
+- `n_tests`: Number of iterations or resamples to perform within the hypothesis test.
+  Default is 20.
 - Additional keyword arguments are passed directly to the mutual information estimator.
 
 ```{eval-rst}

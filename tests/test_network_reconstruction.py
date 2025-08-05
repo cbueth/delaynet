@@ -25,7 +25,7 @@ from delaynet.network_reconstruction import (
     reconstruct_network,
     format_time,
     print_progress,
-    update_progress
+    update_progress,
 )
 
 
@@ -562,16 +562,18 @@ def test_print_progress_sphinx_mode(monkeypatch):
     print_progress(50, 100, start_time, prefix="Test: ", sphinx_mode=True)
 
     # Verify that stdout.write was not called due to early return
-    assert not write_called[0], "stdout.write should not be called when sphinx_mode=True and current < total"
+    assert not write_called[
+        0
+    ], "stdout.write should not be called when sphinx_mode=True and current < total"
 
     # Test with sphinx_mode=True and current == total
     write_called[0] = False
     print_progress(100, 100, start_time, prefix="Test: ", sphinx_mode=True)
 
     # Verify that stdout.write was called
-    assert write_called[0], "stdout.write should be called when sphinx_mode=True and current == total"
-
-
+    assert write_called[
+        0
+    ], "stdout.write should be called when sphinx_mode=True and current == total"
 
 
 def test_reconstruct_network_sphinx_mode(monkeypatch, two_time_series):
@@ -590,7 +592,9 @@ def test_reconstruct_network_sphinx_mode(monkeypatch, two_time_series):
     monkeypatch.setattr("sys.stdout.flush", lambda: None)
 
     # Test with Sphinx mode disabled
-    monkeypatch.setattr("delaynet.network_reconstruction.is_sphinx_build", lambda: False)
+    monkeypatch.setattr(
+        "delaynet.network_reconstruction.is_sphinx_build", lambda: False
+    )
 
     ts1, ts2 = two_time_series
     time_series = column_stack([ts1, ts2])
@@ -630,7 +634,9 @@ def test_update_progress(monkeypatch):
     def mock_flush():
         pass
 
-    monkeypatch.setattr("delaynet.network_reconstruction.print_progress", mock_print_progress)
+    monkeypatch.setattr(
+        "delaynet.network_reconstruction.print_progress", mock_print_progress
+    )
     monkeypatch.setattr("sys.stdout.flush", mock_flush)
 
     # Create a mock counter

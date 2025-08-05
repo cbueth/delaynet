@@ -7,8 +7,11 @@ from delaynet.utils.lag_steps import Connectivity, find_optimal_lag
 
 def test_connectivity_protocol():
     """Test the Connectivity protocol by creating a function that adheres to it."""
+
     # Define a function that follows the Connectivity protocol
-    def example_connectivity(ts1: np.ndarray, ts2: np.ndarray, lag: int, *args, **kwargs) -> float:
+    def example_connectivity(
+        ts1: np.ndarray, ts2: np.ndarray, lag: int, *args, **kwargs
+    ) -> float:
         """Example connectivity function that follows the protocol."""
         return float(lag)  # Just return the lag as a float for testing
 
@@ -17,10 +20,7 @@ def test_connectivity_protocol():
 
     # Use the function through the protocol
     result = connectivity_func(
-        np.array([1, 2, 3]),
-        np.array([4, 5, 6]),
-        2,
-        extra_arg="test"
+        np.array([1, 2, 3]), np.array([4, 5, 6]), 2, extra_arg="test"
     )
 
     # Verify the result
@@ -35,8 +35,11 @@ def test_connectivity_protocol_with_find_optimal_lag():
     in the find_optimal_lag function, which directly uses the __call__
     method of the protocol.
     """
+
     # Define a function that follows the Connectivity protocol
-    def example_connectivity(ts1: np.ndarray, ts2: np.ndarray, lag: int, *args, **kwargs) -> float:
+    def example_connectivity(
+        ts1: np.ndarray, ts2: np.ndarray, lag: int, *args, **kwargs
+    ) -> float:
         """Example connectivity function that follows the protocol."""
         # Use the lag parameter to determine the return value
         if lag == 3:
@@ -56,18 +59,16 @@ def test_connectivity_protocol_with_find_optimal_lag():
     assert lag == 3
 
     # Test with additional kwargs
-    def example_connectivity_with_kwargs(ts1: np.ndarray, ts2: np.ndarray, lag: int, **kwargs) -> float:
+    def example_connectivity_with_kwargs(
+        ts1: np.ndarray, ts2: np.ndarray, lag: int, **kwargs
+    ) -> float:
         """Example connectivity function that uses kwargs."""
-        multiplier = kwargs.get('multiplier', 1)
+        multiplier = kwargs.get("multiplier", 1)
         return lag * multiplier
 
     # Use find_optimal_lag with kwargs
     value, lag = find_optimal_lag(
-        example_connectivity_with_kwargs, 
-        ts1, 
-        ts2, 
-        lag_steps, 
-        multiplier=0.1
+        example_connectivity_with_kwargs, ts1, ts2, lag_steps, multiplier=0.1
     )
 
     # Verify that kwargs were properly passed through the protocol

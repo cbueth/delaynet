@@ -120,7 +120,7 @@ class TestBetweennessCentrality:
         # Return a value that will definitely be normalized
         mock_result = [3.0, 0.0, 0.0, 0.0]  # Center node has betweenness of 3.0
 
-        with patch('igraph.Graph.betweenness', return_value=mock_result):
+        with patch("igraph.Graph.betweenness", return_value=mock_result):
             # This should trigger the normalization code where max_betweenness > 0
             centrality = betweenness_centrality(weights, directed=True, normalize=True)
 
@@ -148,7 +148,7 @@ class TestBetweennessCentrality:
         mock_graph.betweenness.return_value = [3.0, 0.0, 0.0, 0.0]
 
         # Mock the Graph.Weighted_Adjacency constructor to return our mock graph
-        with patch('igraph.Graph.Weighted_Adjacency', return_value=mock_graph):
+        with patch("igraph.Graph.Weighted_Adjacency", return_value=mock_graph):
             # Test with normalize=True to trigger the normalization code
             centrality = betweenness_centrality(weights, directed=True, normalize=True)
 
@@ -156,7 +156,9 @@ class TestBetweennessCentrality:
             assert centrality[0] == pytest.approx(0.5)
 
             # Test with normalize=False to skip the normalization code
-            centrality_unnorm = betweenness_centrality(weights, directed=True, normalize=False)
+            centrality_unnorm = betweenness_centrality(
+                weights, directed=True, normalize=False
+            )
 
             # Verify the result is not normalized
             assert centrality_unnorm[0] == pytest.approx(3.0)
@@ -178,10 +180,13 @@ class TestBetweennessCentrality:
 
         # Create a mock for the Graph class
         mock_graph = MagicMock()
-        mock_graph.betweenness.return_value = [0.0, 0.0]  # Both nodes have 0 betweenness
+        mock_graph.betweenness.return_value = [
+            0.0,
+            0.0,
+        ]  # Both nodes have 0 betweenness
 
         # Mock the Graph.Weighted_Adjacency constructor to return our mock graph
-        with patch('igraph.Graph.Weighted_Adjacency', return_value=mock_graph):
+        with patch("igraph.Graph.Weighted_Adjacency", return_value=mock_graph):
             # Test with normalize=True, but max_betweenness will be 0
             centrality = betweenness_centrality(weights, directed=False, normalize=True)
 
@@ -208,7 +213,7 @@ class TestBetweennessCentrality:
         mock_graph.betweenness.return_value = [3.0, 0.0, 0.0, 0.0]
 
         # Mock the Graph.Weighted_Adjacency constructor to return our mock graph
-        with patch('igraph.Graph.Weighted_Adjacency', return_value=mock_graph):
+        with patch("igraph.Graph.Weighted_Adjacency", return_value=mock_graph):
             # Test with normalize=True to trigger the normalization code
             centrality = betweenness_centrality(weights, directed=True, normalize=True)
 
@@ -217,7 +222,9 @@ class TestBetweennessCentrality:
             assert centrality[0] == pytest.approx(0.5)
 
             # Test with normalize=False to skip the normalization code
-            centrality_unnorm = betweenness_centrality(weights, directed=True, normalize=False)
+            centrality_unnorm = betweenness_centrality(
+                weights, directed=True, normalize=False
+            )
 
             # Verify the result is not normalized
             assert centrality_unnorm[0] == pytest.approx(3.0)
@@ -377,10 +384,13 @@ class TestGlobalEfficiency:
 
         # Create a mock for the Graph class
         mock_graph = MagicMock()
-        mock_graph.distances.return_value = [[float('inf'), float('inf')], [float('inf'), float('inf')]]
+        mock_graph.distances.return_value = [
+            [float("inf"), float("inf")],
+            [float("inf"), float("inf")],
+        ]
 
         # Mock the Graph.Weighted_Adjacency constructor to return our mock graph
-        with patch('igraph.Graph.Weighted_Adjacency', return_value=mock_graph):
+        with patch("igraph.Graph.Weighted_Adjacency", return_value=mock_graph):
             # Also patch the loop that increments pair_count to ensure it's 0
             original_range = range
 
@@ -390,7 +400,7 @@ class TestGlobalEfficiency:
                     return []
                 return original_range(*args, **kwargs)
 
-            with patch('builtins.range', side_effect=mock_range):
+            with patch("builtins.range", side_effect=mock_range):
                 efficiency = global_efficiency(weights)
                 assert efficiency == 0.0
 
@@ -497,7 +507,7 @@ class TestTransitivity:
         weights = np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]])
 
         # Mock the igraph.Graph.transitivity_undirected method to return NaN
-        with patch('igraph.Graph.transitivity_undirected', return_value=float('nan')):
+        with patch("igraph.Graph.transitivity_undirected", return_value=float("nan")):
             trans = transitivity(weights)
             assert trans == 0.0
 
@@ -576,7 +586,7 @@ class TestReciprocity:
                 return False
             return True
 
-        with patch('delaynet.network_analysis.metrics.np_all', side_effect=mock_np_all):
+        with patch("delaynet.network_analysis.metrics.np_all", side_effect=mock_np_all):
             recip = reciprocity(weights)
             assert recip == 0.0
 
@@ -592,7 +602,7 @@ class TestReciprocity:
         weights = np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]])
 
         # Mock the igraph.Graph.reciprocity method to return NaN
-        with patch('igraph.Graph.reciprocity', return_value=float('nan')):
+        with patch("igraph.Graph.reciprocity", return_value=float("nan")):
             recip = reciprocity(weights)
             assert recip == 0.0
 
@@ -692,15 +702,19 @@ class TestEigenvectorCentrality:
         # Create a custom norm function that returns a fixed value for our mock result
         def custom_norm(x, *args, **kwargs):
             # Check if this is our mock result array
-            if isinstance(x, np.ndarray) and x.shape == mock_result_array.shape and np.all(x == mock_result_array):
+            if (
+                isinstance(x, np.ndarray)
+                and x.shape == mock_result_array.shape
+                and np.all(x == mock_result_array)
+            ):
                 return np.sqrt(0.75)
             # For any other input, use the real norm function
             return original_norm(x, *args, **kwargs)
 
         # Mock the Graph.Weighted_Adjacency constructor to return our mock graph
-        with patch('igraph.Graph.Weighted_Adjacency', return_value=mock_graph):
+        with patch("igraph.Graph.Weighted_Adjacency", return_value=mock_graph):
             # Use our custom norm function
-            with patch('numpy.linalg.norm', side_effect=custom_norm):
+            with patch("numpy.linalg.norm", side_effect=custom_norm):
                 centrality = eigenvector_centrality(weights)
 
                 # The result should be normalized to unit length
@@ -733,7 +747,7 @@ class TestEigenvectorCentrality:
         mock_graph.eigenvector_centrality.return_value = mock_result_positive
 
         # Mock the Graph.Weighted_Adjacency constructor to return our mock graph
-        with patch('igraph.Graph.Weighted_Adjacency', return_value=mock_graph):
+        with patch("igraph.Graph.Weighted_Adjacency", return_value=mock_graph):
             # Test the positive norm case
             centrality_positive = eigenvector_centrality(weights)
 
@@ -745,7 +759,7 @@ class TestEigenvectorCentrality:
         mock_graph.eigenvector_centrality.return_value = mock_result_zero
 
         # Mock the Graph.Weighted_Adjacency constructor to return our mock graph
-        with patch('igraph.Graph.Weighted_Adjacency', return_value=mock_graph):
+        with patch("igraph.Graph.Weighted_Adjacency", return_value=mock_graph):
             # Test the zero norm case
             centrality_zero = eigenvector_centrality(weights)
 

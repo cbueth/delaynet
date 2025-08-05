@@ -60,6 +60,7 @@ def test_assure_lag_list_with_zero_in_list(caplog):
 
 def test_find_optimal_lag_with_min_operator():
     """Test find_optimal_lag with the min operator."""
+
     # Create a simple metric function that returns the lag value as the metric
     def metric_func(ts1, ts2, lag, **kwargs):
         return lag
@@ -76,6 +77,7 @@ def test_find_optimal_lag_with_min_operator():
 
 def test_find_optimal_lag_with_max_operator():
     """Test find_optimal_lag with the max operator."""
+
     # Create a simple metric function that returns the lag value as the metric
     def metric_func(ts1, ts2, lag, **kwargs):
         return lag
@@ -92,6 +94,7 @@ def test_find_optimal_lag_with_max_operator():
 
 def test_find_optimal_lag_with_custom_operator():
     """Test find_optimal_lag with a custom operator."""
+
     # Create a simple metric function that returns the lag value as the metric
     def metric_func(ts1, ts2, lag, **kwargs):
         return lag
@@ -112,9 +115,10 @@ def test_find_optimal_lag_with_custom_operator():
 
 def test_find_optimal_lag_with_kwargs():
     """Test find_optimal_lag with additional keyword arguments."""
+
     # Create a metric function that uses additional kwargs
     def metric_func(ts1, ts2, lag, **kwargs):
-        multiplier = kwargs.get('multiplier', 1)
+        multiplier = kwargs.get("multiplier", 1)
         return lag * multiplier
 
     ts1 = np.array([1, 2, 3, 4, 5])
@@ -130,6 +134,7 @@ def test_find_optimal_lag_with_kwargs():
 
 def test_find_optimal_lag_with_custom_metric():
     """Test find_optimal_lag with a custom metric function."""
+
     # Create a custom metric function that returns a specific pattern
     def custom_metric(ts1, ts2, lag, **kwargs):
         # Return a pattern where lag=3 gives the minimum value

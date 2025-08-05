@@ -18,7 +18,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 from os import environ
-environ['SPHINX_MYST_NB_BUILD'] = '1'
+
+environ["SPHINX_MYST_NB_BUILD"] = "1"
 
 from datetime import datetime
 

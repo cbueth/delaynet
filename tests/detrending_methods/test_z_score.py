@@ -125,6 +125,7 @@ def test_periodicity_too_large(ts_len, period, raises):
     else:
         detrend(time_series, "z_score", periodicity=period)
 
+
 def test_z_score_with_periodicity():
     """Test Z-Score detrending with periodicity on a sawtooth wave."""
     # Create a sawtooth wave with period 24
@@ -133,7 +134,7 @@ def test_z_score_with_periodicity():
     ts = array(mod(arange(ts_length), periodicity), dtype=float)
     # Add small noise
     rng = default_rng(25689)
-    ts += rng.normal(0., 0.01, ts_length)
+    ts += rng.normal(0.0, 0.01, ts_length)
 
     # Apply Z-Score detrending with periodicity=24
     ts_detrended = detrend(ts, method="z_score", periodicity=periodicity)

@@ -44,7 +44,7 @@ Issues = "https://gitlab.ifisc.uib-csic.es/carlson/delaynet/issues"
 Changelog = "https://carlson.pages.ifisc.uib-csic.es/delaynet/changelog/"
 
 [project.optional-dependencies]
-lint = ["ruff"]
+lint = ["pre-commit", "ruff"]
 test = ["pytest", "pytest-cov", "coverage"]
 doc = [
     "sphinx",

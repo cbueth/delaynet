@@ -5,10 +5,13 @@ kernelspec:
 ---
 
 (connectivity_sec)=
+
 # Connectivity
 
-`delaynet` provides a variety of connectivity measures to analyze the relationships between time series.
-These measures can be used to detect causal relationships, correlations, and synchronization between different time series.
+`delaynet` provides a variety of connectivity measures to analyze the relationships
+between time series.
+These measures can be used to detect causal relationships, correlations, and
+synchronisation between different time series.
 
 To measure a significant correlation between two time series,
 each connectivity approach calculates a $p$-value.
@@ -19,12 +22,18 @@ A strong correlation results in a low $p$-value.
 One assumption is that the information propagation in the network can have varying
 delays between each node in the network.
 Due to this, the connectivity needs to be calculated for different delay steps.
-It is possible to either test for all delays up to a certain maximum delay,
+It is possible to either test for all delays up to a certain maximum delay
 or to test for specific delays.
 The best delay value and it's corresponding $p$-value are returned.
 
-To visualize this, we generate synthetic time series data using a {ref}`delayed causal network (DCN) <dcn_generation>` model. The data consists of 8 interconnected nodes with 1000 time points each, where causal relationships exist between different time series with varying delays. We extract two specific time series from this network and apply Granger causality to find the optimal lag that produces the strongest causal relationship. The algorithm tests all possible lags from 1 to 50 time steps and identifies the lag that yields the minimum p-value, indicating the most significant causal connection.
-
+To visualise this, we generate synthetic time series data using a {ref}
+`delayed causal network (DCN) <dcn_generation>` model. The data consists of eight
+interconnected nodes with 1000 time points each, where causal relationships exist
+between different time series with varying delays. We extract two specific time series
+from this network and apply Granger causality to find the optimal lag that produces the
+strongest causal relationship. The algorithm tests all possible lags from 1 to 50 time
+steps and identifies the lag that yields the minimum p-value, indicating the most
+significant causal connection.
 
 ```{code-cell}
 :tags: [hide-input]
@@ -33,8 +42,7 @@ from delaynet.connectivities.granger import gt_single_lag
 from numpy.random import default_rng
 from matplotlib import pyplot as plt
 
-_, _, time_series = dn.preparation.gen_data(
-    generation_method="dcn",    # Delayed causal network time series
+_, _, time_series = dn.preparation.gen_delayed_causal_network(
     ts_len=1000,                # Length of time series
     n_nodes=8,                  # Number of nodes
     l_dens=0.8,                 # Density of the adjacency matrix
@@ -71,7 +79,9 @@ plt.grid(True)
 plt.show()
 ```
 
-*How the best lag is determined using p-values:* The plot shows p-values calculated for each lag, with the minimum occurring around lag 7, after which the p-values increase. The algorithm selects this minimum as the best lag.
+*How the best lag is determined using p-values:* The plot shows p-values calculated for
+each lag, with the minimum occurring around lag 7, after which the p-values increase.
+The algorithm selects this minimum as the best lag.
 
 In one line:
 
@@ -81,20 +91,30 @@ dn.connectivity(ts1, ts2, "gc", lag_steps=max_lag)
 
 ## Using Connectivity Measures
 
-`delaynet` provides a unified interface for all connectivity measures through the {py:func}`~delaynet.connectivity.connectivity` function.
-A diverse set of connectivity metrics to analyze relationships between time series data are available. Each metric offers different approaches to detecting connections, from simple correlations to complex causality measures. You can refer to each method by its full name or by its shorthand:
+`delaynet` provides a unified interface for all connectivity measures through the {py:
+func}`~delaynet.connectivity.connectivity` function.
+A diverse set of connectivity metrics to analyze relationships between time series data
+are available. Each metric offers different approaches to detecting connections, from
+simple correlations to complex causality measures. You can refer to each method by its
+full name or by its shorthand:
 
-- {ref}`Granger Causality <granger_causality>`: Statistical concept of causality based on prediction
+- {ref}`Granger Causality <granger_causality>`: Statistical concept of causality based
+  on prediction
     * `gc`, `granger causality`, or `gt_multi_lag`
-- {ref}`Transfer Entropy <transfer_entropy>`: Measures the amount of directed transfer of information between two random processes
+- {ref}`Transfer Entropy <transfer_entropy>`: Measures the amount of directed transfer
+  of information between two random processes
     * `te`, `transfer entropy`, or `transfer_entropy`
-- {ref}`Mutual Information <mutual_information>`: Measures the amount of information obtained about one random variable through observing another
+- {ref}`Mutual Information <mutual_information>`: Measures the amount of information
+  obtained about one random variable through observing another
     * `mi`, `mutual information`, or `mutual_information`
-- {ref}`Linear Correlation <linear_correlation>`: Calculates the Pearson correlation coefficient between two time series
+- {ref}`Linear Correlation <linear_correlation>`: Calculates the Pearson correlation
+  coefficient between two time series
     * `lc`, `linear correlation`, or `linear_correlation`
-- {ref}`Rank Correlation <rank_correlation>`: Calculates the Spearman rank correlation between two time series
+- {ref}`Rank Correlation <rank_correlation>`: Calculates the Spearman rank correlation
+  between two time series
     * `rc`, `rank correlation`, or `rank_correlation`
-- {ref}`Continuous Ordinal Patterns <continuous_ordinal_patterns>`: Analyzes patterns in time series data to detect relationships
+- {ref}`Continuous Ordinal Patterns <continuous_ordinal_patterns>`: Analyzes patterns in
+  time series data to detect relationships
     * `cop`, `continuous ordinal patterns`, or `random_patterns`
 - {ref}`Gravity <gravity_sec>`: A toy metric for educational purposes
     * `gv`, or `gravity`
@@ -113,7 +133,8 @@ Now, `result` is a tuple of the best $p$-value and the corresponding delay step.
 For example, if `result` is `(0.05, 3)`, it means that the best $p$-value is 0.05
 and it occurs with a lag of 3 time steps.
 
-You can view all available connectivity measures using the {py:func}`~delaynet.connectivity.show_connectivity_metrics()` function:
+You can view all available connectivity measures using the {py:func}
+`~delaynet.connectivity.show_connectivity_metrics()` function:
 
 ```{code-cell}
 :tags: [hide-output]
@@ -123,7 +144,8 @@ from delaynet.connectivity import show_connectivity_metrics
 show_connectivity_metrics()
 ```
 
-Analysing the same time series data from the earlier example, switching between connectivity metrics is really simple:
+Analysing the same time series data from the earlier example, switching between
+connectivity metrics is really simple:
 
 ```{code-cell}
 max_lag = 40
@@ -136,7 +158,9 @@ dn.connectivity(ts1, ts2, "cop", lag_steps=max_lag),
 dn.connectivity(ts1, ts2, "gv", lag_steps=max_lag))
 ```
 
-For some connectivity measures the optimal lags agree with each other, but they generally vary, especially the _p_-values, as each of these approaches covers a different type of connectivity.
+For some connectivity measures the optimal lags agree with each other, but they
+generally vary, especially the _p_-values, as each of these approaches covers a
+different type of connectivity.
 
 For details about these connectivity methods, see the next subsections.
 

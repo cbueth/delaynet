@@ -46,8 +46,7 @@ import delaynet as dn
 from numpy.random import default_rng
 
 # Generate synthetic data
-adjacency_matrix, weight_matrix, time_series = dn.preparation.gen_data(
-    generation_method="dcn",    # Delayed causal network time series
+adjacency_matrix, weight_matrix, time_series = dn.preparation.gen_delayed_causal_network(
     ts_len=1000,                # Length of time series
     n_nodes=8,                  # Number of nodes
     l_dens=0.5,                 # Density of the adjacency matrix

@@ -1,5 +1,21 @@
-"""Generate example data for delaynet."""
+"""Generate example data for delaynet.
 
+This module provides functions to generate synthetic data for testing and
+demonstrating the delaynet package. It includes:
+
+1. Delayed causal network generation (gen_delayed_causal_network)
+2. fMRI-like time series generation (gen_fmri, gen_fmri_multiple)
+3. SynthATDelays-based transportation delay generation:
+   - Random connectivity scenario (gen_synthatdelays_random_connectivity)
+   - Independent operations with trends scenario (gen_synthatdelays_independent_operations_with_trends)
+
+The SynthATDelays generators create realistic transportation delay data based on
+simulated airport and flight operations, allowing for testing of delay propagation
+detection methods in controlled scenarios. These functions return a Results_Class
+object containing delay data matrices and statistics.
+"""
+
+import numpy as np
 from numpy import (
     zeros,
     ndarray,
@@ -16,47 +32,247 @@ from numpy.random import default_rng, Generator
 from scipy.stats import gamma
 from numba import jit
 
+# Try to import synthatdelays, but don't fail if it's not installed
+try:
+    import synthatdelays as satd
+    from synthatdelays.Scenarios import (
+        Scenario_RandomConnectivity,
+        Scenario_IndependentOperationsWithTrends,
+    )
+    from synthatdelays.Analysis import AnalyseResults
+    from synthatdelays.Classes import Results_Class, Options_Class
 
-def gen_data(
-    generation_method: str,
-    ts_len: int,
-    n_nodes: int = 1,
-    **kwargs,
-) -> ndarray | tuple[ndarray, ...]:
-    """Wrapper for the different data generation approaches.
+    SYNTHATDELAYS_AVAILABLE = True
+except ImportError:
+    SYNTHATDELAYS_AVAILABLE = False
 
-    Supported generation methods:
 
-    - 'dcn': Delayed causal network time series. :func:`gen_delayed_causal_network`
-    - 'fmri': fMRI time series. :func:`gen_fmri`
+    # Create placeholder classes for type hints
+    class Results_Class:
+        """Placeholder for synthatdelays.Classes.Results_Class when synthatdelays is not installed."""
 
-    :param generation_method: Type of time series to generate.
-    :type generation_method: str
-    :param ts_len: Length of time series.
-    :type ts_len: int
-    :param n_nodes: Number of nodes (i.e., time series). If not specified,
-                    defaults to 1.
-    :type n_nodes: int
-    :param kwargs: Additional arguments for the data generation functions.
-    :return: Time series, possibly with additional data.
-    :rtype: numpy.ndarray or tuple[ndarray, ...]
-    :raises ValueError: If the generation method is unknown.
+        pass
+
+
+    class Options_Class:
+        """Placeholder for synthatdelays.Classes.Options_Class when synthatdelays is not installed."""
+
+        pass
+
+
+def gen_synthatdelays_random_connectivity(
+        sim_time: int,
+        num_airports: int,
+        num_aircraft: int,
+        buffer_time: float,
+        seed: int = 0,
+) -> Results_Class:
+    """Generate delay data using SynthATDelays Random Connectivity scenario.
+
+    This scenario is composed of a set of airports, randomly connected by a set of
+    independent flights, and with random and homogeneous enroute delays.
+
+    :param sim_time: Simulation time in days.
+    :type sim_time: int
+    :param num_airports: Number of simulated airports.
+    :type num_airports: int
+    :param num_aircraft: Number of simulated aircraft.
+    :type num_aircraft: int
+    :param buffer_time: Buffer time between subsequent operations, in hours.
+    :type buffer_time: float
+    :param seed: Seed for random number generation.
+    :type seed: int
+    :param _testing: Internal parameter for testing, do not use.
+    :type _testing: bool
+    :return: Results object containing delay data and statistics.
+    :rtype: synthatdelays.Classes.Results_Class
+
+    The returned Results_Class object contains several attributes:
+
+    - avgArrivalDelay: Average arrival delay per airport and time window.
+      Shape: (num_windows, num_airports)
+    - avgDepartureDelay: Average departure delay per airport and time window.
+      Shape: (num_windows, num_airports)
+    - numArrivalFlights: Number of arrival flights per airport and time window.
+    - numDepartureFlights: Number of departure flights per airport and time window.
+    - totalArrivalDelay: Total arrival delay across all flights.
+    - totalDepartureDelay: Total departure delay across all flights.
+
+    Example usage:
+
+    >>> import numpy as np
+    >>> from delaynet.preparation.data_generator import gen_synthatdelays_random_connectivity
+    >>>
+    >>> # Generate delay data for 5 airports over 10 days
+    >>> results = gen_synthatdelays_random_connectivity(
+    ...     sim_time=10,
+    ...     num_airports=5,
+    ...     num_aircraft=10,
+    ...     buffer_time=0.8
+    ... )
+    >>>
+    >>> # Access the average arrival delay matrix
+    >>> arrival_delays = results.avgArrivalDelay
+    >>> arrival_delays.shape
+    (240, 5)  # 240 time windows (24 hours * 10 days), 5 airports
     """
-    if generation_method.lower() == "dcn":
-        return gen_delayed_causal_network(ts_len, n_nodes, **kwargs)
-    if generation_method.lower() == "fmri":
-        if n_nodes == 1:
-            return gen_fmri(ts_len, **kwargs)
-        return gen_fmri_multiple(ts_len, n_nodes, **kwargs)
-    raise ValueError(f"Unknown generation method: {generation_method}.")
+    # Validate inputs
+    if not isinstance(sim_time, (int, np.integer)) or sim_time < 1:
+        raise ValueError(f"sim_time must be a positive integer, but is {sim_time}.")
+
+    # Check if synthatdelays is available
+    if not SYNTHATDELAYS_AVAILABLE:
+        raise ImportError(
+            "The synthatdelays package is required for this function. "
+            "Please install it with: pip install synthatdelays"
+        )
+
+    try:
+        # Create the scenario with the specified parameters
+        options = satd.Scenario_RandomConnectivity(
+            numAirports=num_airports,
+            numAircraft=num_aircraft,
+            bufferTime=buffer_time,
+            seed=seed,
+        )
+
+        # Override simulation time with the requested value
+        options.simTime = sim_time
+
+        # Run the simulation
+        executed_flights = satd.ExecSimulation(options)
+        all_results = satd.AnalyseResults(executed_flights, options)
+
+        return all_results
+    except Exception as e:
+        raise RuntimeError(f"Error in SynthATDelays simulation: {str(e)}")
+
+
+def gen_synthatdelays_independent_operations_with_trends(
+        sim_time: int,
+        activate_trend: bool,
+        seed: int = 0,
+) -> Results_Class:
+    """Generate delay data using SynthATDelays Independent Operations with Trends scenario.
+
+    This scenario is composed of two groups of two airports. Flights connect airports within
+    the same group, but not across groups; hence, no propagations can happen between groups.
+    When trends are activated, delays are added at specific hours, generating spurious
+    causality relations.
+
+    :param sim_time: Simulation time in days.
+    :type sim_time: int
+    :param activate_trend: If true, delays are added at 12:00 and 14:00, generating spurious causalities.
+    :type activate_trend: bool
+    :param seed: Seed for random number generation.
+    :type seed: int
+    :param _testing: Internal parameter for testing, do not use.
+    :type _testing: bool
+    :return: Results object containing delay data and statistics.
+    :rtype: synthatdelays.Classes.Results_Class
+
+    The returned Results_Class object contains several attributes:
+
+    - avgArrivalDelay: Average arrival delay per airport and time window.
+      Shape: (num_windows, num_airports)
+    - avgDepartureDelay: Average departure delay per airport and time window.
+      Shape: (num_windows, num_airports)
+    - numArrivalFlights: Number of arrival flights per airport and time window.
+    - numDepartureFlights: Number of departure flights per airport and time window.
+    - totalArrivalDelay: Total arrival delay across all flights.
+    - totalDepartureDelay: Total departure delay across all flights.
+
+    Example usage:
+
+    >>> from delaynet.preparation.data_generator import gen_synthatdelays_independent_operations_with_trends
+    >>>
+    >>> # Generate delay data with trends activated
+    >>> results = gen_synthatdelays_independent_operations_with_trends(
+    ...     sim_time=10,
+    ...     activate_trend=True
+    ... )
+    >>>
+    >>> # Access the average departure delay matrix
+    >>> departure_delays = results.avgDepartureDelay
+    >>> departure_delays.shape
+    (240, 4)  # 240 time windows (24 hours * 10 days), 4 airports
+    """
+    # Validate inputs
+    if not isinstance(sim_time, (int, np.integer)) or sim_time < 1:
+        raise ValueError(f"sim_time must be a positive integer, but is {sim_time}.")
+    if not isinstance(activate_trend, bool):
+        raise ValueError(f"activate_trend must be a boolean, but is {activate_trend}.")
+
+    # Check if synthatdelays is available
+    if not SYNTHATDELAYS_AVAILABLE:
+        raise ImportError(
+            "The synthatdelays package is required for this function. "
+            "Please install it with: pip install synthatdelays"
+        )
+
+    try:
+        # Create the scenario with the specified parameters
+        options = satd.Scenario_IndependentOperationsWithTrends(
+            activateTrend=activate_trend, seed=seed
+        )
+
+        # Override simulation time with the requested value
+        options.simTime = sim_time
+
+        # Run the simulation
+        executed_flights = satd.ExecSimulation(options)
+        all_results = satd.AnalyseResults(executed_flights, options)
+
+        return all_results
+    except Exception as e:
+        raise RuntimeError(f"Error in SynthATDelays simulation: {str(e)}")
+
+
+def extract_airport_delay_time_series(
+        results: Results_Class,
+        delay_type: str = "arrival",
+) -> np.ndarray:
+    """Extract airport delay time series from SynthATDelays results.
+
+    :param results: Results object from SynthATDelays simulation.
+    :type results: synthatdelays.Classes.Results_Class
+    :param delay_type: Type of delay to extract ('arrival' or 'departure').
+    :type delay_type: str
+    :return: Delay time series for each airport.
+    :rtype: numpy.ndarray, shape = (num_time_windows, num_airports)
+    :raises ValueError: If delay_type is not 'arrival' or 'departure'.
+    :raises ImportError: If synthatdelays is not installed.
+
+    Example usage:
+
+    >>> results = gen_synthatdelays_random_connectivity(10, 5, 10, 0.8)
+    >>> arrival_delays = extract_airport_delay_time_series(results, "arrival")
+    >>> arrival_delays.shape
+    (240, 5)  # 240 time windows (24 hours * 10 days), 5 airports
+    """
+    # Check if synthatdelays is available
+    if not SYNTHATDELAYS_AVAILABLE:
+        raise ImportError(
+            "The synthatdelays package is required for this function. "
+            "Please install it with: pip install synthatdelays"
+        )
+
+    if delay_type.lower() == "arrival":
+        return results.avgArrivalDelay
+    elif delay_type.lower() == "departure":
+        return results.avgDepartureDelay
+    else:
+        raise ValueError(
+            f"Unknown delay type: {delay_type}. Use 'arrival' or 'departure'."
+        )
 
 
 def gen_delayed_causal_network(
-    ts_len: int,
-    n_nodes: int,
-    l_dens: float,
-    wm_min_max: tuple[float, float] = (0.5, 1.5),
-    rng=None,
+        ts_len: int,
+        n_nodes: int,
+        l_dens: float,
+        wm_min_max: tuple[float, float] = (0.5, 1.5),
+        rng=None,
 ) -> tuple[ndarray[bool], ndarray[float], ndarray[float]]:
     """
     Generate delayed causal network data for delaynet.
@@ -91,11 +307,11 @@ def gen_delayed_causal_network(
     if not isinstance(l_dens, (float, floating)) or not 0.0 <= l_dens <= 1.0:
         raise ValueError(f"l_dens must be a float in [0, 1], but is {l_dens}.")
     if not (
-        isinstance(wm_min_max, tuple)
-        and len(wm_min_max) == 2
-        and isinstance(wm_min_max[0], (float, floating))
-        and isinstance(wm_min_max[1], (float, floating))
-        and wm_min_max[0] <= wm_min_max[1]
+            isinstance(wm_min_max, tuple)
+            and len(wm_min_max) == 2
+            and isinstance(wm_min_max[0], (float, floating))
+            and isinstance(wm_min_max[1], (float, floating))
+            and wm_min_max[0] <= wm_min_max[1]
     ):
         raise ValueError(
             f"wm_min_max must be a tuple of floats with length 2 and "
@@ -132,13 +348,13 @@ def gen_delayed_causal_network(
 
 
 def gen_fmri(
-    ts_len: int = 1000,
-    downsampling_factor: int = 2,
-    time_resolution: float = 0.2,
-    coupling_strength: float = 2.0,
-    noise_initial_sd: float = 1.0,
-    noise_final_sd: float = 0.1,
-    rng=None,
+        ts_len: int = 1000,
+        downsampling_factor: int = 2,
+        time_resolution: float = 0.2,
+        coupling_strength: float = 2.0,
+        noise_initial_sd: float = 1.0,
+        noise_final_sd: float = 0.1,
+        rng=None,
 ):
     """
     Generate fMRI time series.
@@ -187,14 +403,14 @@ def gen_fmri(
 
 
 def gen_fmri_multiple(
-    ts_len: int = 1000,
-    n_nodes: int = 2,
-    downsampling_factor: int = 2,
-    time_resolution: float = 0.2,
-    coupling_strength: float = 2.0,
-    noise_initial_sd: float = 1.0,
-    noise_final_sd: float = 0.1,
-    rng=None,
+        ts_len: int = 1000,
+        n_nodes: int = 2,
+        downsampling_factor: int = 2,
+        time_resolution: float = 0.2,
+        coupling_strength: float = 2.0,
+        noise_initial_sd: float = 1.0,
+        noise_final_sd: float = 0.1,
+        rng=None,
 ):
     """
     Generate fMRI time series for multiple nodes.
@@ -249,10 +465,10 @@ def gen_fmri_multiple(
 
 @jit(cache=True, nopython=True, nogil=True)
 def __initial_ts(
-    ts_len: int,
-    noise: float,
-    coupling_matrix: ndarray[float],
-    rng: Generator,
+        ts_len: int,
+        noise: float,
+        coupling_matrix: ndarray[float],
+        rng: Generator,
 ):  # pragma: no cover
     """
     Generate initial time series.
@@ -278,14 +494,14 @@ def __initial_ts(
             continue
 
         ts[k, 0] = (
-            ts[k - 1, 0] * coupling_matrix[0, 0]
-            + ts[k - 1, 1] * coupling_matrix[0, 1]
-            + rng.normal(0.0, 1.0) * noise
+                ts[k - 1, 0] * coupling_matrix[0, 0]
+                + ts[k - 1, 1] * coupling_matrix[0, 1]
+                + rng.normal(0.0, 1.0) * noise
         )
         ts[k, 1] = (
-            ts[k - 1, 0] * coupling_matrix[1, 0]
-            + ts[k - 1, 1] * coupling_matrix[1, 1]
-            + rng.normal(0.0, 1.0) * noise
+                ts[k - 1, 0] * coupling_matrix[1, 0]
+                + ts[k - 1, 1] * coupling_matrix[1, 1]
+                + rng.normal(0.0, 1.0) * noise
         )
 
     return ts
@@ -312,11 +528,11 @@ def __hrf(times: ndarray[float], rng: Generator = None) -> ndarray[float]:
 
 @jit(cache=True, nopython=True, nogil=True)
 def __initial_ts_var_num_nodes(
-    ts_len: int,
-    num_ts: int,
-    noise: float,
-    coupling_matrix: ndarray[float],
-    rng: Generator,
+        ts_len: int,
+        num_ts: int,
+        noise: float,
+        coupling_matrix: ndarray[float],
+        rng: Generator,
 ):  # pragma: no cover
     """
     Generate initial time series for multiple nodes.

@@ -304,6 +304,25 @@ def test_gen_synthatdelays_random_connectivity_invalid_inputs():
         gen_synthatdelays_random_connectivity(0, 3, 6, 0.8)
 
 
+def test_gen_synthatdelays_random_connectivity_exception_handling(monkeypatch):
+    """Test exception handling in gen_synthatdelays_random_connectivity."""
+
+    # Mock ExecSimulation to raise an exception
+    def mock_exec_simulation(*args, **kwargs):
+        raise Exception("Test exception")
+
+    # Apply the mock
+    monkeypatch.setattr(
+        "delaynet.preparation.data_generator.ExecSimulation", mock_exec_simulation
+    )
+
+    # Test that the exception is properly caught and re-raised
+    with pytest.raises(
+        RuntimeError, match="Error in SynthATDelays simulation: Test exception"
+    ):
+        gen_synthatdelays_random_connectivity(1, 3, 6, 0.8)
+
+
 def test_gen_synthatdelays_independent_operations_with_trends():
     """Test the gen_synthatdelays_independent_operations_with_trends function."""
     # Test with trends activated
@@ -339,6 +358,27 @@ def test_gen_synthatdelays_independent_operations_with_trends_invalid_inputs():
     # Test with invalid activate_trend
     with pytest.raises(ValueError, match="activate_trend must be a boolean"):
         gen_synthatdelays_independent_operations_with_trends(1, "yes")
+
+
+def test_gen_synthatdelays_independent_operations_with_trends_exception_handling(
+    monkeypatch,
+):
+    """Test exception handling in gen_synthatdelays_independent_operations_with_trends."""
+
+    # Mock ExecSimulation to raise an exception
+    def mock_exec_simulation(*args, **kwargs):
+        raise Exception("Test exception")
+
+    # Apply the mock
+    monkeypatch.setattr(
+        "delaynet.preparation.data_generator.ExecSimulation", mock_exec_simulation
+    )
+
+    # Test that the exception is properly caught and re-raised
+    with pytest.raises(
+        RuntimeError, match="Error in SynthATDelays simulation: Test exception"
+    ):
+        gen_synthatdelays_independent_operations_with_trends(1, True)
 
 
 def test_extract_airport_delay_time_series():

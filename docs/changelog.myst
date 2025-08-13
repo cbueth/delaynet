@@ -40,8 +40,8 @@
 
 - 🏗 **Network Reconstruction and Documentation Overhaul**
 
-    - **Added:** Complete network reconstruction functionality with the new {func}
-      `~delaynet.network_reconstruction.reconstruct_network` function that applies
+    - **Added:** Complete network reconstruction functionality with the new
+      {func}`~delaynet.network_reconstruction.reconstruct_network` function that applies
       connectivity measures to pairs of time series to build networks represented by $p$
       -value and lag matrices.
     - **Enhanced:** Documentation structure with comprehensive individual guides for

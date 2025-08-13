@@ -31,8 +31,9 @@ a certain threshold, retaining only the strongest and most significant connectio
 
 ### Statistical Pruning
 
-The `delaynet` package provides the {func}
-`~delaynet.network_analysis.pruning.statistical_pruning` function for pruning networks
+The `delaynet` package provides the
+{func}`~delaynet.network_analysis.pruning.statistical_pruning` function for pruning
+networks
 based on statistical significance. This function takes a matrix of $p$-values and
 returns a boolean mask indicating which connections are statistically significant.
 For this example, we are using the same network as from the previous page, but with an
@@ -172,11 +173,13 @@ print(f"Link density: {density:.4f}")
 
 These metrics identify nodes that are disconnected from the rest of the network in terms
 of incoming or outgoing connections.
-Nodes with no incoming connections {func}
-`~delaynet.network_analysis.metrics.isolated_nodes_inbound` don't receive delays from
+Nodes with no incoming connections
+{func}`~delaynet.network_analysis.metrics.isolated_nodes_inbound` don't receive delays
+from
 other nodes.
-Nodes with no outgoing connections {func}
-`~delaynet.network_analysis.metrics.isolated_nodes_outbound` don't propagate delays to
+Nodes with no outgoing connections
+{func}`~delaynet.network_analysis.metrics.isolated_nodes_outbound` don't propagate
+delays to
 other nodes.
 In transportation networks, isolated nodes may represent stations or airports that
 operate independently of the broader network.
@@ -198,8 +201,8 @@ Centrality measures help identify the most important or influential nodes in a n
 
 {func}`~delaynet.network_analysis.metrics.betweenness_centrality` is a prominent measure
 of centrality which tries to measure the importance of a node or edge in a network by
-counting the number of shortest paths that lead through it {cite:p}
-`brandesVariantsShortestpathBetweenness2008`.
+counting the number of shortest paths that lead through it
+{cite:p}`brandesVariantsShortestpathBetweenness2008`.
 Nodes with high betweenness centrality act as bridges or bottlenecks in the network.
 These nodes control information flow between different parts of the network.
 In transportation networks, high betweenness nodes are critical junctions where many
@@ -256,8 +259,8 @@ plt.show()
 
 {func}`~delaynet.network_analysis.metrics.global_efficiency` quantifies how efficiently
 information can flow through the network, calculated as the average of the inverse
-shortest path lengths between all pairs of nodes {cite:p}
-`latoraEfficientBehaviorSmallWorld2001`.
+shortest path lengths between all pairs of nodes
+{cite:p}`latoraEfficientBehaviorSmallWorld2001`.
 Values range from 0 (completely disconnected) to 1 (perfectly efficient), where higher
 values indicate more efficient networks with shorter paths between nodes.
 In transportation networks, higher efficiency suggests better connectivity and

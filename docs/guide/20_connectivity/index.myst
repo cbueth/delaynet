@@ -26,8 +26,8 @@ It is possible to either test for all delays up to a certain maximum delay
 or to test for specific delays.
 The best delay value and it's corresponding $p$-value are returned.
 
-To visualise this, we generate synthetic time series data using a {ref}
-`delayed causal network (DCN) <dcn_generation>` model. The data consists of eight
+To visualise this, we generate synthetic time series data using a
+{ref}`delayed causal network (DCN) <dcn_generation>` model. The data consists of eight
 interconnected nodes with 1000 time points each, where causal relationships exist
 between different time series with varying delays. We extract two specific time series
 from this network and apply Granger causality to find the optimal lag that produces the
@@ -133,8 +133,8 @@ Now, `result` is a tuple of the best $p$-value and the corresponding delay step.
 For example, if `result` is `(0.05, 3)`, it means that the best $p$-value is 0.05
 and it occurs with a lag of 3 time steps.
 
-You can view all available connectivity measures using the {py:func}
-`~delaynet.connectivity.show_connectivity_metrics()` function:
+You can view all available connectivity measures using the
+{py:func}`~delaynet.connectivity.show_connectivity_metrics()` function:
 
 ```{code-cell}
 :tags: [hide-output]

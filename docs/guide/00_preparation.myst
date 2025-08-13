@@ -17,8 +17,8 @@ for testing and experimentation.
 
 In order to reconstruct delay functional networks,
 `delaynet` requires a set of time series data for each node in the network.
-For each pair of nodes a weight as $p$-value can be calculated with a given {ref}
-`connectivity measure <connectivity_sec>`.
+For each pair of nodes a weight as $p$-value can be calculated with a given
+{ref}`connectivity measure <connectivity_sec>`.
 The data length must be consistent across all nodes.
 For example, having ten nodes with time series:
 
@@ -45,8 +45,8 @@ data
 
 ### Data cleaning
 
-Before performing any {ref}`detrending <detrending_sec>` and {ref}
-`connectivity analysis <connectivity_sec>`,
+Before performing any {ref}`detrending <detrending_sec>` and
+{ref}`connectivity analysis <connectivity_sec>`,
 it's crucial to clean the data. This includes handling missing values and outliers.
 
 ```{attention}
@@ -72,8 +72,8 @@ np.nan_to_num(data, nan=0.0, copy=False)
 data
 ```
 
-If you already have a dataset, you can advance to the {ref}
-`next section <detrending_sec>`.
+If you already have a dataset, you can advance to the
+{ref}`next section <detrending_sec>`.
 
 (data_generation)=
 
@@ -159,9 +159,9 @@ plt.show()
 
 The functional Magnetic Resonance Imaging (fMRI) data generation process simulates
 realistic functional MRI signals by modeling both the underlying neural activity and the
-hemodynamic response. This approach is based on studies by Roebroeck *et al.* and
-Rajapakse and Zhou {cite:p}
-`roebroeckMappingDirectedInfluence2005,rajapakseLearningEffectiveBrain2007`.
+haemodynamic response. This approach is based on studies by Roebroeck *et al.* and
+Rajapakse and Zhou
+{cite:p}`roebroeckMappingDirectedInfluence2005,rajapakseLearningEffectiveBrain2007`.
 
 {cite:t}`roebroeckMappingDirectedInfluence2005` proposed Granger causality mapping (GCM)
 as an approach to explore directed influences between neuronal populations in fMRI data.
@@ -174,7 +174,7 @@ Markov chain to model fMRI time-series and determine temporal relationships betw
 brain regions. Their research demonstrated that DBN performance is comparable to GCM for
 linearly connected networks, while providing more complete statistical descriptions of
 connectivity. They also studied the effects of various noise types, inter-scan
-intervals, and hemodynamic parameter variability on connectivity analysis. Together,
+intervals, and haemodynamic parameter variability on connectivity analysis. Together,
 these papers provide the theoretical foundation for generating realistic fMRI data with
 directed causal influences.
 
@@ -184,13 +184,14 @@ The generation process follows these steps:
    underlying neural activity:
     - For a single node {py:func}`~delaynet.preparation.data_generator.gen_fmri()`:
       Generates two coupled time series with specified coupling strength
-    - For multiple nodes {py:func}
-      `~delaynet.preparation.data_generator.gen_fmri_multiple()`: Creates a network
+    - For multiple nodes
+      {py:func}`~delaynet.preparation.data_generator.gen_fmri_multiple()`: Creates a
+      network
       where the first node influences all other nodes with the specified coupling
       strength
 
 2. **Hemodynamic Response Function (HRF) Application**: Convolves the neural activity
-   with a hemodynamic response function:
+   with a haemodynamic response function:
     - The HRF is modeled using gamma distributions with both peak and undershoot
       components
     - This simulates the blood-oxygen-level-dependent (BOLD) response that fMRI measures

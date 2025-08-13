@@ -32,8 +32,8 @@
 </div>
 
 Python package to reconstruct and analyse delay functional networks from time series.
-It provides tools for data preparation and detrending, multiple connectivity measures (
-e.g., Granger causality, transfer entropy, correlations), optimal-lag network
+It provides tools for data preparation and detrending, multiple connectivity measures
+(e.g. Granger causality, transfer entropy, correlations), optimal-lag network
 reconstruction, and network analysis.
 
 ---

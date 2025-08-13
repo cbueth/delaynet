@@ -64,7 +64,7 @@ exclude = [
 namespaces = false
 
 [tool.setuptools.dynamic]
-readme = { file = ["README.md", "LICENSE.txt"] }
+readme = { file = ["README.md", "LICENSE"], content-type = "text/markdown" }
 version = { attr = "delaynet._version.__version__" }
 
 # --------------------------------------------------------------------------------------

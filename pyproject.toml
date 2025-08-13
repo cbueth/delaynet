@@ -7,7 +7,7 @@ name = "delaynet"
 authors = [{ name = "Carlson Büth" }, { name = "Massimiliano Zanin" }]
 maintainers = [{ name = "Carlson Büth", email = "code@cbueth.de" }]
 description = "Delay Propagation in Transportation Networks"
-keywords = ["Delay Propagation", "Transportation Networks", "Tnformation Flow", "Information Theory"]
+keywords = ["Delay Propagation", "Transportation Networks", "Information Flow", "Information Theory"]
 license = { text = "BSD-3-Clause" }
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -23,7 +23,6 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent",
     "Natural Language :: English",
-    "Private :: Do Not Upload", # Remove this line to upload to PyPI
 ]
 dynamic = ["readme", "version"]
 requires-python = ">=3.11"
@@ -39,10 +38,10 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://carlson.pages.ifisc.uib-csic.es/delaynet/"
-Repository = "https://gitlab.ifisc.uib-csic.es/carlson/delaynet"
-Issues = "https://gitlab.ifisc.uib-csic.es/carlson/delaynet/issues"
-Changelog = "https://carlson.pages.ifisc.uib-csic.es/delaynet/changelog/"
+Documentation = "https://delaynet.readthedocs.io/"
+Repository = "https://github.com/cbueth/delaynet"
+Issues = "https://github.com/cbueth/delaynet/issues"
+Changelog = "https://delaynet.readthedocs.io/en/latest/changelog/"
 
 [project.optional-dependencies]
 lint = ["pre-commit", "ruff"]

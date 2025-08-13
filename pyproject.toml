@@ -10,7 +10,7 @@ description = "Delay Propagation in Transportation Networks"
 keywords = ["Delay Propagation", "Transportation Networks", "Tnformation Flow", "Information Theory"]
 license = { text = "BSD-3-Clause" }
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: BSD License",
     "Topic :: Scientific/Engineering :: Physics",
@@ -26,7 +26,7 @@ classifiers = [
     "Private :: Do Not Upload", # Remove this line to upload to PyPI
 ]
 dynamic = ["readme", "version"]
-requires-python = ">=3.13"  # TODO: undo change
+requires-python = ">=3.11"
 dependencies = [
     "numpy",
     "scipy",
@@ -35,7 +35,7 @@ dependencies = [
     "numba",
     "infomeasure>=0.5.0",
     "igraph",
-    "synthatdelays", # tbd, add >=1.0.2 when released
+    "synthatdelays>=1.0.2",
 ]
 
 [project.urls]

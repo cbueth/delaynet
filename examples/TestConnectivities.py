@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import delaynet as dn
-from delaynet.preparation import gen_data
+from delaynet.preparation import gen_fmri
 
 
 def calculate_approaches(num_it, l_coupl, methods):
@@ -18,10 +18,8 @@ def calculate_approaches(num_it, l_coupl, methods):
         print(f"Computing {c_index + 1} of {n} couplings")
 
         for _ in range(num_it):
-            ts = gen_data(
-                generation_method="fMRI",
+            ts = gen_fmri(
                 ts_len=10000,
-                n_nodes=1,
                 downsampling_factor=10,
                 time_resolution=0.2,
                 coupling_strength=coupling,

@@ -17,13 +17,13 @@ This results in a $(n \times n)$ matrix of $p$-values and lags.
 
 ## The `reconstruct_network()` Function
 
-The `delaynet` package provides the {func}
-`~delaynet.network_reconstruction.reconstruct_network` function to generate $p$-value
-matrices by applying connectivity measures to pairs of time series.
-As described in the {ref}`connectivity_sec` section, connectivity measures return $p$
--values that indicate the strength of connections between time series.
-Therefore, the $p$-value matrix in network reconstruction represents a matrix of $p$
--values, where lower values indicate stronger connections.
+The `delaynet` package provides the
+{func}`~delaynet.network_reconstruction.reconstruct_network` function to generate
+$p$-value matrices by applying connectivity measures to pairs of time series.
+As described in the {ref}`connectivity_sec` section, connectivity measures return
+$p$-values that indicate the strength of connections between time series.
+Therefore, the $p$-value matrix in network reconstruction represents a matrix of
+$p$-values, where lower values indicate stronger connections.
 
 ## Complete Network Reconstruction Example
 
@@ -46,8 +46,7 @@ from matplotlib import pyplot as plt
 import delaynet as dn
 from numpy.random import default_rng
 
-adjacency_matrix, weight_matrix, time_series = dn.preparation.gen_data(
-    generation_method="dcn",    # Delayed causal network time series
+adjacency_matrix, weight_matrix, time_series = dn.preparation.gen_delayed_causal_network(
     ts_len=1000,                # Length of time series
     n_nodes=8,                  # Number of nodes
     l_dens=0.5,                 # Density of the adjacency matrix

@@ -5,9 +5,11 @@ kernelspec:
 ---
 
 (linear_correlation)=
+
 # Linear Correlation
 
-The Linear Correlation (LC) connectivity metric calculates the Pearson correlation coefficient between two time series.
+The Linear Correlation (LC) connectivity metric calculates the Pearson correlation
+coefficient between two time series.
 
 ```python
 import delaynet as dn
@@ -17,8 +19,11 @@ result = dn.connectivity(ts1, ts2, metric="linear_correlation", lag_steps=5)
 ```
 
 Parameters:
-- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps]. Passing a list will consider the specified values as lags.
-- `**pr_kwargs`: Additional keyword arguments forwarded to scipy.stats.pearsonr.
+
+- `lag_steps`: Time lags to consider. An integer will consider lags [1, ..., lag_steps].
+  Passing a list will consider the specified values as lags.
+- `**pr_kwargs`: Additional keyword arguments forwarded to {py:func}
+  `scipy.stats.pearsonr`.
 
 ```{eval-rst}
 .. automethod:: delaynet.connectivities.linear_correlation

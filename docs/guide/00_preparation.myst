@@ -12,11 +12,13 @@ Second, {ref}`data_generation` will describe how to generate synthetic data
 for testing and experimentation.
 
 (data_preparation)=
+
 ## Data preparation
 
 In order to reconstruct delay functional networks,
 `delaynet` requires a set of time series data for each node in the network.
-For each pair of nodes a weight as $p$-value can be calculated with a given {ref}`connectivity measure <connectivity_sec>`.
+For each pair of nodes a weight as $p$-value can be calculated with a given
+{ref}`connectivity measure <connectivity_sec>`.
 The data length must be consistent across all nodes.
 For example, having ten nodes with time series:
 
@@ -42,7 +44,9 @@ data
 ```
 
 ### Data cleaning
-Before performing any {ref}`detrending <detrending_sec>` and {ref}`connectivity analysis <connectivity_sec>`,
+
+Before performing any {ref}`detrending <detrending_sec>` and
+{ref}`connectivity analysis <connectivity_sec>`,
 it's crucial to clean the data. This includes handling missing values and outliers.
 
 ```{attention}
@@ -54,7 +58,8 @@ e.g. replacing NaNs with zeros, mean, median imputation, or using interpolation 
 
 #### Handling Missing Values
 
-Missing values can be handled by filling them with a specific value or method like mean imputation:
+Missing values can be handled by filling them with a specific value or method like mean
+imputation:
 
 ```{code-cell}
 import numpy as np
@@ -67,36 +72,57 @@ np.nan_to_num(data, nan=0.0, copy=False)
 data
 ```
 
-If you already have a dataset, you can advance to the {ref}`next section <detrending_sec>`.
+If you already have a dataset, you can advance to the
+{ref}`next section <detrending_sec>`.
 
 (data_generation)=
+
 ## Data generation
 
-`delaynet` provides several methods for generating synthetic data that can be used for testing and experimentation. The library offers two primary data generation methods:
+`delaynet` provides several methods for generating synthetic data that can be used for
+testing and experimentation. The library offers two primary data generation methods:
 
-1. **Delayed Causal Network Generation**: Creates time series with explicit causal relationships and time delays between nodes, suitable for testing delay network reconstruction algorithms.
-2. **fMRI Data Generation**: Simulates realistic fMRI signals with hemodynamic response functions, based on neuroimaging research.
+1. **Delayed Causal Network Generation**: Creates time series with explicit causal
+   relationships and time delays between nodes, suitable for testing delay network
+   reconstruction algorithms.
+2. **fMRI Data Generation**: Simulates realistic fMRI signals with haemodynamic response
+   functions, based on neuroimaging research.
+3. **SynthATDelays Transportation Delay Generation**: Generates realistic transportation
+   delay data through integration with the specialised simulation
+   tool [SynthATDelays](https://gitlab.com/MZanin/synth-at-delays/), offering controlled
+   scenarios for testing delay propagation in transportation networks.
 
-Both methods are accessible through the convenient {py:func}`dn.preparation.gen_data()<delaynet.preparation.data_generator.gen_data>` function, which serves as a unified interface for all data generation approaches:
+Each method provides specific functions for generating different types of synthetic
+data:
 
 (dcn_generation)=
+
 ### 1. Delayed Causal Network Generation
 
 The delayed causal network generation process follows these steps:
 
-1. **Adjacency Matrix Generation**: Creates a random binary matrix where each entry has a probability `l_dens` of being 1 (indicating a connection). Self-loops are explicitly removed by setting diagonal elements to False.
+1. **Adjacency Matrix Generation**: Creates a random binary matrix where each entry has
+   a probability `l_dens` of being 1 (indicating a connection). Self-loops are
+   explicitly removed by setting diagonal elements to False.
 
-2. **Weight Matrix Creation**: Assigns random weights to connections in the adjacency matrix. Weights are uniformly distributed between the minimum and maximum values specified in `wm_min_max`. Non-connections (where adjacency matrix is 0) have zero weight.
+2. **Weight Matrix Creation**: Assigns random weights to connections in the adjacency
+   matrix. Weights are uniformly distributed between the minimum and maximum values
+   specified in `wm_min_max`. Non-connections (where adjacency matrix is 0) have zero
+   weight.
 
-3. **Lag Matrix Generation**: Creates a matrix of random integers between 1 and 4, representing time delays between connected nodes.
+3. **Lag Matrix Generation**: Creates a matrix of random integers between 1 and 4,
+   representing time delays between connected nodes.
 
 4. **Time Series Generation**: For each connection in the network:
-   - With 80% probability, no effect is applied (simulating sporadic influence)
-   - With 20% probability, a value from an exponential distribution is generated, scaled by the connection weight
-   - This value is added to the source node's time series
-   - The same value is added to the target node's time series after the specified lag
+    - With 80% probability, no effect is applied (simulating sporadic influence)
+    - With 20% probability, a value from an exponential distribution is generated,
+      scaled by the connection weight
+    - This value is added to the source node's time series
+    - The same value is added to the target node's time series after the specified lag
 
-This approach creates time series with causal relationships that have both magnitude (weight) and temporal (lag) components, making it suitable for testing delay network reconstruction algorithms.
+This approach creates time series with causal relationships that have both magnitude (
+weight) and temporal (lag) components, making it suitable for testing delay network
+reconstruction algorithms.
 
 ```{code-cell}
 import delaynet as dn
@@ -111,7 +137,6 @@ adjacency_matrix, weight_matrix, time_series = dn.preparation.data_generator.gen
     rng=default_rng(1249687)
 )
 ```
-
 
 ```{code-cell}
 :tags: [hide-input]
@@ -129,32 +154,62 @@ plt.show()
 ```
 
 (fmri_generation)=
+
 ### 2. fMRI Data Generation
 
-The functional Magnetic Resonance Imaging (fMRI) data generation process simulates realistic functional MRI signals by modeling both the underlying neural activity and the hemodynamic response. This approach is based on studies by Roebroeck *et al.* and Rajapakse and Zhou {cite:p}`roebroeckMappingDirectedInfluence2005,rajapakseLearningEffectiveBrain2007`.
+The functional Magnetic Resonance Imaging (fMRI) data generation process simulates
+realistic functional MRI signals by modeling both the underlying neural activity and the
+haemodynamic response. This approach is based on studies by Roebroeck *et al.* and
+Rajapakse and Zhou
+{cite:p}`roebroeckMappingDirectedInfluence2005,rajapakseLearningEffectiveBrain2007`.
 
-{cite:t}`roebroeckMappingDirectedInfluence2005` proposed Granger causality mapping (GCM) as an approach to explore directed influences between neuronal populations in fMRI data. Their method doesn't rely on a priori specification of a model with pre-selected regions and connections, instead using temporal precedence information to identify voxels that are sources or targets of directed influence.
-{cite:t}`rajapakseLearningEffectiveBrain2007` extended this work by using dynamic Bayesian networks (DBN) to learn effective brain connectivity. Their approach uses a Markov chain to model fMRI time-series and determine temporal relationships between brain regions. Their research demonstrated that DBN performance is comparable to GCM for linearly connected networks, while providing more complete statistical descriptions of connectivity. They also studied the effects of various noise types, inter-scan intervals, and hemodynamic parameter variability on connectivity analysis. Together, these papers provide the theoretical foundation for generating realistic fMRI data with directed causal influences.
+{cite:t}`roebroeckMappingDirectedInfluence2005` proposed Granger causality mapping (GCM)
+as an approach to explore directed influences between neuronal populations in fMRI data.
+Their method doesn't rely on a priori specification of a model with pre-selected regions
+and connections, instead using temporal precedence information to identify voxels that
+are sources or targets of directed influence.
+{cite:t}`rajapakseLearningEffectiveBrain2007` extended this work by using dynamic
+Bayesian networks (DBN) to learn effective brain connectivity. Their approach uses a
+Markov chain to model fMRI time-series and determine temporal relationships between
+brain regions. Their research demonstrated that DBN performance is comparable to GCM for
+linearly connected networks, while providing more complete statistical descriptions of
+connectivity. They also studied the effects of various noise types, inter-scan
+intervals, and haemodynamic parameter variability on connectivity analysis. Together,
+these papers provide the theoretical foundation for generating realistic fMRI data with
+directed causal influences.
 
 The generation process follows these steps:
 
-1. **Initial Time Series Generation**: Creates coupled time series representing underlying neural activity:
-   - For a single node {py:func}`~delaynet.preparation.data_generator.gen_fmri()`: Generates two coupled time series with a specified coupling strength
-   - For multiple nodes {py:func}`~delaynet.preparation.data_generator.gen_fmri_multiple()`: Creates a network where the first node influences all other nodes with the specified coupling strength
+1. **Initial Time Series Generation**: Creates coupled time series representing
+   underlying neural activity:
+    - For a single node {py:func}`~delaynet.preparation.data_generator.gen_fmri()`:
+      Generates two coupled time series with specified coupling strength
+    - For multiple nodes
+      {py:func}`~delaynet.preparation.data_generator.gen_fmri_multiple()`: Creates a
+      network
+      where the first node influences all other nodes with the specified coupling
+      strength
 
-2. **Hemodynamic Response Function (HRF) Application**: Convolves the neural activity with a hemodynamic response function:
-   - The HRF is modeled using gamma distributions with both peak and undershoot components
-   - This simulates the blood-oxygen-level-dependent (BOLD) response that fMRI measures
+2. **Hemodynamic Response Function (HRF) Application**: Convolves the neural activity
+   with a haemodynamic response function:
+    - The HRF is modeled using gamma distributions with both peak and undershoot
+      components
+    - This simulates the blood-oxygen-level-dependent (BOLD) response that fMRI measures
 
-3. **Downsampling**: Reduces the temporal resolution of the signal to match typical fMRI acquisition rates:
-   - The downsampling factor parameter controls the temporal resolution
-   - This simulates the relatively slow sampling rate of fMRI compared to actual neural activity
+3. **Downsampling**: Reduces the temporal resolution of the signal to match typical fMRI
+   acquisition rates:
+    - The downsampling factor parameter controls the temporal resolution
+    - This simulates the relatively slow sampling rate of fMRI compared to actual neural
+      activity
 
 4. **Noise Addition**: Adds Gaussian noise to the final time series:
-   - The noise level can be controlled separately for the initial neural activity and the final fMRI signal
-   - This simulates measurement noise in real fMRI data
+    - The noise level can be controlled separately for the initial neural activity and
+      the final fMRI signal
+    - This simulates measurement noise in real fMRI data
 
-This approach creates realistic fMRI time series with directed influences between regions, making it suitable for testing connectivity analysis methods in neuroimaging research.
+This approach creates a realistic fMRI time series with directed influences between
+regions, making it suitable for testing connectivity analysis methods in neuroimaging
+research.
 
 ```{code-cell}
 # Generate fMRI data for a single node
@@ -208,5 +263,122 @@ plt.grid()
 plt.show()
 ```
 
+The generated fMRI data simulates realistic brain activity patterns with directed
+influences between regions, making it suitable for testing connectivity analysis
+methods.
 
-The generated fMRI data simulates realistic brain activity patterns with directed influences between regions, making it suitable for testing connectivity analysis methods.
+(synthatdelays_generation)=
+
+### 3. SynthATDelays Transportation Delay Generation
+
+The [SynthATDelays](https://gitlab.com/MZanin/synth-at-delays/) transportation delay
+generation process creates realistic delay data specifically designed for transportation
+networks.
+This approach addresses a critical limitation in delay dynamics analysis—the
+impossibility of executing what-if scenarios
+with real systems. Unlike comprehensive air transport simulators that aim for maximum
+realism at high computational cost, this method focuses on generating highly tunable
+scenarios to test specific conditions and hypotheses.
+This integration offers two predefined scenarios,
+but more intricate scenarios can be simulated, when using all the features of
+[SynthATDelays](https://gitlab.com/MZanin/synth-at-delays/).
+For this, visit [their documentation](https://gitlab.com/MZanin/synth-at-delays/).
+The predefined scenarios are:
+
+#### Random Connectivity Scenario
+
+This scenario simulates a set of airports randomly connected by independent flights,
+with random and homogeneous enroute delays. It allows customisation of:
+
+- Number of airports
+- Number of aircraft
+- Buffer time between operations
+
+```{code-cell}
+# Generate delay data using the Random Connectivity scenario
+from delaynet.preparation import gen_synthatdelays_random_connectivity
+
+results = gen_synthatdelays_random_connectivity(
+    sim_time=5,               # Simulation time in days
+    num_airports=5,           # Number of airports
+    num_aircraft=10,          # Number of aircraft
+    buffer_time=0.8,          # Buffer time between operations in hours
+    seed=42                   # Random seed for reproducibility
+)
+
+# Extract the average arrival delay matrix
+arrival_delays = results.avgArrivalDelay
+print(f"Shape of arrival delays matrix: {arrival_delays.shape}")
+```
+
+```{code-cell}
+::tags: [hide-input]
+# Plot the average arrival delays for each airport
+plt.figure(figsize=(12, 6), dpi=300)
+for i in range(arrival_delays.shape[1]):
+    plt.plot(arrival_delays[:, i], label=f"Airport {i+1}")
+plt.xlabel("Time Window (hourly)")
+plt.ylabel("Average Arrival Delay (hours)")
+plt.title("Average Arrival Delays by Airport")
+plt.legend()
+plt.grid()
+plt.show()
+```
+
+#### Independent Operations with Trends Scenario
+
+This scenario creates two groups of two airports, where flights connect airports within
+the same group but not across groups. When trends are activated, delays are added at
+specific hours, generating spurious causality relations between airports despite no
+actual propagation pathways between groups.
+
+```{code-cell}
+# Generate delay data using the Independent Operations with Trends scenario
+from delaynet.preparation import gen_synthatdelays_independent_operations_with_trends
+
+results = gen_synthatdelays_independent_operations_with_trends(
+    sim_time=5,               # Simulation time in days
+    activate_trend=True,      # Activate trends at specific hours
+    seed=42                   # Random seed for reproducibility
+)
+
+# Extract the average departure delay matrix
+departure_delays = results.avgDepartureDelay
+print(f"Shape of departure delays matrix: {departure_delays.shape}")
+```
+
+```{code-cell}
+::tags: [hide-input]
+# Plot the average departure delays for each airport
+plt.figure(figsize=(12, 6), dpi=300)
+for i in range(departure_delays.shape[1]):
+    plt.plot(departure_delays[:, i], label=f"Airport {i+1}")
+plt.xlabel("Time Window (hourly)")
+plt.ylabel("Average Departure Delay (hours)")
+plt.title("Average Departure Delays by Airport")
+plt.legend()
+plt.grid()
+plt.show()
+```
+
+#### Working with SynthATDelays Results
+
+The SynthATDelays generators return a `Results_Class` object containing various delay
+metrics. To extract specific delay time series, you can use the helper function:
+
+```{code-cell}
+# Extract delay time series from results
+from delaynet.preparation import extract_airport_delay_time_series
+
+# Get arrival delays
+arrival_delays = extract_airport_delay_time_series(results, "arrival")
+
+# Get departure delays
+departure_delays = extract_airport_delay_time_series(results, "departure")
+```
+
+These synthetic transportation delay datasets enable researchers to validate analytical
+methods, benchmark connectivity measures, and explore specific propagation scenarios
+under controlled conditions. This is particularly valuable in transportation research
+where ground truth propagation patterns are often challenging to establish from
+observational data alone.

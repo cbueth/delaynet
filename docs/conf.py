@@ -17,12 +17,16 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+from os import environ
+
+environ["SPHINX_MYST_NB_BUILD"] = "1"
+
 from datetime import datetime
 
 project = "delaynet"
-copyright = f"2024–{datetime.now().year}, infomeasure maintainers"
+copyright = f"2024–{datetime.now().year}, delaynet maintainers"
 author = "Carlson Büth"
-version = "0.2.0"
+version = "0.3.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -101,4 +105,5 @@ intersphinx_mapping = {
     "statsmodels": ("https://www.statsmodels.org/stable", None),
     "sklearn": ("https://scikit-learn.org/stable", None),
     "infomeasure": ("https://infomeasure.readthedocs.io/en/latest", None),
+    "igraph": ("https://python.igraph.org/en/stable/", None),
 }

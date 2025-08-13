@@ -1,6 +1,7 @@
 """Tests for the network reconstruction module."""
 
 import pytest
+from time import time
 from numpy import (
     ndarray,
     column_stack,
@@ -20,7 +21,12 @@ from numpy import (
 )
 from numpy.testing import assert_array_equal
 
-from delaynet.network_reconstruction import reconstruct_network
+from delaynet.network_reconstruction import (
+    reconstruct_network,
+    format_time,
+    print_progress,
+    update_progress,
+)
 
 
 def _simple_metric_for_parallel_test(ts1, ts2, lag_steps=None):
@@ -46,9 +52,11 @@ def test_reconstruct_network_basic_functionality(two_time_series):
     assert weights.shape == (2, 2)
     assert lags.shape == (2, 2)
 
-    # Check diagonal elements (self-connections should be 0)
-    assert_array_equal(weights, [[0.0, 0.0], [0.0, 0.0]])
-    assert_array_equal(lags, [[0, 1], [1, 0]])
+    # Check diagonal elements (self-connections should be 1.0 - no significant connection)
+    assert weights[0, 0] == 1.0
+    assert weights[1, 1] == 1.0
+    assert lags[0, 0] == 0
+    assert lags[1, 1] == 0
 
 
 def test_reconstruct_network_with_random_data(two_random_time_series):
@@ -64,8 +72,8 @@ def test_reconstruct_network_with_random_data(two_random_time_series):
     assert weights.shape == (3, 3)
     assert lags.shape == (3, 3)
 
-    # Check diagonal is zero
-    assert_array_equal(diag(weights), [0.0, 0.0, 0.0])
+    # Check diagonal is 1.0 (no significant self-connection)
+    assert_array_equal(diag(weights), [1.0, 1.0, 1.0])
     assert_array_equal(diag(lags), [0, 0, 0])
 
     # Check that weights are valid p-values (between 0 and 1)
@@ -95,7 +103,7 @@ def test_reconstruct_network_with_different_measures(
 
     assert weights.shape == (2, 2)
     assert lags.shape == (2, 2)
-    assert diag(weights).tolist() == [0.0, 0.0]
+    assert diag(weights).tolist() == [1.0, 1.0]
     assert diag(lags).tolist() == [0, 0]
 
 
@@ -118,7 +126,7 @@ def test_reconstruct_network_with_connectivity_kwargs(two_random_time_series):
 
     assert weights.shape == (2, 2)
     assert lags.shape == (2, 2)
-    assert diag(weights).tolist() == [0.0, 0.0]
+    assert diag(weights).tolist() == [1.0, 1.0]
 
 
 def test_reconstruct_network_input_validation():
@@ -154,7 +162,7 @@ def test_reconstruct_network_edge_cases():
 
     assert weights.shape == (2, 2)
     assert lags.shape == (2, 2)
-    assert diag(weights).tolist() == [0.0, 0.0]
+    assert diag(weights).tolist() == [1.0, 1.0]
     assert diag(lags).tolist() == [0, 0]
 
 
@@ -192,8 +200,8 @@ def test_reconstruct_network_symmetry_properties():
 
     weights, lags = reconstruct_network(time_series, "linear_correlation", lag_steps=5)
 
-    # Check that diagonal is zero
-    assert allclose(diag(weights), 0.0)
+    # Check that diagonal is one
+    assert allclose(diag(weights), 1.0)
     assert allclose(diag(lags), 0)
 
     # Check that matrices have correct shape
@@ -225,7 +233,7 @@ def test_reconstruct_network_with_connectivity_returning_single_value():
     # Verify the structure is correct
     assert weights.shape == (3, 3)
     assert lags.shape == (3, 3)
-    assert diag(weights).tolist() == [0.0, 0.0, 0.0]
+    assert diag(weights).tolist() == [1.0, 1.0, 1.0]
     assert diag(lags).tolist() == [0, 0, 0]
 
 
@@ -245,7 +253,7 @@ def test_reconstruct_network_different_sizes(n_time, n_nodes):
 
     assert weights.shape == (n_nodes, n_nodes)
     assert lags.shape == (n_nodes, n_nodes)
-    assert allclose(diag(weights), 0.0)
+    assert allclose(diag(weights), 1.0)
     assert allclose(diag(lags), 0)
 
 
@@ -267,7 +275,7 @@ def test_reconstruct_network_integration_with_connectivity_fixtures(
 
         assert weights.shape == (3, 3)
         assert lags.shape == (3, 3)
-        assert allclose(diag(weights), 0.0)
+        assert allclose(diag(weights), 1.0)
         assert allclose(diag(lags), 0)
 
     except Exception as e:
@@ -303,8 +311,8 @@ def test_reconstruct_network_with_callable_metric(two_time_series, callable_metr
     assert isinstance(weights, ndarray)
     assert isinstance(lags, ndarray)
 
-    # Check diagonal elements are zero (no self-connections)
-    assert diag(weights).tolist() == [0.0, 0.0]
+    # Check diagonal elements are 1.0 (no significant self-connections)
+    assert diag(weights).tolist() == [1.0, 1.0]
     assert diag(lags).tolist() == [0, 0]
 
     # Check that off-diagonal elements have valid values
@@ -384,7 +392,7 @@ def test_reconstruct_network_parallel_vs_sequential(two_random_time_series, work
     # Verify basic properties
     assert weights_seq.shape == (4, 4)
     assert lags_seq.shape == (4, 4)
-    assert allclose(diag(weights_seq), 0.0)
+    assert allclose(diag(weights_seq), 1.0)
     assert allclose(diag(lags_seq), 0)
 
 
@@ -500,5 +508,158 @@ def test_reconstruct_network_parallel_large_dataset():
     # Verify properties
     assert weights_seq.shape == (6, 6)
     assert lags_seq.shape == (6, 6)
-    assert allclose(diag(weights_seq), 0.0)
+    assert allclose(diag(weights_seq), 1.0)
     assert allclose(diag(lags_seq), 0)
+
+
+def test_format_time():
+    """Test the format_time function for different time ranges."""
+    # Test seconds format (< 60 seconds)
+    assert format_time(30) == "30.0s"
+    assert format_time(59.9) == "59.9s"
+
+    # Test minutes format (>= 60 seconds but < 3600 seconds)
+    assert format_time(60) == "1.0m"
+    assert format_time(120) == "2.0m"
+    assert format_time(3599) == "60.0m"
+
+    # Test hours format (>= 3600 seconds)
+    assert format_time(3600) == "1.0h"
+    assert format_time(7200) == "2.0h"
+    assert format_time(36000) == "10.0h"
+
+
+def test_print_progress_zero_progress(monkeypatch, capsys):
+    """Test print_progress function with zero progress."""
+    # Mock stdout.write to avoid actual printing during tests
+    monkeypatch.setattr("sys.stdout.write", lambda x: None)
+    monkeypatch.setattr("sys.stdout.flush", lambda: None)
+
+    # Test with zero progress
+    start_time = time()
+    print_progress(0, 100, start_time, prefix="Test: ")
+
+    # Capture stdout to verify output
+    captured = capsys.readouterr()
+
+    # We don't need to check the actual output since we mocked stdout.write,
+    # but we need to ensure the function runs without errors
+
+
+def test_print_progress_sphinx_mode(monkeypatch):
+    """Test print_progress function with sphinx_mode=True and current < total."""
+    # Mock stdout.write to avoid actual printing during tests
+    write_called = [False]
+
+    def mock_write(x):
+        write_called[0] = True
+
+    monkeypatch.setattr("sys.stdout.write", mock_write)
+    monkeypatch.setattr("sys.stdout.flush", lambda: None)
+
+    # Test with sphinx_mode=True and current < total
+    start_time = time()
+    print_progress(50, 100, start_time, prefix="Test: ", sphinx_mode=True)
+
+    # Verify that stdout.write was not called due to early return
+    assert not write_called[
+        0
+    ], "stdout.write should not be called when sphinx_mode=True and current < total"
+
+    # Test with sphinx_mode=True and current == total
+    write_called[0] = False
+    print_progress(100, 100, start_time, prefix="Test: ", sphinx_mode=True)
+
+    # Verify that stdout.write was called
+    assert write_called[
+        0
+    ], "stdout.write should be called when sphinx_mode=True and current == total"
+
+
+def test_reconstruct_network_sphinx_mode(monkeypatch, two_time_series):
+    """Test reconstruct_network function with Sphinx mode enabled and disabled."""
+    # Mock is_sphinx_build to control Sphinx mode
+    print_called = [False]
+
+    def mock_print(*args, **kwargs):
+        print_called[0] = True
+
+    # Mock print to track if it's called
+    monkeypatch.setattr("builtins.print", mock_print)
+
+    # Mock stdout.write and flush to avoid actual printing
+    monkeypatch.setattr("sys.stdout.write", lambda x: None)
+    monkeypatch.setattr("sys.stdout.flush", lambda: None)
+
+    # Test with Sphinx mode disabled
+    monkeypatch.setattr(
+        "delaynet.network_reconstruction.is_sphinx_build", lambda: False
+    )
+
+    ts1, ts2 = two_time_series
+    time_series = column_stack([ts1, ts2])
+
+    # Reset print_called
+    print_called[0] = False
+
+    # Run reconstruct_network with Sphinx mode disabled
+    reconstruct_network(time_series, "linear_correlation", lag_steps=1)
+
+    # Verify that print was called (newline after completion)
+    assert print_called[0], "print() should be called when not in Sphinx mode"
+
+    # Test with Sphinx mode enabled
+    monkeypatch.setattr("delaynet.network_reconstruction.is_sphinx_build", lambda: True)
+
+    # Reset print_called
+    print_called[0] = False
+
+    # Run reconstruct_network with Sphinx mode enabled
+    reconstruct_network(time_series, "linear_correlation", lag_steps=1)
+
+    # Verify that print was not called (no newline after completion)
+    assert not print_called[0], "print() should not be called when in Sphinx mode"
+
+
+def test_update_progress(monkeypatch):
+    """Test update_progress function."""
+    # Mock print_progress and stdout.flush to avoid actual printing
+    called = [False]
+    sphinx_mode_value = [None]
+
+    def mock_print_progress(current, total, start_time, prefix, sphinx_mode=None):
+        called[0] = True
+        sphinx_mode_value[0] = sphinx_mode
+
+    def mock_flush():
+        pass
+
+    monkeypatch.setattr(
+        "delaynet.network_reconstruction.print_progress", mock_print_progress
+    )
+    monkeypatch.setattr("sys.stdout.flush", mock_flush)
+
+    # Create a mock counter
+    class MockCounter:
+        def __init__(self, value):
+            self.value = value
+
+    counter = MockCounter(5)
+    start_time = time()
+
+    # Call update_progress with default parameter
+    update_progress(counter, 10, start_time, "Test: ")
+
+    # Verify print_progress was called with default parameter
+    assert called[0] is True
+    assert sphinx_mode_value[0] is None
+
+    # Reset called flag
+    called[0] = False
+
+    # Call update_progress with explicit parameter
+    update_progress(counter, 10, start_time, "Test: ", sphinx_mode=True)
+
+    # Verify print_progress was called with explicit parameter
+    assert called[0] is True
+    assert sphinx_mode_value[0] is True

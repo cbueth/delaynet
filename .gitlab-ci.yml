@@ -1,21 +1,42 @@
-image: mambaorg/micromamba
+variables:
+  UV_VERSION: "0.8.4"
+  PYTHON_VERSION: "3.13"
+  BASE_LAYER: bookworm-slim
+  # GitLab CI creates a separate mountpoint for the build directory,
+  # so we need to copy instead of using hard links.
+  UV_LINK_MODE: copy
+
+image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_VERSION-$BASE_LAYER
+
+uv-install:
+  variables:
+    UV_CACHE_DIR: .uv-cache
+  cache:
+    - key:
+        files:
+          - uv.lock
+      paths:
+        - $UV_CACHE_DIR
+  script:
+    - uv cache prune --ci
 
 stages:
   - test
   - coverage
-  - deploy
 
 .pythonVersions:
   parallel:
     matrix:
-      - PYTHON_VERSION: [ "3.13", "3.12", "3.11", "3.10" ]
+      - PY_VERSION: [ "3.14", "3.13", "3.12", "3.11" ]
+  allow_failure:
+    - PY_VERSION: "3.14"
   maxVersion:
     matrix:
-      - PYTHON_VERSION: [ "3.13" ]
+      - PY_VERSION: [ "3.13" ]
 
 before_script:
-  - micromamba install -y -n base -c conda-forge python=${PYTHON_VERSION} -f requirements.txt
-  - pip install --no-build-isolation --no-deps -e .
+  - UV_PYTHON=${PY_VERSION} uv sync --extra=test
+  - source .venv/bin/activate
 
 # Test on all python versions on push to main branch, and on bi-weekly schedule
 test:
@@ -30,7 +51,6 @@ test:
     - if: $CI_PIPELINE_SOURCE == "schedule"
   parallel: !reference [ .pythonVersions,parallel ]
   script:
-    - micromamba list
     - pytest tests/
   artifacts:
     expire_in: 1 month
@@ -41,6 +61,7 @@ coverage:
   coverage: /^TOTAL.+?(\d+\%)$/
   needs: [ ]
   rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - changes:
         compare_to: 'refs/heads/main'
         paths:
@@ -53,19 +74,3 @@ coverage:
     - pytest --cov --cov-report term
   artifacts:
     expire_in: 1 month
-
-# build documentation to gitlab pages, only on main branch
-pages:
-  stage: deploy
-  rules:
-    - when: never  # if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  script:
-    - sphinx-apidoc -o docs/api/ delaynet/ -f
-    - sphinx-build docs/ public -b dirhtml
-  artifacts:
-    paths:
-      - public
-    expire_in: 1 month
-  environment:
-    name: production
-    url: https://${CI_PROJECT_NAMESPACE}.pages.ifisc.uib-csic.es/${CI_PROJECT_NAME}

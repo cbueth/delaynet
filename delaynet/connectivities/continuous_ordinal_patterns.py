@@ -12,7 +12,8 @@ def random_patterns(
     ts1, ts2, p_size=5, num_rnd_patterns=50, linear=True, lag_steps: int | list = None
 ):
     """
-    Continuous Ordinal Patterns (COP) connectivity metric.
+    Continuous Ordinal Patterns (COP) connectivity metric
+    :cite:p:`zaninContinuousOrdinalPatterns2023,olivaresEvaluatingMethodsDetrending2025`.
 
     :param ts1: First time series.
     :type ts1: numpy.ndarray
@@ -34,7 +35,7 @@ def random_patterns(
     """
     if p_size + max(lag_steps) - 1 > ts1.shape[0]:
         raise ValueError(
-            "Pattern size + max-lag-step cannot be larger than the time series length."
+            "Pattern size + lag-steps cannot be larger than the time series length."
         )
 
     if linear:
@@ -88,7 +89,7 @@ def pattern_transform(ts: np.ndarray, patterns: np.ndarray) -> np.ndarray:
                     or shape=(pattern_len,)
     :return: Transformed time series.
     :rtype: numpy.ndarray, shape=(n_ts, n_patterns, ts_len - pattern_len + 1)
-            or if ``ts`` and/or ``patterns`` are 1D, the squeezed shape.
+            or if ``ts`` and/or ``patterns`` are 1D, the squeesed shape.
             For both 1D, the shape is (ts_len - pattern_len + 1).
     """
     if ts.ndim == 1:

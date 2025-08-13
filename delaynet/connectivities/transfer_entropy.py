@@ -16,10 +16,11 @@ def transfer_entropy(
     lag_steps: int | list = None,
     hypothesis_type: str = "permutation_test",
     n_tests: int = 20,
-    te_kwargs=None,
+    **te_kwargs,
 ):
     r"""
-    Transfer Entropy (TE) connectivity metric.
+    Transfer Entropy (TE) connectivity metric
+    :cite:p:`schreiberMeasuringInformationTransfer2000,buthInfomeasureComprehensivePython2025`.
 
     :param ts1: First time series.
     :type ts1: numpy.ndarray
@@ -41,7 +42,6 @@ def transfer_entropy(
                     test.
     :type n_tests: int
     :param te_kwargs: Additional keyword arguments for the transfer entropy estimator.
-    :type te_kwargs: dict
     :return: Best *p*-value and corresponding lag.
     :rtype: tuple[float, int]
     """
@@ -56,9 +56,6 @@ def transfer_entropy(
             "See `infomeasure.transfer_entropy` for available approaches. \n"
             f"help(infomeasure.transfer_entropy):\n{im_te.__doc__}"
         )
-
-    if te_kwargs is None:
-        te_kwargs = {}
 
     def te_p_value(x, y, lag, **kwargs):
         est = estimator(

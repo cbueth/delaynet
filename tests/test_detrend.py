@@ -1,8 +1,10 @@
 """Tests for the detrending function."""
 
 import pytest
+import io
+import sys
 from numpy import array, array_equal, ndarray
-from delaynet.detrending import detrend
+from delaynet.detrending import detrend, show_detrending_methods
 
 
 def test_detrend_with_string_metric(time_series):
@@ -107,3 +109,26 @@ def test_detrend_empty_time_series(empty_time_series_array):
     """Test detrending with empty time series."""
     with pytest.raises(ValueError):
         detrend(empty_time_series_array, method="id")
+
+
+def test_show_detrending_methods():
+    """Test the show_detrending_methods function."""
+    # Capture stdout
+    captured_output = io.StringIO()
+    sys.stdout = captured_output
+
+    # Call the function
+    show_detrending_methods()
+
+    # Restore stdout
+    sys.stdout = sys.__stdout__
+
+    # Check the output
+    output = captured_output.getvalue()
+    assert "Available detrending methods:" in output
+    assert "Detrending method:" in output
+    assert "Aliases:" in output
+
+    # Check for some common methods
+    assert "identity" in output or "id" in output
+    assert "delta" in output or "dt" in output

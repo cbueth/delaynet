@@ -29,6 +29,14 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
     detrend the data point.
     The current value is removed from the sub time series to avoid bias.
 
+    When ``periodicity > 1``, the function compares each point with other points at the
+    same phase of the cycle (same position within each period).
+
+    When ``periodicity == 1``:
+    - If ``max_periods == -1``, a simple Z-score is applied to the entire time series.
+    - If ``max_periods != -1``, a moving window approach is used, where each point is
+      compared with ``max_periods`` points before and after it.
+
     For a valid Z-Score, :math:`2\times\texttt{periodicity}+1 \leq \texttt{len(ts)}`
     needs to be satisfied.
     Also, :math:`\texttt{max_periods} \times \texttt{periodicity} \geq\texttt{len(ts)}`
@@ -71,7 +79,7 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
         )
         max_periods = -1
 
-    if max_periods == -1 or periodicity == 1:
+    if periodicity == 1 and max_periods == -1:
         # Simple case, no slicing needed
         ts_std = std(ts)
         if ts_std == 0:
@@ -99,6 +107,10 @@ def _z_score_loop_all(periodicity, ts):  # pragma: no cover
         st_dev = std(sub_ts)
         if st_dev > 0:
             ts2[k] = (ts[k] - npmean(sub_ts)) / st_dev
+        else:
+            # When std is 0, all points at the same phase have the same value
+            # The detrended value should be 0 (point is exactly at the mean)
+            ts2[k] = 0.0
     return ts2
 
 
@@ -110,18 +122,23 @@ def _z_score_loop_partial(periodicity, max_periods, ts):  # pragma: no cover
         st_dev = std(sub_ts)
         if st_dev > 0:
             ts2[k] = (ts[k] - npmean(sub_ts)) / st_dev
+        else:
+            # When std is 0, all points at the same phase have the same value
+            # The detrended value should be 0 (point is exactly at the mean)
+            ts2[k] = 0.0
     return ts2
 
 
 @njit
 def _get_sub_ts_all_periods(ts, k, periodicity):  # pragma: no cover
     """Get the sub time series for all periods."""
-    in_offset = mod(k, periodicity)
-    sub_slice = slice(in_offset, None, periodicity)
-    sub_ts = ts[sub_slice]
+    # Get the phase of the current point
+    phase = mod(k, periodicity)
+    # Get all indices with the same phase
+    indices = arange(phase, len(ts), periodicity, dtype=int64)
     # Remove the current index
-    mask = arange(len(ts)) != k
-    return sub_ts[mask[sub_slice]]
+    indices = indices[indices != k]
+    return ts[indices]
 
 
 @njit

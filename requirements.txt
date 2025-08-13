@@ -21,3 +21,4 @@ sphinx-book-theme
 sphinxcontrib-bibtex
 # Plotting
 matplotlib
+networkx

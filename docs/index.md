@@ -111,7 +111,7 @@ Furthermore, you can also find the {ref}`API documentation <API Reference>`.
 ## How to cite
 
 If you use `delaynet` in your research, find the `CITATION.cff` file
-in [the repository](https://gitlab.ifisc.uib-csic.es/carlson/delaynet) and cite it
+in [the repository](https://github.com/cbueth/delaynet) and cite it
 accordingly.
 GitLab provides citation metadata from the `CITATION.cff`, and you can also copy an APA
 or BibTeX entry from the repository.
@@ -122,7 +122,7 @@ availability.
 ## Contributing
 
 If you want to contribute to the development of `delaynet`, please read the
-[CONTRIBUTING.md](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/-/blob/main/CONTRIBUTING.md)
+[CONTRIBUTING.md](https://github.com/cbueth/delaynet/-/blob/main/CONTRIBUTING.md)
 file.
 
 ## Acknowledgments

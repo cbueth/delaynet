@@ -68,7 +68,7 @@ html_theme = "sphinx_book_theme"
 html_static_path = ["_static"]
 html_js_files = ["custom.js"]
 html_theme_options = {
-    "repository_url": "https://gitlab.ifisc.uib-csic.es/carlson/delaynet",
+    "repository_url": "https://github.com/cbueth/delaynet",
     "repository_branch": "main",
     "use_source_button": True,
     "use_repository_button": True,

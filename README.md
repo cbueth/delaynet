@@ -3,7 +3,7 @@
     <picture>
       <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/cbueth/delaynet/refs/heads/main/docs/_static/dn_banner.png">
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cbueth/delaynet/refs/heads/main/docs/_static/dn_banner_dark.png">
-      <img src="https://raw.githubusercontent.com/cbueth/delaynet/refs/heads/main/docs/_static/dn_banner.png" style="max-width: 100%; height: auto;" alt="delaynet logo">
+      <img src="https://raw.githubusercontent.com/cbueth/delaynet/refs/heads/main/docs/_static/dn_banner.png" style="max-width: 80%; height: auto;" alt="delaynet logo">
     </picture>
   </a>
 </div>
@@ -39,8 +39,8 @@ reconstruction, and network analysis.
 ---
 
 For details on how to use this package, see the
-[Guide](https://carlson.pages.ifisc.uib-csic.es/delaynet/guide/) or
-the [Documentation](https://carlson.pages.ifisc.uib-csic.es/delaynet/).
+[Guide](https://delaynet.readthedocs.io/en/latest/guide/) or
+the [Documentation](https://delaynet.readthedocs.io/en/latest/).
 
 ## Setup
 

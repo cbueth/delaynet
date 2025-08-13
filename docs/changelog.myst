@@ -1,6 +1,16 @@
 # Changelog
 
-## Version 0.3.0 (2025-0X-XX)
+## Version 0.3.0 (2025-08-13)
+
+- 📊 **Data Generation Integration**: Added [
+  `synthatdelays`](https://pypi.org/project/synthatdelays/) data generation
+  configurations for synthetic time series
+  creation (`61de4ca`)
+
+- 🔧 **Development Infrastructure**
+    - Updated UV package manager to version 0.8.4 (`9478c31`)
+    - Enhanced `uv`-based testing and setup instructions (`31a803d`)
+    - Added Python 3.14rc1 to CI testing with allowed failures (`9478c31`)
 
 - 🔄 **API Improvements for Entropy-based Connectivities**
 
@@ -12,6 +22,7 @@
     - Add test suite for detrending methods and connectivity metrics (`833e5c5`)
     - Update regex in test assertion for pattern size and lag-steps (`2ef4ba3`)
     - Increase test coverage among several modules (`6c2414d`)
+    - Relaxed correlation threshold in data generator tests (`ac63942`)
 
 - 🐛 **Fixes:**
     - Specify 'spawn' start method in ProcessPoolExecutor to resolve fork warnings (
@@ -60,7 +71,7 @@
 
 - 🔄 **API Refactoring: Normalization → Detrending**
 
-    - **Breaking Change:** Renamed all "normalization/norm" terminology to "
+    - **Breaking Change:** Renamed all "normalisation/norm" terminology to "
       detrending/detrend" for semantic accuracy
     - **Renamed:** Main API function from `normalise()` to `detrend()` and
       `show_norms()` to `show_detrending_methods()`

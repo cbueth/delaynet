@@ -24,7 +24,7 @@ environ["SPHINX_MYST_NB_BUILD"] = "1"
 from datetime import datetime
 
 project = "delaynet"
-copyright = f"2024–{datetime.now().year}, infomeasure maintainers"
+copyright = f"2024–{datetime.now().year}, delaynet maintainers"
 author = "Carlson Büth"
 version = "0.3.0"
 

@@ -253,6 +253,7 @@ def test_gen_fmri_multiple_different_node_counts(n_nodes):
     ts = gen_fmri_multiple(
         ts_len=ts_len,
         n_nodes=n_nodes,
+        rng=0,
     )
 
     assert ts.shape[0] == n_nodes

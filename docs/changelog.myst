@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.3.1 (2025-08-XX)
+## Version 0.3.1 (2025-08-14)
 
 - **Network metrics normalisation**
     - Added decorator-based option to return z-scores for all network analysis metrics

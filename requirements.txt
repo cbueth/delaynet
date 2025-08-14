@@ -5,7 +5,7 @@ statsmodels
 scikit-learn
 numba
 python-igraph
-synthatdelays
+synthatdelays>=1.0.2
 # Code Quality
 pre-commit
 ruff

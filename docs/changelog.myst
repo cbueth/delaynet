@@ -1,5 +1,19 @@
 # Changelog
 
+## Version 0.3.1 (2025-08-14)
+
+- **Network metrics normalisation**
+    - Added decorator-based option to return z-scores for all network analysis metrics
+      by comparing against directed Erdos–Rényi $G(n,m)$ ensembles with matching nodes
+      and
+      links.
+    - API: `normalise: bool | None` (default None), `n_random: int = 20`,
+      `random_seed: int | None`.
+    - Strictly binary-only for normalisation; weighted normalisation is not supported.
+    - Documented in the Network Analysis guide with rationale and examples, citing
+      {cite:p}`zaninStudyingTopologyTransportation2018`.
+      See in {ref}`normalisation-metrics-example`.
+
 ## Version 0.3.0 (2025-08-13)
 
 - 📊 **Data Generation Integration**: Added [

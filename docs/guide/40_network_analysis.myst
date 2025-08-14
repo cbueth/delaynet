@@ -321,6 +321,55 @@ recip = dn.network_analysis.reciprocity(binary_adjacency)
 print(f"Reciprocity: {recip:.4f}")
 ```
 
+(normalisation-metrics-example)=
+
+## Normalising Metrics with Random Equivalent Networks
+
+Raw topological metrics can be misleading when networks differ in size or density. To
+enable fair comparison and scientific rigour, delaynet supports reporting metrics as
+z-scores relative to an ensemble of random directed graphs with the same number of nodes
+and links. This follows best practices advocated for transportation systems analysis in
+{cite:p}`zaninStudyingTopologyTransportation2018`.
+
+- Null model: Directed Erdos–Rényi $G(n,m)$ with no self-loops, sampled on-the-fly via
+  `igraph.Graph.Erdos_Renyi(n, m, directed=True, loops=False)`.
+- Binary-only: Normalisation requires a strictly binary adjacency with a zero diagonal
+  (no self-loops). Weighted normalisation is intentionally not supported; first
+  binarise (e.g., statistical pruning) before normalising.
+- Z-score: $z = \frac{x_{\text{true}} - \mu_{\text{null}}}{\sigma_{\text{null}}}$
+  computed element-wise for vector metrics; if
+  $\sigma_{\text{null}} = 0$, the returned $z$ is 0.0.
+- Reproducibility: Use `random_seed` to seed igraph’s RNG through Python’s `random`
+  module; results are deterministic for a given seed and `n_random`.
+
+Example usage:
+
+```{code-cell}
+# Global efficiency as a z-score vs random equivalent networks
+z_eff = dn.network_analysis.global_efficiency(
+    binary_adjacency, normalise=True  # n_random=20 is default
+)
+print(f"Global efficiency z-score: {z_eff:.4f}")
+
+# Betweenness centrality z-scores per node
+z_bc = dn.network_analysis.betweenness_centrality(
+    binary_adjacency, normalise=True, n_random=30
+)
+print(f"Betweenness centrality z-scores: {z_bc}")
+
+# Reciprocity z-score
+z_rec = dn.network_analysis.reciprocity(
+    binary_adjacency, normalise=True, n_random=50, random_seed=107
+)
+print(f"Reciprocity z-score: {z_rec:.4f}")
+```
+
+Interpretation guidance:
+
+- $z>0$ indicates the observed metric is larger than expected under the null; $z<0$
+  smaller than random.
+- Magnitude reflects strength of deviation from the null.
+
 ## Network Visualization
 
 We can visualize the network using NetworkX to better understand its structure:

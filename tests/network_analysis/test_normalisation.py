@@ -22,6 +22,8 @@ from delaynet.network_analysis.metrics import (
     global_efficiency,
     transitivity,
     eigenvector_centrality,
+    isolated_nodes_inbound,
+    isolated_nodes_outbound,
 )
 from delaynet.network_analysis._normalisation import (
     _random_directed_gnm_igraph,
@@ -87,7 +89,10 @@ def test_er_generator_invalid_m_raises():
 
 
 def test_seed_reproducibility_for_zscores():
-    """Same seed yields identical z-scores; different seeds likely differ."""
+    """Same seed yields identical z-scores; different seeds likely differ.
+
+    Use a metric with non-degenerate null variance to avoid NaN (e.g., global_efficiency).
+    """
     # Small binary graph without self-loops
     A = np.array(
         [
@@ -99,26 +104,49 @@ def test_seed_reproducibility_for_zscores():
         dtype=int,
     )
 
-    z1 = link_density(A, normalise=True, n_random=20, random_seed=555)
-    z2 = link_density(A, normalise=True, n_random=20, random_seed=555)
+    z1 = global_efficiency(A, normalise=True, n_random=20, random_seed=555)
+    z2 = global_efficiency(A, normalise=True, n_random=20, random_seed=555)
     assert z1 == pytest.approx(z2), "Same seed should reproduce identical z-scores"
 
-    z3 = link_density(A, normalise=True, n_random=20, random_seed=556)
+    z3 = global_efficiency(A, normalise=True, n_random=20, random_seed=556)
     # With high probability different seeds differ; allow equality as a rare edge-case
     assert not np.allclose(z1, z3) or True
 
 
-def test_sigma_zero_returns_zero():
-    """When the null distribution has zero variance, the z-score should be 0.0."""
+def test_sigma_zero_returns_nan():
+    """When the null distribution has zero variance, the z-score should be NaN.
+
+    Also expect a user warning when normalising link density.
+    """
     # Empty graph (m=0) => link density is always 0 across the ensemble
     A = np.zeros((4, 4), dtype=int)
-    z = link_density(A, normalise=True, n_random=10)
-    assert z == 0.0
-    assert np.isfinite(z)
+    with pytest.warns(UserWarning, match=r"link density"):
+        z = link_density(A, normalise=True, n_random=10)
+    assert np.isnan(z)
 
 
-def test_output_shape_parity_scalar_and_vector_metrics():
-    """Normalised outputs must preserve shapes/types of raw outputs across metrics."""
+def test_link_density_normalisation_warns_user():
+    """Normalising link density should warn that it is not very meaningful (σ=0)."""
+    A = np.array(
+        [
+            [0, 1, 0],
+            [0, 0, 1],
+            [1, 0, 0],
+        ],
+        dtype=int,
+    )
+    # Keep the regex simple to avoid false negatives due to punctuation/casing
+    with pytest.warns(UserWarning, match=r"link density"):
+        _ = link_density(A, normalise=True, n_random=5, random_seed=123)
+
+
+def test_output_shape_parity_scalar_and_vector_metrics(network_metric_and_kind):
+    """Normalised outputs must preserve shapes/types of raw outputs across metrics.
+
+    This test uses the network_metric_and_kind fixture to iterate over all metrics
+    and verifies scalar vs vector parity. It also expects the link_density warning
+    when normalising.
+    """
     # Build a small binary, directed graph without self-loops
     A = np.array(
         [
@@ -130,27 +158,51 @@ def test_output_shape_parity_scalar_and_vector_metrics():
         dtype=int,
     )
 
-    # Scalar metrics
-    for fn in (link_density, reciprocity, transitivity, global_efficiency):
-        raw = fn(A)
-        z = fn(A, normalise=True, n_random=10)
-        assert isinstance(raw, float)
-        assert np.asarray(z).shape == ()
+    fn, kind = network_metric_and_kind
 
-    # Vector metrics
-    for fn in (betweenness_centrality, eigenvector_centrality):
-        raw_vec = fn(A)
-        z_vec = fn(A, normalise=True, n_random=10)
-        assert isinstance(raw_vec, np.ndarray)
-        assert raw_vec.shape == z_vec.shape
+    # Compute raw and normalised outputs, handling expected warnings for link_density
+    raw = fn(A)
+    if fn is link_density:
+        with pytest.warns(UserWarning, match=r"link density"):
+            z = fn(A, normalise=True, n_random=10)
+    else:
+        z = fn(A, normalise=True, n_random=10)
+
+    if kind == "scalar":
+        # Raw must be a scalar (float or int depending on metric)
+        assert np.asarray(raw).shape == ()
+        # Normalised output for scalar metrics must also be a scalar float
+        assert isinstance(z, float)
+        assert np.asarray(z).shape == ()
+    else:
+        # Vector metrics must preserve array shape on normalisation
+        assert isinstance(raw, np.ndarray)
+        assert isinstance(z, np.ndarray)
+        assert raw.shape == z.shape
+
+
+def test_link_density_normalisation_nan_for_random_input():
+    """For an input drawn from G(n,m), density normalisation should be NaN.
+
+    The null ensemble preserves the exact number of links m, making the
+    density distribution degenerate (sigma==0). Therefore the z-score is NaN.
+    Also expect the standard user warning for link density normalisation.
+    """
+    n, m = 7, 11
+    A = _random_directed_gnm_igraph(n, m)
+    with pytest.warns(UserWarning, match=r"link density"):
+        z = link_density(A, normalise=True, n_random=25, random_seed=123)
+    assert np.isnan(z)
 
 
 def test_zscore_near_zero_for_random_graph():
-    """For an input drawn from the null model, z-scores should be near 0 on average."""
+    """For an input drawn from the null model, z-scores should be near 0 on average.
+
+    Use a metric with non-degenerate variance under the null (global_efficiency).
+    """
     n, m = 8, 10
     A = _random_directed_gnm_igraph(n, m)
-    # Ensure diagonal zero (generator already does this); and A is binary
-    z = link_density(A, normalise=True, n_random=100, random_seed=123)
+    z = global_efficiency(A, normalise=True, n_random=100, random_seed=123)
     assert np.isfinite(z)
     assert abs(z) <= 2.0  # loose tolerance; should be near 0 in expectation
 
@@ -195,6 +247,16 @@ def test_invalid_normalise_value_raises():
             eigenvector_centrality,
             lambda: np.array([[0, 1, 0], [0, 0, 1], [0, 0, 0]], dtype=int),
         ),
+        (
+            isolated_nodes_inbound,
+            # Column 2 has zero inbound (no ones in last column)
+            lambda: np.array([[0, 1, 0], [0, 0, 0], [0, 0, 0]], dtype=int),
+        ),
+        (
+            isolated_nodes_outbound,
+            # Row 0 has zero outbound (all zeros in first row)
+            lambda: np.array([[0, 1, 1], [1, 0, 1], [0, 0, 0]], dtype=int),
+        ),
     ],
 )
 def test_normalisation_does_not_change_default(fn, build_A):
@@ -204,6 +266,10 @@ def test_normalisation_does_not_change_default(fn, build_A):
     legacy = fn(A)
     # Explicit False (should be identical)
     current = fn(A, normalise=False)
+
+    assert type(legacy) == type(current)
+    print(fn(A, normalise=True))
+
     if isinstance(legacy, np.ndarray):
         assert np.array_equal(current, legacy)
     else:

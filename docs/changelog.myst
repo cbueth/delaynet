@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.?.? (2025-08-??)
+## Version 0.3.2 (2025-08-14)
 
 - 🐛 Fix: Normalised scalar metrics returned NumPy arrays instead of Python floats; now
   scalars remain floats, vectors remain arrays. Added a user warning when normalising

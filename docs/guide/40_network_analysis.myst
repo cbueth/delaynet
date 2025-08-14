@@ -338,7 +338,7 @@ and links. This follows best practices advocated for transportation systems anal
   binarise (e.g., statistical pruning) before normalising.
 - Z-score: $z = \frac{x_{\text{true}} - \mu_{\text{null}}}{\sigma_{\text{null}}}$
   computed element-wise for vector metrics; if
-  $\sigma_{\text{null}} = 0$, the returned $z$ is 0.0.
+  $\sigma_{\text{null}} = 0$, the returned $z$ is NaN.
 - Reproducibility: Use `random_seed` to seed igraph’s RNG through Python’s `random`
   module; results are deterministic for a given seed and `n_random`.
 

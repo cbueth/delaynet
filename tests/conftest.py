@@ -6,6 +6,16 @@ from numpy import array
 from delaynet.preparation.data_generator import gen_delayed_causal_network, gen_fmri
 from delaynet.connectivities import __all_connectivity_metrics_names_simple__
 from delaynet.detrending_methods import __all_detrending__
+from delaynet.network_analysis.metrics import (
+    link_density,
+    reciprocity,
+    betweenness_centrality,
+    global_efficiency,
+    transitivity,
+    eigenvector_centrality,
+    isolated_nodes_inbound,
+    isolated_nodes_outbound,
+)
 
 
 CONN_METRICS = {
@@ -71,6 +81,39 @@ def connectivity_metric_kwargs(request):
 )
 def detrending_function(request):
     """Return a detrending function."""
+    return request.param
+
+
+# ******************************************************************************
+# Dynamic metrics for network analysis
+# ******************************************************************************
+
+# List all network analysis metrics with their output kind (scalar vs vector)
+# - scalar: returns a single number (float/int) when not normalised
+# - vector: returns a 1-D numpy array
+NETWORK_METRICS_AND_KIND = [
+    (link_density, "scalar"),
+    (reciprocity, "scalar"),
+    (transitivity, "scalar"),
+    (global_efficiency, "scalar"),
+    (isolated_nodes_inbound, "scalar"),
+    (isolated_nodes_outbound, "scalar"),
+    (betweenness_centrality, "vector"),
+    (eigenvector_centrality, "vector"),
+]
+
+
+@pytest.fixture(
+    scope="session",
+    params=NETWORK_METRICS_AND_KIND,
+    ids=[f"{fn.__name__}:{kind}" for fn, kind in NETWORK_METRICS_AND_KIND],
+)
+def network_metric_and_kind(request):
+    """Provide each network metric together with its output kind.
+
+    Returns a tuple (fn, kind) where fn is the metric function and kind is
+    either "scalar" or "vector" indicating the raw (non-normalised) output type.
+    """
     return request.param
 
 

@@ -14,6 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 from igraph import Graph
 import random as _py_random
+import warnings
 
 
 def _is_square_matrix(weight_matrix: NDArray[np.number | np.bool_]) -> bool:
@@ -139,6 +140,16 @@ def normalise_against_random(metric_fn: Callable[..., Any]) -> Callable[..., Any
         # Compute the true metric value on the provided (binary) matrix
         x_true = metric_fn(weight_matrix, *args, **kwargs)
 
+        # Warn users when normalising link density: null ensemble preserves m → σ=0
+        if getattr(metric_fn, "__name__", "").lower() == "link_density":
+            warnings.warn(
+                "Normalising link density against G(n,m) is typically not meaningful: "
+                "the null model preserves the number of links, so the null distribution "
+                "is degenerate (σ=0) and the z-score is undefined (NaN).",
+                UserWarning,
+                stacklevel=2,
+            )
+
         # Sample ensemble and compute metric values
         samples = []
         for _ in range(n_rand_val):
@@ -151,11 +162,17 @@ def normalise_against_random(metric_fn: Callable[..., Any]) -> Callable[..., Any
         sigma = samples_arr.std(axis=0, ddof=0)
 
         x_true_arr = np.asarray(x_true, dtype=float)
-        z = np.zeros_like(x_true_arr, dtype=float)
+        # Start with NaNs; fill only where sigma>0
+        z = np.full_like(x_true_arr, np.nan, dtype=float)
         mask = sigma > 0
         z[mask] = (x_true_arr[mask] - mu[mask]) / sigma[mask]
-        # Where sigma == 0, leave z at 0.0 by design
+        # Where sigma == 0, z remains NaN by design
 
+        # Preserve output type/shape parity with raw metric outputs
+        # - If the raw metric returned a scalar (Python float or NumPy scalar), return a Python float
+        # - Otherwise, return an ndarray matching the raw output shape
+        if np.isscalar(x_true) or np.asarray(x_true).shape == ():
+            return float(z)
         return z
 
     return wrapper

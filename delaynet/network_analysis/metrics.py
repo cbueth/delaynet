@@ -67,7 +67,7 @@ def betweenness_centrality(
       nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
       with ``directed=True`` and ``loops=False``.
     - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null`` (element-wise).
-    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``NaN``.
 
     Example:
     --------
@@ -167,7 +167,7 @@ def link_density(
       with ``directed=True`` and ``loops=False``.
     - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``. For vector-valued
       metrics, the z-score is computed element-wise.
-    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``NaN``.
 
     Example:
     --------
@@ -246,7 +246,7 @@ def isolated_nodes_inbound(weight_matrix: ndarray) -> int:
       nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
       with ``directed=True`` and ``loops=False``.
     - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``.
-    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``NaN``.
 
     Example:
     --------
@@ -318,7 +318,7 @@ def isolated_nodes_outbound(weight_matrix: ndarray) -> int:
       nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
       with ``directed=True`` and ``loops=False``.
     - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``.
-    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``NaN``.
 
     Example:
     --------
@@ -393,7 +393,7 @@ def global_efficiency(weight_matrix: ndarray, directed: bool = True) -> float:
       nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
       with ``directed=True`` and ``loops=False``.
     - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``.
-    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``NaN``.
 
     Example:
     --------
@@ -517,7 +517,7 @@ def transitivity(weight_matrix: ndarray) -> float:
       nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
       with ``directed=True`` and ``loops=False``.
     - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``.
-    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``NaN``.
 
     Example:
     --------
@@ -612,7 +612,7 @@ def reciprocity(weight_matrix: ndarray) -> float:
       nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
       with ``directed=True`` and ``loops=False``.
     - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``.
-    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``NaN``.
 
     Example:
     --------
@@ -710,7 +710,7 @@ def eigenvector_centrality(
       nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
       with ``directed=True`` and ``loops=False``.
     - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null`` (element-wise).
-    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``NaN``.
 
     Example:
     --------

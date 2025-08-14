@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 0.?.? (2025-08-??)
+
+- 🐛 Fix: Normalised scalar metrics returned NumPy arrays instead of Python floats; now
+  scalars remain floats, vectors remain arrays. Added a user warning when normalising
+  link density since the null ensemble preserves the number of links (σ=0), making the
+  null distribution degenerate with undefined z-scores (NaN), so normalising density is
+  not very meaningful.
+
 ## Version 0.3.1 (2025-08-14)
 
 - **Network metrics normalisation**

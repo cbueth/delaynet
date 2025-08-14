@@ -16,8 +16,10 @@ from numpy import (
     zeros,
     linalg,
 )
+from ._normalisation import normalise_against_random
 
 
+@normalise_against_random
 def betweenness_centrality(
     weight_matrix: ndarray,
     directed: bool = True,
@@ -35,11 +37,37 @@ def betweenness_centrality(
     :type weight_matrix: numpy.ndarray, shape (n_nodes, n_nodes)
     :param directed: If True, treat the network as directed.
     :type directed: bool
-    :param normalize: If True, normalize by the maximum possible betweenness.
+    :param normalize: If True, normalize by the maximum possible betweenness (scaling).
     :type normalize: bool
-    :return: Array of betweenness centrality values for each node.
+    :param normalise: If True, return a z-score by comparing the metric value to an
+                      ensemble of directed random graphs with the same number of nodes
+                      and links (G(n,m)). If False or None, the metric is computed
+                      without normalisation (default).
+    :type normalise: bool | None
+    :param n_random: Number of random realisations for the null ensemble. Only valid when
+                     ``normalise=True``. Default is 20.
+    :type n_random: int
+    :param random_seed: Random seed for reproducibility of the null ensemble. Only valid
+                        when ``normalise=True``.
+    :type random_seed: int | None
+    :return: Array of betweenness centrality values for each node, or the corresponding
+             z-scores if ``normalise=True``.
     :rtype: numpy.ndarray, shape (n_nodes,)
     :raises ValueError: If weight_matrix is not square.
+    :raises ValueError: If ``normalise`` is False or None and normalisation parameters
+                        (``n_random`` or ``random_seed``) are provided.
+    :raises ValueError: If ``normalise=True`` and ``weight_matrix`` is not strictly binary
+                        (values must be in {0,1}). Weighted normalisation is not supported.
+    :raises ValueError: If ``normalise=True`` and the diagonal of ``weight_matrix`` is not
+                        zero (no self-loops are assumed).
+
+    Normalisation details:
+
+    - The null model is a directed Erdos–Rényi G(n,m) ensemble with the same number of
+      nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
+      with ``directed=True`` and ``loops=False``.
+    - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null`` (element-wise).
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
 
     Example:
     --------
@@ -93,6 +121,7 @@ def betweenness_centrality(
     return centrality
 
 
+@normalise_against_random
 def link_density(
     weight_matrix: ndarray,
     directed: bool = True,
@@ -109,9 +138,36 @@ def link_density(
     :type weight_matrix: numpy.ndarray, shape (n_nodes, n_nodes)
     :param directed: If True, treat the network as directed.
     :type directed: bool
-    :return: Link density value between 0 and 1.
+    :param normalise: If True, return a z-score by comparing the metric value to an
+                      ensemble of directed random graphs with the same number of nodes
+                      and links (G(n,m)). If False or None, the metric is computed
+                      without normalisation (default).
+    :type normalise: bool | None
+    :param n_random: Number of random realisations for the null ensemble. Only valid when
+                     ``normalise=True``. Default is 20.
+    :type n_random: int
+    :param random_seed: Random seed for reproducibility of the null ensemble. Only valid
+                        when ``normalise=True``.
+    :type random_seed: int | None
+    :return: Link density value between 0 and 1, or the corresponding z-score if
+             ``normalise=True``.
     :rtype: float
-    :raises ValueError: If weight_matrix is not square.
+    :raises ValueError: If ``weight_matrix`` is not square.
+    :raises ValueError: If ``normalise`` is False or None and normalisation parameters
+                        (``n_random`` or ``random_seed``) are provided.
+    :raises ValueError: If ``normalise=True`` and ``weight_matrix`` is not strictly binary
+                        (values must be in {0,1}). Weighted normalisation is not supported.
+    :raises ValueError: If ``normalise=True`` and the diagonal of ``weight_matrix`` is not
+                        zero (no self-loops are assumed).
+
+    Normalisation details:
+
+    - The null model is a directed Erdos–Rényi G(n,m) ensemble with the same number of
+      nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
+      with ``directed=True`` and ``loops=False``.
+    - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``. For vector-valued
+      metrics, the z-score is computed element-wise.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
 
     Example:
     --------
@@ -151,6 +207,7 @@ def link_density(
     return existing_connections / max_connections
 
 
+@normalise_against_random
 def isolated_nodes_inbound(weight_matrix: ndarray) -> int:
     """
     Count the number of nodes with no inbound links.
@@ -161,9 +218,35 @@ def isolated_nodes_inbound(weight_matrix: ndarray) -> int:
                           indicate connections. Rows represent sources,
                           columns represent targets.
     :type weight_matrix: numpy.ndarray, shape (n_nodes, n_nodes)
-    :return: Number of nodes with no inbound connections.
-    :rtype: int
+    :param normalise: If True, return a z-score by comparing the metric value to an
+                      ensemble of directed random graphs with the same number of nodes
+                      and links (G(n,m)). If False or None, the metric is computed
+                      without normalisation (default).
+    :type normalise: bool | None
+    :param n_random: Number of random realisations for the null ensemble. Only valid when
+                     ``normalise=True``. Default is 20.
+    :type n_random: int
+    :param random_seed: Random seed for reproducibility of the null ensemble. Only valid
+                        when ``normalise=True``.
+    :type random_seed: int | None
+    :return: Number of nodes with no inbound connections, or the corresponding z-score if
+             ``normalise=True``.
+    :rtype: int | float
     :raises ValueError: If weight_matrix is not square.
+    :raises ValueError: If ``normalise`` is False or None and normalisation parameters
+                        (``n_random`` or ``random_seed``) are provided.
+    :raises ValueError: If ``normalise=True`` and ``weight_matrix`` is not strictly binary
+                        (values must be in {0,1}). Weighted normalisation is not supported.
+    :raises ValueError: If ``normalise=True`` and the diagonal of ``weight_matrix`` is not
+                        zero (no self-loops are assumed).
+
+    Normalisation details:
+
+    - The null model is a directed Erdos–Rényi G(n,m) ensemble with the same number of
+      nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
+      with ``directed=True`` and ``loops=False``.
+    - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
 
     Example:
     --------
@@ -195,6 +278,7 @@ def isolated_nodes_inbound(weight_matrix: ndarray) -> int:
     return int(isolated_inbound)
 
 
+@normalise_against_random
 def isolated_nodes_outbound(weight_matrix: ndarray) -> int:
     """
     Count the number of nodes with no outbound links.
@@ -206,9 +290,35 @@ def isolated_nodes_outbound(weight_matrix: ndarray) -> int:
                           indicate connections. Rows represent sources,
                           columns represent targets.
     :type weight_matrix: numpy.ndarray, shape (n_nodes, n_nodes)
-    :return: Number of nodes with no outbound connections.
-    :rtype: int
+    :param normalise: If True, return a z-score by comparing the metric value to an
+                      ensemble of directed random graphs with the same number of nodes
+                      and links (G(n,m)). If False or None, the metric is computed
+                      without normalisation (default).
+    :type normalise: bool | None
+    :param n_random: Number of random realisations for the null ensemble. Only valid when
+                     ``normalise=True``. Default is 20.
+    :type n_random: int
+    :param random_seed: Random seed for reproducibility of the null ensemble. Only valid
+                        when ``normalise=True``.
+    :type random_seed: int | None
+    :return: Number of nodes with no outbound connections, or the corresponding z-score if
+             ``normalise=True``.
+    :rtype: int | float
     :raises ValueError: If weight_matrix is not square.
+    :raises ValueError: If ``normalise`` is False or None and normalisation parameters
+                        (``n_random`` or ``random_seed``) are provided.
+    :raises ValueError: If ``normalise=True`` and ``weight_matrix`` is not strictly binary
+                        (values must be in {0,1}). Weighted normalisation is not supported.
+    :raises ValueError: If ``normalise=True`` and the diagonal of ``weight_matrix`` is not
+                        zero (no self-loops are assumed).
+
+    Normalisation details:
+
+    - The null model is a directed Erdos–Rényi G(n,m) ensemble with the same number of
+      nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
+      with ``directed=True`` and ``loops=False``.
+    - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
 
     Example:
     --------
@@ -240,6 +350,7 @@ def isolated_nodes_outbound(weight_matrix: ndarray) -> int:
     return int(isolated_outbound)
 
 
+@normalise_against_random
 def global_efficiency(weight_matrix: ndarray, directed: bool = True) -> float:
     """
     Compute the global efficiency of the network.
@@ -254,9 +365,35 @@ def global_efficiency(weight_matrix: ndarray, directed: bool = True) -> float:
     :type weight_matrix: numpy.ndarray, shape (n_nodes, n_nodes)
     :param directed: If True, treat the network as directed.
     :type directed: bool
-    :return: Global efficiency value between 0 and 1.
+    :param normalise: If True, return a z-score by comparing the metric value to an
+                      ensemble of directed random graphs with the same number of nodes
+                      and links (G(n,m)). If False or None, the metric is computed
+                      without normalisation (default).
+    :type normalise: bool | None
+    :param n_random: Number of random realisations for the null ensemble. Only valid when
+                     ``normalise=True``. Default is 20.
+    :type n_random: int
+    :param random_seed: Random seed for reproducibility of the null ensemble. Only valid
+                        when ``normalise=True``.
+    :type random_seed: int | None
+    :return: Global efficiency value between 0 and 1, or the corresponding z-score if
+             ``normalise=True``.
     :rtype: float
     :raises ValueError: If weight_matrix is not square.
+    :raises ValueError: If ``normalise`` is False or None and normalisation parameters
+                        (``n_random`` or ``random_seed``) are provided.
+    :raises ValueError: If ``normalise=True`` and ``weight_matrix`` is not strictly binary
+                        (values must be in {0,1}). Weighted normalisation is not supported.
+    :raises ValueError: If ``normalise=True`` and the diagonal of ``weight_matrix`` is not
+                        zero (no self-loops are assumed).
+
+    Normalisation details:
+
+    - The null model is a directed Erdos–Rényi G(n,m) ensemble with the same number of
+      nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
+      with ``directed=True`` and ``loops=False``.
+    - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
 
     Example:
     --------
@@ -319,6 +456,7 @@ def global_efficiency(weight_matrix: ndarray, directed: bool = True) -> float:
     return total_efficiency / pair_count
 
 
+@normalise_against_random
 def transitivity(weight_matrix: ndarray) -> float:
     r"""
     Compute the transitivity (global clustering coefficient) of the network.
@@ -351,9 +489,35 @@ def transitivity(weight_matrix: ndarray) -> float:
     :param weight_matrix: Matrix of connection weights. Non-zero values
                           indicate connections.
     :type weight_matrix: numpy.ndarray, shape (n_nodes, n_nodes)
-    :return: Transitivity value between 0 and 1.
+    :param normalise: If True, return a z-score by comparing the metric value to an
+                      ensemble of directed random graphs with the same number of nodes
+                      and links (G(n,m)). If False or None, the metric is computed
+                      without normalisation (default).
+    :type normalise: bool | None
+    :param n_random: Number of random realisations for the null ensemble. Only valid when
+                     ``normalise=True``. Default is 20.
+    :type n_random: int
+    :param random_seed: Random seed for reproducibility of the null ensemble. Only valid
+                        when ``normalise=True``.
+    :type random_seed: int | None
+    :return: Transitivity value between 0 and 1, or the corresponding z-score if
+             ``normalise=True``.
     :rtype: float
     :raises ValueError: If weight_matrix is not square.
+    :raises ValueError: If ``normalise`` is False or None and normalisation parameters
+                        (``n_random`` or ``random_seed``) are provided.
+    :raises ValueError: If ``normalise=True`` and ``weight_matrix`` is not strictly binary
+                        (values must be in {0,1}). Weighted normalisation is not supported.
+    :raises ValueError: If ``normalise=True`` and the diagonal of ``weight_matrix`` is not
+                        zero (no self-loops are assumed).
+
+    Normalisation details:
+
+    - The null model is a directed Erdos–Rényi G(n,m) ensemble with the same number of
+      nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
+      with ``directed=True`` and ``loops=False``.
+    - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
 
     Example:
     --------
@@ -394,6 +558,7 @@ def transitivity(weight_matrix: ndarray) -> float:
     return float(result)
 
 
+@normalise_against_random
 def reciprocity(weight_matrix: ndarray) -> float:
     r"""
     Compute the reciprocity of a directed network.
@@ -419,9 +584,35 @@ def reciprocity(weight_matrix: ndarray) -> float:
     :param weight_matrix: Matrix of connection weights. Non-zero values
                           indicate connections.
     :type weight_matrix: numpy.ndarray, shape (n_nodes, n_nodes)
-    :return: Reciprocity value between 0 and 1.
+    :param normalise: If True, return a z-score by comparing the metric value to an
+                      ensemble of directed random graphs with the same number of nodes
+                      and links (G(n,m)). If False or None, the metric is computed
+                      without normalisation (default).
+    :type normalise: bool | None
+    :param n_random: Number of random realisations for the null ensemble. Only valid when
+                     ``normalise=True``. Default is 20.
+    :type n_random: int
+    :param random_seed: Random seed for reproducibility of the null ensemble. Only valid
+                        when ``normalise=True``.
+    :type random_seed: int | None
+    :return: Reciprocity value between 0 and 1, or the corresponding z-score if
+             ``normalise=True``.
     :rtype: float
     :raises ValueError: If weight_matrix is not square or if the network is undirected.
+    :raises ValueError: If ``normalise`` is False or None and normalisation parameters
+                        (``n_random`` or ``random_seed``) are provided.
+    :raises ValueError: If ``normalise=True`` and ``weight_matrix`` is not strictly binary
+                        (values must be in {0,1}). Weighted normalisation is not supported.
+    :raises ValueError: If ``normalise=True`` and the diagonal of ``weight_matrix`` is not
+                        zero (no self-loops are assumed).
+
+    Normalisation details:
+
+    - The null model is a directed Erdos–Rényi G(n,m) ensemble with the same number of
+      nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
+      with ``directed=True`` and ``loops=False``.
+    - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null``.
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
 
     Example:
     --------
@@ -473,6 +664,7 @@ def reciprocity(weight_matrix: ndarray) -> float:
     return float(result)
 
 
+@normalise_against_random
 def eigenvector_centrality(
     weight_matrix: ndarray,
     directed: bool = True,
@@ -490,9 +682,35 @@ def eigenvector_centrality(
     :type weight_matrix: numpy.ndarray, shape (n_nodes, n_nodes)
     :param directed: If True, treat the network as directed.
     :type directed: bool
-    :return: Array of eigenvector centrality values for each node.
+    :param normalise: If True, return z-scores by comparing the metric values to an
+                      ensemble of directed random graphs with the same number of nodes
+                      and links (G(n,m)). If False or None, the metric is computed
+                      without normalisation (default).
+    :type normalise: bool | None
+    :param n_random: Number of random realisations for the null ensemble. Only valid when
+                     ``normalise=True``. Default is 20.
+    :type n_random: int
+    :param random_seed: Random seed for reproducibility of the null ensemble. Only valid
+                        when ``normalise=True``.
+    :type random_seed: int | None
+    :return: Array of eigenvector centrality values for each node, or the corresponding
+             z-scores if ``normalise=True``.
     :rtype: numpy.ndarray, shape (n_nodes,)
     :raises ValueError: If weight_matrix is not square.
+    :raises ValueError: If ``normalise`` is False or None and normalisation parameters
+                        (``n_random`` or ``random_seed``) are provided.
+    :raises ValueError: If ``normalise=True`` and ``weight_matrix`` is not strictly binary
+                        (values must be in {0,1}). Weighted normalisation is not supported.
+    :raises ValueError: If ``normalise=True`` and the diagonal of ``weight_matrix`` is not
+                        zero (no self-loops are assumed).
+
+    Normalisation details:
+
+    - The null model is a directed Erdos–Rényi G(n,m) ensemble with the same number of
+      nodes and links as the input network, sampled using :func:`igraph.Graph.Erdos_Renyi`
+      with ``directed=True`` and ``loops=False``.
+    - The returned value is a z-score: ``z = (x_true − μ_null) / σ_null`` (element-wise).
+    - If ``σ_null = 0`` at any position, the returned z-score at that position is ``0.0``.
 
     Example:
     --------

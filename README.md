@@ -36,6 +36,16 @@ It provides tools for data preparation and detrending, multiple connectivity mea
 (e.g. Granger causality, transfer entropy, correlations), optimal-lag network
 reconstruction, and network analysis.
 
+### Features
+
+- Connectivity measures with hypothesis testing and optimal-lag reconstruction
+- Network analysis: betweenness, eigenvector centrality, link density, transitivity,
+  reciprocity, isolated nodes, global efficiency
+- Null-model normalisation for metrics: report z-scores vs directed G(n,m) random
+  graphs (igraph-based; binary-only; on-the-fly generation)
+- Comprehensive documentation and examples
+- Tested across multiple Python versions with high coverage
+
 ---
 
 For details on how to use this package, see the

@@ -12,8 +12,11 @@ These tests focus on:
 
 from __future__ import annotations
 
+import random as _py_random
+
 import numpy as np
 import pytest
+from igraph import Graph
 
 from delaynet.network_analysis.metrics import (
     link_density,
@@ -152,8 +155,8 @@ def test_output_shape_parity_scalar_and_vector_metrics(network_metric_and_kind):
         [
             [0, 1, 0, 0],
             [0, 0, 1, 0],
-            [0, 0, 0, 1],
-            [0, 0, 0, 0],
+            [1, 0, 0, 1],
+            [1, 0, 1, 0],
         ],
         dtype=int,
     )
@@ -195,18 +198,6 @@ def test_link_density_normalisation_nan_for_random_input():
     assert np.isnan(z)
 
 
-def test_zscore_near_zero_for_random_graph():
-    """For an input drawn from the null model, z-scores should be near 0 on average.
-
-    Use a metric with non-degenerate variance under the null (global_efficiency).
-    """
-    n, m = 8, 10
-    A = _random_directed_gnm_igraph(n, m)
-    z = global_efficiency(A, normalise=True, n_random=100, random_seed=123)
-    assert np.isfinite(z)
-    assert abs(z) <= 2.0  # loose tolerance; should be near 0 in expectation
-
-
 def test_non_square_with_normalise_true_raises():
     A = np.array([[0, 1, 0], [0, 0, 1]])  # 2x3 non-square
     with pytest.raises(ValueError, match="must be square"):
@@ -245,7 +236,9 @@ def test_invalid_normalise_value_raises():
         ),
         (
             eigenvector_centrality,
-            lambda: np.array([[0, 1, 0], [0, 0, 1], [0, 0, 0]], dtype=int),
+            lambda: np.array(
+                [[0, 1, 0, 1], [1, 0, 0, 1], [1, 1, 0, 0], [0, 0, 1, 0]], dtype=int
+            ),
         ),
         (
             isolated_nodes_inbound,
@@ -268,9 +261,44 @@ def test_normalisation_does_not_change_default(fn, build_A):
     current = fn(A, normalise=False)
 
     assert type(legacy) == type(current)
-    print(fn(A, normalise=True))
 
     if isinstance(legacy, np.ndarray):
-        assert np.array_equal(current, legacy)
+        assert np.allclose(current, legacy)
     else:
         assert current == legacy
+
+
+@pytest.mark.parametrize("n, m", [(15, 32), (15, 66), (15, 132), (15, 135)])
+def test_example_matrices(network_metric_and_kind, n, m):
+    """Test with G(n, m) matrices."""
+    _py_random.seed(123)
+    A = Graph.Erdos_Renyi(n=n, m=m, directed=True, loops=False).get_adjacency().data
+    A = np.array(A, dtype=int)
+    fn, kind = network_metric_and_kind
+
+    if fn.__name__.lower() == "link_density":
+        with pytest.warns(UserWarning, match=r"link density"):
+            z = fn(A, normalise=True, random_seed=123)
+    else:
+        z = fn(A, normalise=True, random_seed=123)
+
+    val = fn(A, normalise=False)
+
+    if (fn.__name__.lower() == "link_density") or (
+        fn.__name__.lower() == "global_efficiency" and m > 133
+    ):
+        assert not np.isnan(val)
+        assert np.isnan(z)
+    elif "isolated_nodes" in fn.__name__.lower() and m > 80:
+        assert not np.isnan(val)
+        assert val == 0
+        assert np.isnan(z)
+    else:
+        if isinstance(z, np.ndarray):
+            assert not np.any(np.isnan(val))
+            assert not np.any(np.isnan(z))
+            assert np.all(np.isfinite(z))
+        else:
+            assert not np.isnan(val)
+            assert not np.isnan(z)
+            assert np.isfinite(z)

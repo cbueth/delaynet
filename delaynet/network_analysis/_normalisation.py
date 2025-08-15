@@ -8,7 +8,7 @@ number of nodes and links (G(n, m)), generated on-the-fly with igraph.
 from __future__ import annotations
 
 from functools import wraps
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 import numpy as np
 from numpy.typing import NDArray
@@ -124,6 +124,17 @@ def normalise_against_random(metric_fn: Callable[..., Any]) -> Callable[..., Any
                 "zero self-loops and try again."
             )
 
+        # Warn users when normalising link density: null ensemble preserves m → σ=0
+        if getattr(metric_fn, "__name__", "").lower() == "link_density":
+            warnings.warn(
+                "Normalising link density against G(n,m) is typically not meaningful: "
+                "the null model preserves the number of links, so the null distribution "
+                "is degenerate (σ=0) and the z-score is undefined (NaN).",
+                UserWarning,
+                stacklevel=2,
+            )
+            return float("nan")
+
         n = weight_matrix.shape[0]
         m = int(
             weight_matrix.sum()
@@ -139,16 +150,6 @@ def normalise_against_random(metric_fn: Callable[..., Any]) -> Callable[..., Any
 
         # Compute the true metric value on the provided (binary) matrix
         x_true = metric_fn(weight_matrix, *args, **kwargs)
-
-        # Warn users when normalising link density: null ensemble preserves m → σ=0
-        if getattr(metric_fn, "__name__", "").lower() == "link_density":
-            warnings.warn(
-                "Normalising link density against G(n,m) is typically not meaningful: "
-                "the null model preserves the number of links, so the null distribution "
-                "is degenerate (σ=0) and the z-score is undefined (NaN).",
-                UserWarning,
-                stacklevel=2,
-            )
 
         # Sample ensemble and compute metric values
         samples = []

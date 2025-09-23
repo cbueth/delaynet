@@ -6,7 +6,7 @@ see the following notebooks which integrate the package's features.
 ```{admonition} TBD
 :class: warning
 
-Demos are currently beoing prepared and will be available shortly.
+Demos are currently being prepared and will be available shortly.
 
 - Demo 1: Synthetic connectivity and optimal lag - based on the paper's methods
   example, this demo shows how to:

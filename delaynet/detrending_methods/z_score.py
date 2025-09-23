@@ -33,6 +33,7 @@ def z_score(ts: ndarray, periodicity: int = 1, max_periods: int = -1) -> ndarray
     same phase of the cycle (same position within each period).
 
     When ``periodicity == 1``:
+
     - If ``max_periods == -1``, a simple Z-score is applied to the entire time series.
     - If ``max_periods != -1``, a moving window approach is used, where each point is
       compared with ``max_periods`` points before and after it.

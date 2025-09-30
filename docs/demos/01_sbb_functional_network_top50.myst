@@ -275,7 +275,7 @@ weights, lags = dn.reconstruct_network(
     arrival_delay_15mins_matrix_detrended.T,
     connectivity_measure="gc",  # Granger Causality
     lag_steps=16,  # 4h max delay tested
-    workers=10,
+#    workers=10,
 )
 ```
 

@@ -48,7 +48,7 @@ def gen_synthatdelays_random_connectivity(
     buffer_time: float,
     seed: int = 0,
 ) -> Results_Class:
-    """Generate delay data using SynthATDelays Random Connectivity scenario.
+    """Generate delay data using `SynthATDelays <https://gitlab.com/MZanin/synth-at-delays>`_ Random Connectivity scenario.
 
     This scenario is composed of a set of airports, randomly connected by a set of
     independent flights, and with random and homogeneous enroute delays.

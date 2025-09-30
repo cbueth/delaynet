@@ -1,0 +1,209 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
+(demo_network_reconstruction)=
+
+# Connectivity: best lag and $p$-value landscapes (SynthATDelays)
+
+This short demo focuses on a minimal, interpretable workflow using
+the [SynthATDelays](https://gitlab.com/MZanin/synth-at-delays) "random connectivity" generator.
+We generate synthetic airport delay time series with
+{py:func}`~delaynet.preparation.data_generator.gen_synthatdelays_random_connectivity`,
+pick two airports and find the optimal lag with Granger causality (GC), visualise the GC $p$-values across lags to see how
+the optimum is selected, and finally compare the $p$-value landscapes of several measures (LC/RC/GC/MI/TE).
+
+```{code-cell}
+import delaynet as dn
+from delaynet.connectivities.granger import gt_single_lag
+from numpy.random import default_rng
+from matplotlib import pyplot as plt
+
+rng = default_rng(1612757)
+```
+
+## 1. Generate synthetic airport delays and pick two series
+
+We use the [SynthATDelays](https://gitlab.com/MZanin/synth-at-delays) "random connectivity" scenario to obtain realistic delay time
+series. Then we select two airports and estimate the optimal lag with GC.
+
+```{code-cell}
+# Generate transportation-like delay time series (airports × time)
+results = dn.preparation.gen_synthatdelays_random_connectivity(
+    sim_time=40,        # Simulation time in days
+    num_airports=5,     # Number of airports
+    num_aircraft=14,    # Number of aircraft
+    buffer_time=0.8,    # Buffer time between operations in hours
+    seed=16729410976    # Random seed for reproducibility
+)
+
+# Extract the average arrival delay matrix
+time_series = results.avgArrivalDelay
+print(f"Shape of arrival delays matrix: {time_series.shape}")
+
+# Extract two time series
+ts1 = time_series[:, 0]
+ts2 = time_series[:, 1]
+max_lag = 50
+
+# Using this package
+best_p_value, lag = dn.connectivity(ts1, ts2, "gc", lag_steps=max_lag)
+
+print(f"Best lag: {lag}")
+print(f"Best p-value: {best_p_value}")
+```
+
+## 2. Visualise GC $p$-values across lags
+
+A simple scan of lags shows how the optimal delay corresponds to the minimum $p$-value.
+
+```{code-cell}
+:tags: [hide-input]
+# Visualisation on how this value is found:
+def get_p_values(ts1, ts2, method, lags):
+    p_vals = []
+    for lag in lags:
+        p_value = method(ts1, ts2, lag)
+        p_vals.append(p_value)
+    return p_vals
+
+lags = range(1, max_lag + 1, 1)
+p_values = get_p_values(ts1, ts2, gt_single_lag, lags)
+
+# Plotting the p-values
+plt.figure(figsize=(10, 4), dpi=300)
+plt.plot(lags, p_values, marker='o')
+plt.axvline(x=p_values.index(min(p_values)) + 1, color='r', linestyle='--',
+            label=f'Minimum $p$-value at lag {p_values.index(min(p_values)) + 1}')
+plt.title(r'$p$-values for Different Lags in GC Connectivity')
+plt.xlabel('Lag')
+plt.ylabel('$p$-value')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+This plot shows the evolution of the $p$-values calculated for each lag, as obtained by the
+GC on two synthetic time series created with a delayed causal network. The minimum
+$p$-value is interpreted as the optimal delay, indicating the most
+significant causal connection. Note how $p$-values can increase for high lags; as their
+calculation requires more complex models, the corresponding degrees of freedom also
+increase, resulting in less statistically significant results. See {ref}`network_reconstruction`
+for a discussion of best-lag selection and $p$-values.
+
+## 3. Compare connectivity measures and their $p$-value landscapes
+
+We next compare several measures on the same pair (using a smaller max lag) and then plot
+their $p$-value curves across lags.
+
+```{code-cell}
+max_lag = 20
+(
+    dn.connectivity(ts1, ts2, "lc", lag_steps=max_lag),
+    dn.connectivity(ts1, ts2, "rc", lag_steps=max_lag),
+    dn.connectivity(ts1, ts2, "gc", lag_steps=max_lag),
+    dn.connectivity(ts1, ts2, "mi", lag_steps=max_lag, approach="kernel", kernel="box",
+                    bandwidth=0.01),
+    dn.connectivity(ts1, ts2, "te", lag_steps=max_lag, approach="ordinal",
+                    embedding_dim=3)
+)
+```
+
+We see the different approaches find different best $p$-values at differing lags.
+Let’s also visualise each method's $p$-value landscape.
+
+```{code-cell}
+:tags: [hide-input]
+from scipy.stats import pearsonr, spearmanr
+from infomeasure import estimator
+
+# LC:
+def _pearson_pval(ts1, ts2, lag, **pr_kwargs):
+    return pearsonr(ts1[: -lag or None], ts2[lag:], **pr_kwargs)[1]
+
+# RC:
+def _rc_pval(ts1, ts2, lag, **sr_kwargs):
+    return spearmanr(ts1[: -lag or None], ts2[lag:], **sr_kwargs)[1]
+
+# GC: gt_single_lag
+
+# MI:
+def mi_p_value(x, y, lag):
+    est = estimator(
+        x,
+        y,
+        measure="mutual_information",
+        approach="kernel", kernel="box", bandwidth=0.01,
+        prop_time=lag,
+    )
+    test = est.statistical_test(method="permutation_test", n_tests=20)
+    return test.p_value
+
+# TE:
+
+def te_p_value(x, y, lag, **kwargs):
+    est = estimator(
+        x,
+        y,
+        measure="transfer_entropy",
+        approach="ordinal", embedding_dim=3,
+        prop_time=lag,
+    )
+    test = est.statistical_test(method="permutation_test", n_tests=20)
+    return test.p_value
+```
+
+```{code-cell}
+lags = range(1, 24, 1)
+p_vals_per_method = {
+    "LC": _pearson_pval,
+    "RC": _rc_pval,
+    "GC": gt_single_lag,
+    "MI (Box Kernel)": mi_p_value,
+    "TE (Ordinal D=3)": te_p_value,
+}
+p_vals_per_method = {
+    key: get_p_values(ts1, ts2, val, lags)
+    for key, val in p_vals_per_method.items()
+}
+```
+
+```{code-cell}
+:tags: [hide-input]
+# Plot all methods like the GC plot before, but all in one axis
+plt.figure(figsize=(12, 6), dpi=300)
+
+for method, p_vals in p_vals_per_method.items():
+    line = plt.plot(lags, p_vals, marker='o', markersize=4, label=method)
+
+    # Find minimum p-value and its lag for each method
+    min_idx = p_vals.index(min(p_vals))
+    min_lag = list(lags)[min_idx]
+
+    plt.axvline(x=min_lag, linestyle='--', alpha=0.7, color=line[0].get_color())
+
+plt.title('$p$-values for Different Lags - Comparing Connectivity Methods')
+plt.xlabel('Lag')
+plt.ylabel('$p$-value')
+plt.legend()
+plt.grid(True, alpha=0.5)
+plt.show()
+```
+
+The $p$-value curves produced in our run are shown for reference.
+These illustrate that different methods often achieve their minima at different lags, with varying significance levels.
+MI here uses a kernel estimator with a box kernel and specific bandwidth; changing the estimator or its parameters may alter sensitivity. TE here uses an ordinal estimator with `embedding_dim=3`; as
+with MI, the estimator choice and parameters matter and can change outcomes.
+
+### Interpretation notes
+
+There is no strict hierarchy among connectivity measures. While TE is more sophisticated than a simple correlation, it is not universally "better"; the right choice depends on the data, the task, the
+estimator, and the window length (see {ref}`connectivity_sec` and {ref}`network_reconstruction`).
+Non‑linear approaches such as TE and MI typically require longer time series to detect relationships reliably, and may therefore be ill‑suited for short windows where data are scarce.
+When the underlying propagation is predominantly linear, non‑linear methods can be ill‑matched to the signal, whereas linear methods (LC/RC/GC) can perform strongly.
+Importantly, linear approaches do not ignore non‑linear relations; they capture the linear component or a linear approximation of them, so a negative result from a linear method does not prove the
+absence of non‑linear dependence—and vice versa.
+Finally, remember that $p$-values quantify statistical significance, not effect size; they vary with series length, noise level, estimator settings, and degrees of freedom (which typically grow with
+lag/order), so avoid comparing $p$-values across datasets or lengths without care.

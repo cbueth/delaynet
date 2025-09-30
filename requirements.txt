@@ -22,3 +22,4 @@ sphinxcontrib-bibtex
 # Plotting
 matplotlib
 networkx
+contextily

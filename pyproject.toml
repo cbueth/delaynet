@@ -25,7 +25,7 @@ classifiers = [
     "Natural Language :: English",
 ]
 dynamic = ["readme", "version"]
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 dependencies = [
     "numpy",
     "scipy",
@@ -53,6 +53,8 @@ doc = [
     "sphinx-book-theme",
     "sphinxcontrib-bibtex",
     "matplotlib",
+    "networkx",
+    "contextily",
 ]
 all = ["delaynet[lint,test,doc]"]
 

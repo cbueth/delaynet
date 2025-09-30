@@ -8,7 +8,9 @@ kernelspec:
 
 # Connectivity: best lag and $p$-value landscapes (SynthATDelays)
 
-This short demo focuses on a minimal, interpretable workflow using the SynthATDelays "random connectivity" generator. We generate synthetic airport delay time series with
+This short demo focuses on a minimal, interpretable workflow using
+the [SynthATDelays](https://gitlab.com/MZanin/synth-at-delays) "random connectivity" generator.
+We generate synthetic airport delay time series with
 {py:func}`~delaynet.preparation.data_generator.gen_synthatdelays_random_connectivity`,
 pick two airports and find the optimal lag with Granger causality (GC), visualise the GC $p$-values across lags to see how
 the optimum is selected, and finally compare the $p$-value landscapes of several measures (LC/RC/GC/MI/TE).

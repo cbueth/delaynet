@@ -132,6 +132,8 @@ Additional available methods include:
 Choose the appropriate correction method based on your specific requirements, the characteristics of your data, and whether your tests can be assumed to be independent.
 ```
 
+(network_metrics)=
+
 ## Network Metrics
 
 Once we have a pruned network, we can calculate various metrics to analyze its

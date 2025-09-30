@@ -57,6 +57,7 @@ doc = [
     "geopandas",
     "contextily",
     "folium",
+    "mapclassify",
 ]
 all = ["delaynet[lint,test,doc]"]
 

@@ -54,6 +54,7 @@ doc = [
     "sphinxcontrib-bibtex",
     "matplotlib",
     "networkx",
+    "geopandas",
     "contextily",
 ]
 all = ["delaynet[lint,test,doc]"]

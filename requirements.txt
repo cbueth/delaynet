@@ -22,4 +22,5 @@ sphinxcontrib-bibtex
 # Plotting
 matplotlib
 networkx
+geopandas
 contextily

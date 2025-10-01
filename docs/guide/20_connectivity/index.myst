@@ -91,8 +91,8 @@ dn.connectivity(ts1, ts2, "gc", lag_steps=max_lag)
 
 ## Using Connectivity Measures
 
-`delaynet` provides a unified interface for all connectivity measures through the {py:
-func}`~delaynet.connectivity.connectivity` function.
+`delaynet` provides a unified interface for all connectivity measures through
+the {py:func}`~delaynet.connectivity.connectivity` function.
 A diverse set of connectivity metrics to analyze relationships between time series data
 are available. Each metric offers different approaches to detecting connections, from
 simple correlations to complex causality measures. You can refer to each method by its

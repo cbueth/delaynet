@@ -10,6 +10,7 @@ from numpy import (
     array,
     sum as np_sum,
     all as np_all,
+    allclose as np_allclose,
     fill_diagonal,
     triu,
     isnan,
@@ -750,7 +751,30 @@ def eigenvector_centrality(
     )
 
     # Use igraph's eigenvector centrality
-    centrality = g.eigenvector_centrality(weights="weight", directed=directed)
+    # In igraph 1.0.0, the 'directed' parameter behaviour changed
+    # For undirected graphs, don't pass the directed parameter to avoid "Invalid mode" error
+    # For directed graphs, we can pass directed=directed safely
+
+    # Check for contradictory parameters
+    # The issue is when user passes directed=True but the matrix is symmetric
+    # which suggests they might have intended undirected behaviour
+    matrix_is_symmetric = np_allclose(weight_matrix, weight_matrix.T)
+
+    if directed and matrix_is_symmetric:
+        import warnings
+
+        warnings.warn(
+            "Parameter 'directed=True' was passed buts weight matrix is symmetric, "
+            "suggesting an undirected graph was intended. Consider using directed=False "
+            "or providing an asymmetric weight matrix for a directed graph.",
+            UserWarning,
+            stacklevel=2,
+        )
+
+    if g.is_directed():
+        centrality = g.eigenvector_centrality(weights="weight", directed=directed)
+    else:
+        centrality = g.eigenvector_centrality(weights="weight")
 
     # Convert to numpy array and normalize to unit length
     centrality = array(centrality)

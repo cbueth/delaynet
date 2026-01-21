@@ -33,14 +33,12 @@ site:
      <a href="https://pypi.org/project/delaynet/" style="margin: 0 10px; display: inline-block;">
        <img src="https://badge.fury.io/py/delaynet.svg" alt="PyPI version" />
      </a>
-     <!-- arXiv badge will be added once the preprint is available
-     <a href="https://arxiv.org/abs/0000.12345" style="margin: 0 10px; display: inline-block;">
-       <img src="https://img.shields.io/badge/arXiv-0000.12345-b31b1b.svg" alt="arXiv Pre-print" />
+     <a href="https://arxiv.org/abs/2510.05143" style="margin: 0 10px; display: inline-block;">
+       <img src="https://img.shields.io/badge/arXiv-2510.05143-b31b1b.svg" alt="arXiv Pre-print" />
      </a>
-     <a href="https://doi.org/10.5281/zenodo.15241810" style="margin: 0 10px; display: inline-block;">
-       <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.15241810.svg" alt="Zenodo Project" />
+     <a href="https://doi.org/10.5281/zenodo.16875272" style="margin: 0 10px; display: inline-block;">
+       <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.16875272.svg" alt="Zenodo Project" />
      </a>
-     -->
      <a href="https://anaconda.org/conda-forge/delaynet" style="margin: 0 10px; display: inline-block;">
        <img src="https://img.shields.io/conda/vn/conda-forge/delaynet.svg" alt="Conda version" />
      </a>

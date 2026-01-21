@@ -19,6 +19,7 @@
 
 <div align="center">
 
+<a href="">[![arXiv](https://img.shields.io/badge/arXiv-2510.05143-b31b1b.svg)](https://arxiv.org/abs/2510.05143)</a>
 <a href="">[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16875272.svg)](https://doi.org/10.5281/zenodo.16875272)</a>
 <a href="">[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)</a>
 <a href="">[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-1.2-4baaaa.svg)](CODE_OF_CONDUCT.md)</a>

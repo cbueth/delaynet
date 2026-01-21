@@ -766,6 +766,29 @@ class TestEigenvectorCentrality:
             # The result should be the same as the input (zero vector)
             assert_array_equal(centrality_zero, np.array(mock_result_zero))
 
+    def test_eigenvector_centrality_directed_param_warning(self):
+        """Test that a warning is raised when directed=True is passed to undirected graph."""
+        weights = np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]])  # Symmetric undirected
+
+        import warnings
+
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter("always")
+            centrality = eigenvector_centrality(
+                weights, directed=True
+            )  # Contradictory: undirected graph but directed=True
+
+            # Check that a warning was issued
+            assert len(warning_list) == 1
+            assert (
+                "Parameter 'directed=True' was passed buts weight matrix is symmetric"
+                in str(warning_list[0].message)
+            )
+            assert warning_list[0].category == UserWarning
+
+        # The function should still work, just with directed parameter ignored
+        assert len(centrality) == 3
+
     def test_eigenvector_centrality_input_validation(self):
         """Test input validation for eigenvector centrality."""
         non_square_weights = np.array([[1, 0, 1]])

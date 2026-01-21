@@ -1,6 +1,6 @@
 variables:
-  UV_VERSION: "0.8.4"
-  PYTHON_VERSION: "3.13"
+  UV_VERSION: "0.9.26"
+  PYTHON_VERSION: "3.14"
   BASE_LAYER: bookworm-slim
   # GitLab CI creates a separate mountpoint for the build directory,
   # so we need to copy instead of using hard links.
@@ -27,12 +27,12 @@ stages:
 .pythonVersions:
   parallel:
     matrix:
-      - PY_VERSION: [ "3.13", "3.12", "3.11" ]
+      - PY_VERSION: [ "3.14", "3.13", "3.12" ]
   #  allow_failure:
-  #    - PY_VERSION: "3.14"
+  #    - PY_VERSION: "3.15"
   maxVersion:
     matrix:
-      - PY_VERSION: [ "3.13" ]
+      - PY_VERSION: [ "3.14" ]
 
 before_script:
   - UV_PYTHON=${PY_VERSION} uv sync --extra=test

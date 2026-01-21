@@ -23,59 +23,59 @@ class TestBetweennessCentrality:
         "weights, directed, normalize, expected_centrality, test_description",
         [
             (
-                    np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]]),
-                    True,
-                    True,
-                    np.array([0.0, 1.0, 0.0]),
-                    "linear path - middle node has highest betweenness",
+                np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]]),
+                True,
+                True,
+                np.array([0.0, 1.0, 0.0]),
+                "linear path - middle node has highest betweenness",
             ),
             (
-                    np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
-                    False,
-                    True,
-                    np.array([0.0, 0.0, 0.0]),
-                    "triangle network - no betweenness (all nodes connected)",
+                np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
+                False,
+                True,
+                np.array([0.0, 0.0, 0.0]),
+                "triangle network - no betweenness (all nodes connected)",
             ),
             (
-                    np.array([[0, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]]),
-                    False,
-                    True,
-                    np.array([1.0, 0.0, 0.0, 0.0]),
-                    "star network - center node has all betweenness",
+                np.array([[0, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]]),
+                False,
+                True,
+                np.array([1.0, 0.0, 0.0, 0.0]),
+                "star network - center node has all betweenness",
             ),
             (
-                    np.zeros((3, 3)),
-                    True,
-                    True,
-                    np.array([0.0, 0.0, 0.0]),
-                    "network with no connections",
+                np.zeros((3, 3)),
+                True,
+                True,
+                np.array([0.0, 0.0, 0.0]),
+                "network with no connections",
             ),
             (np.array([[0]]), True, True, np.array([0.0]), "single node network"),
             (
-                    np.array([[0, 1], [1, 0]]),
-                    False,
-                    True,
-                    np.array([0.0, 0.0]),
-                    "two node network - no intermediate paths",
+                np.array([[0, 1], [1, 0]]),
+                False,
+                True,
+                np.array([0.0, 0.0]),
+                "two node network - no intermediate paths",
             ),
             (
-                    np.array([[0, 1, 0, 0], [1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0]]),
-                    True,
-                    True,
-                    np.array([0.0, 2.0 / 3.0, 2.0 / 3.0, 0.0]),
-                    "linear path with 4 nodes - middle nodes have equal betweenness",
+                np.array([[0, 1, 0, 0], [1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0]]),
+                True,
+                True,
+                np.array([0.0, 2.0 / 3.0, 2.0 / 3.0, 0.0]),
+                "linear path with 4 nodes - middle nodes have equal betweenness",
             ),
             (
-                    np.array([[0, 1, 1, 0], [1, 0, 0, 1], [1, 0, 0, 1], [0, 1, 1, 0]]),
-                    False,
-                    True,
-                    np.array([1.0 / 6.0, 1.0 / 6.0, 1.0 / 6.0, 1.0 / 6.0]),
-                    "4-node cycle - all nodes have equal betweenness",
+                np.array([[0, 1, 1, 0], [1, 0, 0, 1], [1, 0, 0, 1], [0, 1, 1, 0]]),
+                False,
+                True,
+                np.array([1.0 / 6.0, 1.0 / 6.0, 1.0 / 6.0, 1.0 / 6.0]),
+                "4-node cycle - all nodes have equal betweenness",
             ),
         ],
     )
     def test_betweenness_centrality_scenarios(
-            self, weights, directed, normalize, expected_centrality, test_description
+        self, weights, directed, normalize, expected_centrality, test_description
     ):
         """Test betweenness centrality calculation for various network scenarios."""
         centrality = betweenness_centrality(
@@ -243,35 +243,35 @@ class TestLinkDensity:
         "weights, directed, expected_density, test_description",
         [
             (
-                    np.array([[0, 1, 0], [0, 0, 1], [0, 0, 0]]),
-                    True,
-                    2.0 / 6.0,
-                    "basic directed network",
+                np.array([[0, 1, 0], [0, 0, 1], [0, 0, 0]]),
+                True,
+                2.0 / 6.0,
+                "basic directed network",
             ),
             (
-                    np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]]),
-                    False,
-                    2.0 / 3.0,
-                    "undirected network",
+                np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]]),
+                False,
+                2.0 / 3.0,
+                "undirected network",
             ),
             (
-                    np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
-                    True,
-                    1.0,
-                    "fully connected directed network",
+                np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
+                True,
+                1.0,
+                "fully connected directed network",
             ),
             (
-                    np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
-                    False,
-                    1.0,
-                    "fully connected undirected network",
+                np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
+                False,
+                1.0,
+                "fully connected undirected network",
             ),
             (np.zeros((3, 3)), True, 0.0, "network with no connections"),
             (np.array([[0]]), True, 0.0, "single node network"),
         ],
     )
     def test_link_density_scenarios(
-            self, weights, directed, expected_density, test_description
+        self, weights, directed, expected_density, test_description
     ):
         """Test link density calculation for various network scenarios."""
         density = link_density(weights, directed=directed)
@@ -293,37 +293,37 @@ class TestIsolatedNodes:
         "weights, expected_inbound, expected_outbound, test_description",
         [
             (
-                    np.array([[0, 1, 0], [0, 0, 1], [0, 0, 0]]),
-                    1,  # Node 0 has no inbound connections
-                    1,  # Node 2 has no outbound connections
-                    "basic network with isolated nodes",
+                np.array([[0, 1, 0], [0, 0, 1], [0, 0, 0]]),
+                1,  # Node 0 has no inbound connections
+                1,  # Node 2 has no outbound connections
+                "basic network with isolated nodes",
             ),
             (
-                    np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]]),
-                    0,  # All nodes have inbound connections
-                    0,  # All nodes have outbound connections
-                    "network with no isolated nodes",
+                np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]]),
+                0,  # All nodes have inbound connections
+                0,  # All nodes have outbound connections
+                "network with no isolated nodes",
             ),
             (
-                    np.zeros((3, 3)),
-                    3,  # All nodes isolated inbound
-                    3,  # All nodes isolated outbound
-                    "network with all nodes isolated",
+                np.zeros((3, 3)),
+                3,  # All nodes isolated inbound
+                3,  # All nodes isolated outbound
+                "network with all nodes isolated",
             ),
         ],
     )
     def test_isolated_nodes_scenarios(
-            self, weights, expected_inbound, expected_outbound, test_description
+        self, weights, expected_inbound, expected_outbound, test_description
     ):
         """Test isolated nodes counting for various network scenarios."""
         inbound_count = isolated_nodes_inbound(weights)
         outbound_count = isolated_nodes_outbound(weights)
 
         assert (
-                inbound_count == expected_inbound
+            inbound_count == expected_inbound
         ), f"Inbound count failed for {test_description}"
         assert (
-                outbound_count == expected_outbound
+            outbound_count == expected_outbound
         ), f"Outbound count failed for {test_description}"
 
     def test_isolated_nodes_input_validation(self):
@@ -344,23 +344,23 @@ class TestGlobalEfficiency:
         "weights, directed, expected_efficiency, test_description",
         [
             (
-                    np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
-                    False,
-                    1.0,
-                    "fully connected undirected network",
+                np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
+                False,
+                1.0,
+                "fully connected undirected network",
             ),
             (np.zeros((3, 3)), True, 0.0, "network with no connections"),
             (np.array([[0]]), True, 0.0, "single node network"),
             (
-                    np.array([[0, 1, 0], [0, 0, 1], [0, 0, 0]]),
-                    True,
-                    (1.0 + 0.5 + 1.0) / 6.0,
-                    "directed path network",
+                np.array([[0, 1, 0], [0, 0, 1], [0, 0, 0]]),
+                True,
+                (1.0 + 0.5 + 1.0) / 6.0,
+                "directed path network",
             ),
         ],
     )
     def test_global_efficiency_scenarios(
-            self, weights, directed, expected_efficiency, test_description
+        self, weights, directed, expected_efficiency, test_description
     ):
         """Test global efficiency calculation for various network scenarios."""
         efficiency = global_efficiency(weights, directed=directed)
@@ -418,71 +418,71 @@ class TestTransitivity:
         "weights, expected_transitivity, test_description",
         [
             (
-                    np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
-                    1.0,
-                    "triangle network with perfect transitivity",
+                np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
+                1.0,
+                "triangle network with perfect transitivity",
             ),
             (
-                    np.array([[0, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]]),
-                    0.0,
-                    "star network with no triangles",
+                np.array([[0, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]]),
+                0.0,
+                "star network with no triangles",
             ),
             (np.zeros((3, 3)), 0.0, "network with no connections"),
             (np.array([[0]]), 0.0, "single node network"),
             (np.array([[0, 1], [1, 0]]), 0.0, "two node network"),
             (
-                    np.array([[0, 1, 1, 1], [1, 0, 1, 0], [1, 1, 0, 0], [1, 0, 0, 0]]),
-                    0.6,
-                    "4-node network with one complete triangle (transitivity = 0.6)",
+                np.array([[0, 1, 1, 1], [1, 0, 1, 0], [1, 1, 0, 0], [1, 0, 0, 0]]),
+                0.6,
+                "4-node network with one complete triangle (transitivity = 0.6)",
             ),
             (
-                    np.array(
-                        [
-                            [0, 1, 1, 0, 0],
-                            [1, 0, 1, 1, 0],
-                            [1, 1, 0, 0, 0],
-                            [0, 1, 0, 0, 1],
-                            [0, 0, 0, 1, 0],
-                        ]
-                    ),
-                    0.5,
-                    "5-node network with partial connectivity (transitivity = 0.5)",
+                np.array(
+                    [
+                        [0, 1, 1, 0, 0],
+                        [1, 0, 1, 1, 0],
+                        [1, 1, 0, 0, 0],
+                        [0, 1, 0, 0, 1],
+                        [0, 0, 0, 1, 0],
+                    ]
+                ),
+                0.5,
+                "5-node network with partial connectivity (transitivity = 0.5)",
             ),
             (
-                    np.array([[0, 1, 1, 1], [1, 0, 1, 0], [1, 1, 0, 1], [1, 0, 1, 0]]),
-                    0.75,
-                    "4-node network with multiple triangles (transitivity = 0.75)",
+                np.array([[0, 1, 1, 1], [1, 0, 1, 0], [1, 1, 0, 1], [1, 0, 1, 0]]),
+                0.75,
+                "4-node network with multiple triangles (transitivity = 0.75)",
             ),
             (
-                    np.array(
-                        [
-                            [0, 1, 1, 1, 0, 0],
-                            [1, 0, 1, 0, 1, 0],
-                            [1, 1, 0, 0, 0, 1],
-                            [1, 0, 0, 0, 1, 1],
-                            [0, 1, 0, 1, 0, 1],
-                            [0, 0, 1, 1, 1, 0],
-                        ]
-                    ),
-                    1.0 / 3.0,
-                    "6-node network with mixed connectivity (transitivity ≈ 0.33)",
+                np.array(
+                    [
+                        [0, 1, 1, 1, 0, 0],
+                        [1, 0, 1, 0, 1, 0],
+                        [1, 1, 0, 0, 0, 1],
+                        [1, 0, 0, 0, 1, 1],
+                        [0, 1, 0, 1, 0, 1],
+                        [0, 0, 1, 1, 1, 0],
+                    ]
+                ),
+                1.0 / 3.0,
+                "6-node network with mixed connectivity (transitivity ≈ 0.33)",
             ),
             (
-                    # Directed graph that should be treated as undirected
-                    np.array([[0, 1, 1], [0, 0, 1], [0, 0, 0]]),
-                    1.0,
-                    "directed graph treated as undirected (forms a triangle when undirected)",
+                # Directed graph that should be treated as undirected
+                np.array([[0, 1, 1], [0, 0, 1], [0, 0, 0]]),
+                1.0,
+                "directed graph treated as undirected (forms a triangle when undirected)",
             ),
             (
-                    # Directed graph with a triangle when treated as undirected
-                    np.array([[0, 1, 1], [0, 0, 1], [1, 0, 0]]),
-                    1.0,
-                    "directed graph with a triangle when treated as undirected",
+                # Directed graph with a triangle when treated as undirected
+                np.array([[0, 1, 1], [0, 0, 1], [1, 0, 0]]),
+                1.0,
+                "directed graph with a triangle when treated as undirected",
             ),
         ],
     )
     def test_transitivity_scenarios(
-            self, weights, expected_transitivity, test_description
+        self, weights, expected_transitivity, test_description
     ):
         """Test transitivity calculation for various network scenarios.
 
@@ -525,40 +525,40 @@ class TestReciprocity:
         "weights, expected_reciprocity, test_description",
         [
             (
-                    np.array([[0, 1, 0], [1, 0, 1], [0, 0, 0]]),
-                    2.0 / 3.0,
-                    "3-node network with one reciprocated edge out of two (reciprocity = 2/3)",
+                np.array([[0, 1, 0], [1, 0, 1], [0, 0, 0]]),
+                2.0 / 3.0,
+                "3-node network with one reciprocated edge out of two (reciprocity = 2/3)",
             ),
             (
-                    np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]]),
-                    0.0,
-                    "3-node directed cycle with no reciprocated edges (reciprocity = 0.0)",
+                np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]]),
+                0.0,
+                "3-node directed cycle with no reciprocated edges (reciprocity = 0.0)",
             ),
             (
-                    np.array([[0, 1, 1], [1, 0, 0], [0, 1, 0]]),
-                    0.5,
-                    "3-node network with 1 of 2 edges reciprocated (reciprocity = 0.5)",
+                np.array([[0, 1, 1], [1, 0, 0], [0, 1, 0]]),
+                0.5,
+                "3-node network with 1 of 2 edges reciprocated (reciprocity = 0.5)",
             ),
             (
-                    np.array([[0, 1, 1, 0], [1, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0]]),
-                    0.4,
-                    "4-node network with 2 of 5 edges reciprocated (reciprocity = 0.4)",
+                np.array([[0, 1, 1, 0], [1, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0]]),
+                0.4,
+                "4-node network with 2 of 5 edges reciprocated (reciprocity = 0.4)",
             ),
             (
-                    # Use a matrix with all zeros except for a very small value that's treated as zero
-                    np.array([[0, 1e-10, 0], [0, 0, 0], [0, 0, 0]]),
-                    0.0,
-                    "network with no connections (reciprocity = 0.0)",
+                # Use a matrix with all zeros except for a very small value that's treated as zero
+                np.array([[0, 1e-10, 0], [0, 0, 0], [0, 0, 0]]),
+                0.0,
+                "network with no connections (reciprocity = 0.0)",
             ),
             (
-                    np.array([[0]]),
-                    0.0,
-                    "single node network (reciprocity = 0.0)",
+                np.array([[0]]),
+                0.0,
+                "single node network (reciprocity = 0.0)",
             ),
         ],
     )
     def test_reciprocity_scenarios(
-            self, weights, expected_reciprocity, test_description
+        self, weights, expected_reciprocity, test_description
     ):
         """Test reciprocity calculation for various network scenarios."""
         recip = reciprocity(weights)
@@ -656,7 +656,7 @@ class TestEigenvectorCentrality:
         ],
     )
     def test_eigenvector_centrality_simple_scenarios(
-            self, weights, directed, expected_centrality, test_description
+        self, weights, directed, expected_centrality, test_description
     ):
         """Test eigenvector centrality for simple network scenarios."""
         centrality = eigenvector_centrality(weights, directed=directed)
@@ -703,9 +703,9 @@ class TestEigenvectorCentrality:
         def custom_norm(x, *args, **kwargs):
             # Check if this is our mock result array
             if (
-                    isinstance(x, np.ndarray)
-                    and x.shape == mock_result_array.shape
-                    and np.all(x == mock_result_array)
+                isinstance(x, np.ndarray)
+                and x.shape == mock_result_array.shape
+                and np.all(x == mock_result_array)
             ):
                 return np.sqrt(0.75)
             # For any other input, use the real norm function
@@ -781,8 +781,8 @@ class TestEigenvectorCentrality:
             # Check that a warning was issued
             assert len(warning_list) == 1
             assert (
-                    "Parameter 'directed=True' was passed buts weight matrix is symmetric"
-                    in str(warning_list[0].message)
+                "Parameter 'directed=True' was passed buts weight matrix is symmetric"
+                in str(warning_list[0].message)
             )
             assert warning_list[0].category == UserWarning
 

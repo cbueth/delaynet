@@ -22,9 +22,9 @@ from ._normalisation import normalise_against_random
 
 @normalise_against_random
 def betweenness_centrality(
-        weight_matrix: ndarray,
-        directed: bool = True,
-        normalize: bool = True,
+    weight_matrix: ndarray,
+    directed: bool = True,
+    normalize: bool = True,
 ) -> ndarray:
     """
     Compute betweenness centrality for each node in the network.
@@ -124,8 +124,8 @@ def betweenness_centrality(
 
 @normalise_against_random
 def link_density(
-        weight_matrix: ndarray,
-        directed: bool = True,
+    weight_matrix: ndarray,
+    directed: bool = True,
 ) -> float:
     """
     Compute the link density of the network.
@@ -667,8 +667,8 @@ def reciprocity(weight_matrix: ndarray) -> float:
 
 @normalise_against_random
 def eigenvector_centrality(
-        weight_matrix: ndarray,
-        directed: bool = True,
+    weight_matrix: ndarray,
+    directed: bool = True,
 ) -> ndarray:
     """
     Compute eigenvector centrality for each node in the network.

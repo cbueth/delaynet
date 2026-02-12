@@ -55,13 +55,14 @@ test:
   artifacts:
     expire_in: 1 month
 
-# coverage report - on any change to code and on main branch for coverage badge
+# coverage report - on any change to code, on PRs, dependabot branches and on main branch for coverage badge
 coverage:
   stage: coverage
   coverage: /^TOTAL.+?(\d+\%)$/
   needs: [ ]
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: '$CI_COMMIT_BRANCH =~ /^dependabot\/.*$/'
     - changes:
         compare_to: 'refs/heads/main'
         paths:

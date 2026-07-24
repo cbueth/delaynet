@@ -3,6 +3,7 @@
 # Import all connectivity metrics
 from .continuous_ordinal_patterns import random_patterns
 from .granger import gt_multi_lag
+from ._granger_fast import gt_multi_lag_fast
 from .gravity import gravity
 from .linear_correlation import linear_correlation
 from .mutual_information import mutual_information
@@ -15,8 +16,8 @@ from ..utils.dict_lookup import dict_lookup
 __all_connectivity_metrics_names__ = {
     "continuous ordinal patterns": random_patterns,
     "cop": random_patterns,
-    "granger causality": gt_multi_lag,
-    "gc": gt_multi_lag,
+    "granger causality": gt_multi_lag_fast,
+    "gc": gt_multi_lag_fast,
     "gravity": gravity,
     "gv": gravity,
     "linear correlation": linear_correlation,

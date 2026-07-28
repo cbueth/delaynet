@@ -1,0 +1,35 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["latest", "previous"]
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          show-progress: false
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install, sync, test
+        run: |
+          if [ "${{ matrix.python-version }}" = "previous" ]; then
+            LATEST=$(uv python list --only-downloads 2>/dev/null | grep -oP '3\.\d+' | sort -t. -k2 -n | tail -1)
+            PREV=$((${LATEST#3.} - 1))
+            uv python install "3.$PREV"
+            uv sync --extra test --python "3.$PREV"
+            uv run --python "3.$PREV" pytest -n auto --tb=short
+          else
+            uv python install
+            uv sync --extra test
+            uv run pytest -n auto --tb=short
+          fi

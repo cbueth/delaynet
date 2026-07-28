@@ -28,8 +28,8 @@
 
 <div align="center">
 
-<a href="">[![pipeline status](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/badges/main/pipeline.svg)](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/-/commits/main)</a>
-<a href="">[![coverage report](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/badges/main/coverage.svg)](https://gitlab.ifisc.uib-csic.es/carlson/delaynet/-/jobs)</a>
+<a href="">[![CI](https://github.com/cbueth/delaynet/actions/workflows/test.yml/badge.svg)](https://github.com/cbueth/delaynet/actions/workflows/test.yml)</a>
+<a href="">[![Lint](https://github.com/cbueth/delaynet/actions/workflows/lint.yml/badge.svg)](https://github.com/cbueth/delaynet/actions/workflows/lint.yml)</a>
 
 </div>
 

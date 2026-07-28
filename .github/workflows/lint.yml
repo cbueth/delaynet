@@ -16,6 +16,9 @@ jobs:
 
       - uses: astral-sh/setup-uv@v5
 
+      - name: Sync lint deps
+        run: uv sync --extra lint
+
       - name: Ruff check
         run: uv run ruff check
 

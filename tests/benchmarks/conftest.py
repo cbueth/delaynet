@@ -7,9 +7,9 @@ from delaynet.preparation.data_generator import gen_delayed_causal_network
 
 TIME_POINTS = 200
 LAG_STEPS = 3
-NODE_SIZES = [5, 15]
+NODE_SIZES = [5, 10]
 
-CONTINUOUS_METRICS = ["lc", "rc", "gc", "gv", "cop"]
+CONTINUOUS_METRICS = ["lc", "rc", "gv"]
 
 
 def gen_continuous(n_nodes: int, rng: int = 19425) -> np.ndarray:

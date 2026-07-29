@@ -4,7 +4,7 @@ import pytest
 
 from delaynet.network_reconstruction import reconstruct_network
 
-from .conftest import LAG_STEPS
+from .conftest import LAG_STEPS, gen_continuous
 
 _RECON_METRICS = ["lc", "rc", "gc", "gv"]
 
@@ -17,10 +17,11 @@ def test_reconstruct(benchmark, continuous_data, metric):
 
 @pytest.mark.benchmark(group="parallel-scaling")
 @pytest.mark.parametrize("workers", [1, 2], ids=["seq", "par2"])
-def test_reconstruct_workers(benchmark, continuous_data, workers):
+def test_reconstruct_workers(benchmark, workers):
+    data = gen_continuous(5)
     benchmark(
         reconstruct_network,
-        continuous_data,
+        data,
         "lc",
         lag_steps=LAG_STEPS,
         workers=workers,

@@ -30,15 +30,32 @@ N_TESTS = 2
     [
         (linear_correlation, {}),
         (rank_correlation, {}),
-        (gt_multi_lag, {}),
-        (random_patterns, {}),
     ],
-    ids=["lc", "rc", "gc", "cop"],
+    ids=["lc", "rc"],
 )
 def test_continuous_metric(benchmark, metric_func, kwargs):
-    if metric_func is random_patterns:
-        random_patterns(TS1, TS2, num_rnd_patterns=2, lag_steps=1)
     benchmark(metric_func, TS1, TS2, lag_steps=LAG_STEPS, **kwargs)
+
+
+@pytest.mark.benchmark(group="metrics")
+def test_granger_f_test(benchmark):
+    ts = gen_delayed_causal_network(
+        ts_len=50, n_nodes=5, l_dens=0.3, rng=0
+    )[2].T
+    ts1, ts2 = ts[:, 0], ts[:, 1]
+    benchmark(gt_multi_lag, ts1, ts2, lag_steps=LAG_STEPS)
+
+
+@pytest.mark.benchmark(group="metrics")
+def test_ordinal_patterns(benchmark):
+    ts = gen_delayed_causal_network(
+        ts_len=50, n_nodes=5, l_dens=0.3, rng=0
+    )[2].T
+    ts1, ts2 = ts[:, 0], ts[:, 1]
+    random_patterns(ts1, ts2, p_size=3, num_rnd_patterns=2, lag_steps=1)
+    benchmark(
+        random_patterns, ts1, ts2, p_size=3, num_rnd_patterns=2, lag_steps=1
+    )
 
 
 @pytest.mark.benchmark(group="metrics")

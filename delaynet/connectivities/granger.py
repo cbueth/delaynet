@@ -21,10 +21,9 @@ This module provides three implementations of the Granger causality test:
 a single-lag version, a multi-lag version, and a bidirectional multi-lag version.
 """
 
-from contextlib import redirect_stdout
-
 import numpy as np
-from statsmodels.regression.linear_model import OLS
+from scipy.linalg import solve_triangular
+from scipy.stats import f as f_dist
 from statsmodels.tools.tools import add_constant
 from statsmodels.tsa.tsatools import lagmat2ds
 
@@ -46,23 +45,58 @@ def gt_single_lag(ts1, ts2, lag_step):
     :return: Granger causality test *p*-value.
     :rtype: float
     """
-    full_ts = np.array([ts2, ts1]).T
+    from statsmodels.tools.tools import add_constant
+    from statsmodels.tsa.tsatools import lagmat2ds
 
+    full_ts = np.array([ts2, ts1]).T
     dta = lagmat2ds(full_ts, lag_step, trim="both", dropex=1)
     dtajoint = add_constant(dta[:, 1:], prepend=False)
 
-    res2djoint = OLS(dta[:, 0], dtajoint).fit()
+    y = dta[:, 0]
+    X = dtajoint
 
-    rconstr = np.column_stack(
+    n, k = X.shape
+    L = lag_step
+
+    XTX = X.T @ X
+    L = lag_step
+
+    try:
+        beta = np.linalg.solve(XTX, X.T @ y)
+    except np.linalg.LinAlgError:
+        beta = np.linalg.lstsq(X, y, rcond=None)[0]
+
+    resid = y - X @ beta
+    rss = float(resid @ resid)
+    dof = n - k
+    sigma2 = rss / dof
+
+    try:
+        XTX_inv = np.linalg.inv(XTX)
+    except np.linalg.LinAlgError:
+        XTX_inv = np.linalg.pinv(XTX)
+
+    R = np.column_stack(
         (
-            np.zeros((lag_step, lag_step)),
-            np.eye(lag_step, lag_step),
-            np.zeros((lag_step, 1)),
+            np.zeros((L, L)),
+            np.eye(L, L),
+            np.zeros((L, 1)),
         )
     )
-    ftres = res2djoint.f_test(rconstr)
 
-    return np.squeeze(ftres.pvalue)[()]
+    Rb = R @ beta
+    R_vcov_R = R @ XTX_inv @ R.T
+    R_vcov_R *= sigma2
+
+    try:
+        inner = np.linalg.solve(R_vcov_R, Rb)
+    except np.linalg.LinAlgError:
+        inner = np.linalg.lstsq(R_vcov_R, Rb, rcond=None)[0]
+
+    f_stat = float(Rb @ inner) / L
+    p_value = float(f_dist.sf(f_stat, L, dof))
+
+    return p_value
 
 
 @connectivity

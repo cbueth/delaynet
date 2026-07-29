@@ -1,5 +1,5 @@
 extends:
-  - conventional
+  - '@commitlint/config-conventional'
 rules:
   body-max-line-length:
     - 1

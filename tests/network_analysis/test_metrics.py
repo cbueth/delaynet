@@ -101,12 +101,12 @@ class TestBetweennessCentrality:
 
         # For a 3-node directed path, the middle node should have betweenness = 1 (normalized) or 2 (unnormalized)
         # The normalization factor for directed graphs with n=3 is (n-1)*(n-2) = 2*1 = 2
-        assert centrality_norm[1] == pytest.approx(
-            1.0
-        ), "Normalized betweenness should be 1.0 for middle node"
-        assert centrality_unnorm[1] == pytest.approx(
-            2.0
-        ), "Unnormalized betweenness should be 2.0 for middle node"
+        assert centrality_norm[1] == pytest.approx(1.0), (
+            "Normalized betweenness should be 1.0 for middle node"
+        )
+        assert centrality_unnorm[1] == pytest.approx(2.0), (
+            "Unnormalized betweenness should be 2.0 for middle node"
+        )
 
     def test_betweenness_centrality_normalization_max_betweenness(self):
         """Test betweenness centrality normalization when max_betweenness > 0."""
@@ -275,9 +275,9 @@ class TestLinkDensity:
     ):
         """Test link density calculation for various network scenarios."""
         density = link_density(weights, directed=directed)
-        assert density == pytest.approx(
-            expected_density
-        ), f"Failed for {test_description}"
+        assert density == pytest.approx(expected_density), (
+            f"Failed for {test_description}"
+        )
 
     def test_link_density_input_validation(self):
         """Test input validation for link density."""
@@ -319,12 +319,12 @@ class TestIsolatedNodes:
         inbound_count = isolated_nodes_inbound(weights)
         outbound_count = isolated_nodes_outbound(weights)
 
-        assert (
-            inbound_count == expected_inbound
-        ), f"Inbound count failed for {test_description}"
-        assert (
-            outbound_count == expected_outbound
-        ), f"Outbound count failed for {test_description}"
+        assert inbound_count == expected_inbound, (
+            f"Inbound count failed for {test_description}"
+        )
+        assert outbound_count == expected_outbound, (
+            f"Outbound count failed for {test_description}"
+        )
 
     def test_isolated_nodes_input_validation(self):
         """Test input validation for isolated nodes functions."""
@@ -364,9 +364,9 @@ class TestGlobalEfficiency:
     ):
         """Test global efficiency calculation for various network scenarios."""
         efficiency = global_efficiency(weights, directed=directed)
-        assert efficiency == pytest.approx(
-            expected_efficiency
-        ), f"Failed for {test_description}"
+        assert efficiency == pytest.approx(expected_efficiency), (
+            f"Failed for {test_description}"
+        )
 
     def test_global_efficiency_pair_count_zero(self):
         """Test global efficiency when pair_count is zero.
@@ -490,9 +490,9 @@ class TestTransitivity:
         calculated on the undirected version of the graph.
         """
         trans = transitivity(weights)
-        assert trans == pytest.approx(
-            expected_transitivity
-        ), f"Failed for {test_description}"
+        assert trans == pytest.approx(expected_transitivity), (
+            f"Failed for {test_description}"
+        )
 
     def test_transitivity_nan_result(self):
         """Test transitivity when igraph returns NaN.
@@ -562,9 +562,9 @@ class TestReciprocity:
     ):
         """Test reciprocity calculation for various network scenarios."""
         recip = reciprocity(weights)
-        assert recip == pytest.approx(
-            expected_reciprocity
-        ), f"Failed for {test_description}"
+        assert recip == pytest.approx(expected_reciprocity), (
+            f"Failed for {test_description}"
+        )
 
     def test_reciprocity_no_connections(self):
         """Test reciprocity with a directed network that has no connections."""

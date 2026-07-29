@@ -562,18 +562,18 @@ def test_print_progress_sphinx_mode(monkeypatch):
     print_progress(50, 100, start_time, prefix="Test: ", sphinx_mode=True)
 
     # Verify that stdout.write was not called due to early return
-    assert not write_called[
-        0
-    ], "stdout.write should not be called when sphinx_mode=True and current < total"
+    assert not write_called[0], (
+        "stdout.write should not be called when sphinx_mode=True and current < total"
+    )
 
     # Test with sphinx_mode=True and current == total
     write_called[0] = False
     print_progress(100, 100, start_time, prefix="Test: ", sphinx_mode=True)
 
     # Verify that stdout.write was called
-    assert write_called[
-        0
-    ], "stdout.write should be called when sphinx_mode=True and current == total"
+    assert write_called[0], (
+        "stdout.write should be called when sphinx_mode=True and current == total"
+    )
 
 
 def test_reconstruct_network_sphinx_mode(monkeypatch, two_time_series):

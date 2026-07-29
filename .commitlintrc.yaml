@@ -1,0 +1,13 @@
+extends:
+  - conventional
+rules:
+  body-max-line-length:
+    - warn
+    - 120
+  header-max-length:
+    - error
+    - 100
+  subject-case:
+    - error
+    - never
+    - - upper-case

@@ -28,12 +28,11 @@ repos:
               echo "Skipping in PowerShell";
           else
               os_type=$(uname) &&
+              version=$(sed -n "s/^__version__ = \"\(.*\)\"/\1/p" delaynet/__init__.py) &&
               if [ "$os_type" = "Darwin" ]; then
-                  version=$(awk -F "\"" "/__version__/ {print \$2}" delaynet/_version.py) &&
                   sed -i "" "s/^version: .*/version: $version/" CITATION.cff &&
                   sed -i "" "s/^version = .*/version = \"$version\"/" docs/conf.py;
               elif [ "$os_type" = "Linux" ]; then
-                  version=$(grep -oP "(?<=__version__ = \")[^\"]+" delaynet/_version.py) &&
                   sed -i "s/^version: .*/version: $version/" CITATION.cff &&
                   sed -i "s/^version = .*/version = \"$version\"/" docs/conf.py;
               else
@@ -43,7 +42,7 @@ repos:
           fi'
 
         language: system
-        files: 'CITATION\.cff|delaynet/_version\.py|docs/conf\.py'
+        files: 'CITATION\.cff|delaynet/__init__\.py|docs/conf\.py'
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.4.7

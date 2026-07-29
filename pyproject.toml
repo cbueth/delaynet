@@ -71,7 +71,7 @@ namespaces = false
 
 [tool.setuptools.dynamic]
 readme = { file = ["README.md", "LICENSE"], content-type = "text/markdown" }
-version = { attr = "delaynet._version.__version__" }
+version = { attr = "delaynet.__version__" }
 
 # --------------------------------------------------------------------------------------
 # Linting

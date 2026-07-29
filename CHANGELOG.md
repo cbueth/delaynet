@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.3.2 (2025-08-14)
+## 0.3.2 (2025-08-14)
 
 - 🐛 Fix: Normalised scalar metrics returned NumPy arrays instead of Python floats; now
   scalars remain floats, vectors remain arrays. Added a user warning when normalising
@@ -8,7 +8,7 @@
   null distribution degenerate with undefined z-scores (NaN), so normalising density is
   not very meaningful.
 
-## Version 0.3.1 (2025-08-14)
+## 0.3.1 (2025-08-14)
 
 - **Network metrics normalisation**
     - Added decorator-based option to return z-scores for all network analysis metrics
@@ -22,7 +22,7 @@
       {cite:p}`zaninStudyingTopologyTransportation2018`.
       See in {ref}`normalisation-metrics-example`.
 
-## Version 0.3.0 (2025-08-13)
+## 0.3.0 (2025-08-13)
 
 - 📊 **Data Generation Integration**: Added [
   `synthatdelays`](https://pypi.org/project/synthatdelays/) data generation
@@ -174,7 +174,7 @@
 
 ---
 
-## Version 0.2.0 (2024-03-15)
+## 0.2.0 (2024-03-15)
 
 - 🔄 Granger: Rework bidirectional version
 
@@ -220,7 +220,7 @@
 
 ---
 
-## Version 0.1.0 (2024-02-16)
+## 0.1.0 (2024-02-16)
 
 - 🏗 Setup main functionality
 - 📚️ Setup documentation pages

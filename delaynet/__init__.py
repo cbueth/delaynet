@@ -1,6 +1,6 @@
 """delaynet init."""
 
-from ._version import __version__
+__version__ = "0.3.2"
 from .utils.logging import logging
 
 # Expose most common functions

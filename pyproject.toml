@@ -46,7 +46,7 @@ Changelog = "https://delaynet.readthedocs.io/en/latest/changelog/"
 
 [project.optional-dependencies]
 lint = ["pre-commit", "ruff"]
-test = ["pytest", "pytest-cov", "coverage"]
+test = ["pytest", "pytest-cov", "coverage", "pytest-xdist"]
 doc = [
     "sphinx",
     "myst-nb",
@@ -71,7 +71,7 @@ namespaces = false
 
 [tool.setuptools.dynamic]
 readme = { file = ["README.md", "LICENSE"], content-type = "text/markdown" }
-version = { attr = "delaynet._version.__version__" }
+version = { attr = "delaynet.__version__" }
 
 # --------------------------------------------------------------------------------------
 # Linting

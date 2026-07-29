@@ -4,33 +4,23 @@ import pytest
 
 from delaynet.network_reconstruction import reconstruct_network
 
-from .conftest import LAG_STEPS, SMALL_NODES
+from .conftest import LAG_STEPS
 
-_FAST_RECON_METRICS = ["lc", "rc"]
-_SLOW_RECON_METRICS = ["gc", "gv"]
-LAG_STEPS_SLOW = 3
+_RECON_METRICS = ["lc", "rc", "gc", "gv"]
 
 
 @pytest.mark.benchmark(group="reconstruct-network")
-@pytest.mark.parametrize("metric", _FAST_RECON_METRICS)
-def test_reconstruct_fast(benchmark, continuous_data, metric):
+@pytest.mark.parametrize("metric", _RECON_METRICS)
+def test_reconstruct(benchmark, continuous_data, metric):
     benchmark(reconstruct_network, continuous_data, metric, lag_steps=LAG_STEPS)
 
 
-@pytest.mark.benchmark(group="reconstruct-network")
-@pytest.mark.parametrize("metric", _SLOW_RECON_METRICS)
-def test_reconstruct_slow(benchmark, continuous_data_small, metric):
-    benchmark(
-        reconstruct_network, continuous_data_small, metric, lag_steps=LAG_STEPS_SLOW
-    )
-
-
 @pytest.mark.benchmark(group="parallel-scaling")
-@pytest.mark.parametrize("workers", [1, 4], ids=["seq", "par4"])
-def test_reconstruct_workers(benchmark, continuous_data_20, workers):
+@pytest.mark.parametrize("workers", [1, 2], ids=["seq", "par2"])
+def test_reconstruct_workers(benchmark, continuous_data, workers):
     benchmark(
         reconstruct_network,
-        continuous_data_20,
+        continuous_data,
         "lc",
         lag_steps=LAG_STEPS,
         workers=workers,

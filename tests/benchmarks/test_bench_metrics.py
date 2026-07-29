@@ -14,14 +14,14 @@ from delaynet.preparation.data_generator import gen_delayed_causal_network
 from .conftest import LAG_STEPS
 
 _ts = np.ascontiguousarray(
-    gen_delayed_causal_network(ts_len=500, n_nodes=2, l_dens=0.5, rng=0)[2].T
+    gen_delayed_causal_network(ts_len=200, n_nodes=2, l_dens=0.5, rng=0)[2].T
 )
 TS1, TS2 = _ts[:, 0], _ts[:, 1]
 
-_disc = np.random.default_rng(0).integers(0, 4, size=(500, 2))
+_disc = np.random.default_rng(0).integers(0, 4, size=(200, 2))
 DTS1, DTS2 = _disc[:, 0], _disc[:, 1]
 
-N_TESTS = 5
+N_TESTS = 2
 
 
 @pytest.mark.benchmark(group="metrics")

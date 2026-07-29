@@ -6,9 +6,8 @@ import pytest
 from delaynet.preparation.data_generator import gen_delayed_causal_network
 
 TIME_POINTS = 200
-LAG_STEPS = 5
-NODE_SIZES = [10, 20, 40, 50]
-SMALL_NODES = [10, 20]
+LAG_STEPS = 3
+NODE_SIZES = [5, 15]
 
 CONTINUOUS_METRICS = ["lc", "rc", "gc", "gv", "cop"]
 
@@ -23,16 +22,6 @@ def gen_continuous(n_nodes: int, rng: int = 19425) -> np.ndarray:
 @pytest.fixture(scope="module", params=NODE_SIZES, ids=lambda n: f"nodes{n}")
 def continuous_data(request) -> np.ndarray:
     return gen_continuous(request.param)
-
-
-@pytest.fixture(scope="module", params=SMALL_NODES, ids=lambda n: f"nodes{n}")
-def continuous_data_small(request) -> np.ndarray:
-    return gen_continuous(request.param)
-
-
-@pytest.fixture(scope="module")
-def continuous_data_20() -> np.ndarray:
-    return gen_continuous(20)
 
 
 def pytest_collection_modifyitems(config, items):

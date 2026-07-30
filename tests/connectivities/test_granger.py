@@ -152,3 +152,27 @@ def test_stronger_causal_signal_lower_pvalue(rng):
     assert p_strong < p_weak, (
         f"Stronger signal should have lower p-value (strong: {p_strong}, weak: {p_weak})"
     )
+
+
+def test_gt_single_lag_lstsq_fallback():
+    """Test lstsq fallback when solve raises LinAlgError at line 92."""
+    from unittest.mock import patch
+
+    ts1 = np.random.normal(0, 1, size=100)
+    ts2 = np.random.normal(0, 1, size=100)
+
+    original_solve = np.linalg.solve
+    solve_calls = []
+
+    def mock_solve(a, b):
+        solve_calls.append((a, b))
+        if len(solve_calls) == 2:
+            raise np.linalg.LinAlgError(
+                "Simulating singular R_vcov_R for test coverage"
+            )
+        return original_solve(a, b)
+
+    with patch("numpy.linalg.solve", mock_solve):
+        p_value = gt_single_lag(ts1, ts2, lag_step=2)
+    assert isinstance(p_value, float)
+    assert 0 <= p_value <= 1

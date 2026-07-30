@@ -13,6 +13,7 @@ from numpy import (
     allclose as np_allclose,
     fill_diagonal,
     triu,
+    isinf,
     isnan,
     zeros,
     linalg,
@@ -440,19 +441,11 @@ def global_efficiency(weight_matrix: ndarray, directed: bool = True) -> float:
     dist_matrix = g.distances(weights="weight")
 
     # Calculate global efficiency
-    total_efficiency = 0.0
-    pair_count = 0
-
-    for i in range(n_nodes):
-        for j in range(n_nodes):
-            if i != j:
-                distance = dist_matrix[i][j]
-                if distance < float("inf") and distance > 0:
-                    total_efficiency += 1.0 / distance
-                pair_count += 1
-
-    if pair_count == 0:
-        return 0.0
+    dist = array(dist_matrix)
+    mask = ~isinf(dist) & (dist > 0)
+    fill_diagonal(mask, False)
+    total_efficiency = np_sum(1.0 / dist[mask])
+    pair_count = n_nodes * (n_nodes - 1)
 
     return total_efficiency / pair_count
 

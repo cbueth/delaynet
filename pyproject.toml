@@ -46,7 +46,7 @@ Changelog = "https://delaynet.readthedocs.io/en/latest/changelog/"
 
 [project.optional-dependencies]
 lint = ["pre-commit", "ruff"]
-test = ["pytest", "pytest-cov", "coverage", "pytest-xdist"]
+test = ["pytest", "pytest-cov", "coverage", "pytest-xdist", "pytest-codspeed"]
 doc = [
     "sphinx",
     "myst-nb",
@@ -89,6 +89,15 @@ select = ["NPY201"]
 minversion = "7.0"
 addopts = "-ra"
 testpaths = ["tests"]
+filterwarnings = [
+    "error",
+    # eigenvector_centrality warns about symmetric matrix with directed=True
+    'default:Parameter .*irected.* was passed buts weight matrix is symmetric.*:UserWarning',
+    # igraph C extension runtime warnings (disconnected graphs in eigenvector centrality)
+    'default::RuntimeWarning',
+    # numpy longdouble probe warning on uncommon CPUs (e.g. CodSpeed CI runner)
+    'default:Signature.*numpy.longdouble.*does not match any known type:UserWarning',
+]
 
 [tool.coverage.run]
 branch = true

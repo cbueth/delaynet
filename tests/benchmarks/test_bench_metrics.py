@@ -5,6 +5,7 @@ import pytest
 
 from delaynet.connectivities.continuous_ordinal_patterns import random_patterns
 from delaynet.connectivities.granger import gt_multi_lag
+from delaynet.connectivities.gravity import gravity
 from delaynet.connectivities.linear_correlation import linear_correlation
 from delaynet.connectivities.rank_correlation import rank_correlation
 from delaynet.connectivities.mutual_information import mutual_information
@@ -35,6 +36,11 @@ N_TESTS = 2
 )
 def test_continuous_metric(benchmark, metric_func, kwargs):
     benchmark(metric_func, TS1, TS2, lag_steps=LAG_STEPS, **kwargs)
+
+
+@pytest.mark.benchmark(group="metrics")
+def test_gravity(benchmark):
+    benchmark(gravity, TS1, TS2, lag_steps=LAG_STEPS, n_tests=N_TESTS)
 
 
 @pytest.mark.benchmark(group="metrics")

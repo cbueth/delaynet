@@ -117,8 +117,7 @@ def betweenness_centrality(
             # For undirected graphs: max betweenness = (n-1)*(n-2)/2
             max_betweenness = (n_nodes - 1) * (n_nodes - 2) / 2.0
 
-        if max_betweenness > 0:
-            centrality = centrality / max_betweenness
+        centrality = centrality / max_betweenness
 
     return centrality
 

@@ -30,6 +30,8 @@
 
 <a href="">[![CI](https://github.com/cbueth/delaynet/actions/workflows/test.yml/badge.svg)](https://github.com/cbueth/delaynet/actions/workflows/test.yml)</a>
 <a href="">[![Lint](https://github.com/cbueth/delaynet/actions/workflows/lint.yml/badge.svg)](https://github.com/cbueth/delaynet/actions/workflows/lint.yml)</a>
+<a href="">[![CodSpeed Badge](https://img.shields.io/endpoint?url=https://app.codspeed.io//badge.json)](https://app.codspeed.io//cbueth/delaynet?utm_source=badge)</a>
+<a href="">[![codecov](https://codecov.io/gh/cbueth/delaynet/branch/main/graph/badge.svg)](https://codecov.io/gh/cbueth/delaynet)</a>
 
 </div>
 

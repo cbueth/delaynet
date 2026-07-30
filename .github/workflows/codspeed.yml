@@ -3,7 +3,19 @@ name: CodSpeed
 on:
   push:
     branches: [main]
+    paths:
+      - 'delaynet/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/codspeed.yml'
   pull_request:
+    paths:
+      - 'delaynet/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/codspeed.yml'
   workflow_dispatch:
 
 jobs:

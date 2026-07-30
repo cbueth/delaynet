@@ -10,7 +10,7 @@ from numpy.random import Generator, PCG64, default_rng
     [
         (20, None),  # Default parameters
         (50, None),  # More tests
-        (20, Generator(PCG64(42))),  # Specific RNG
+        (20, Generator(PCG64(123))),  # Specific RNG
     ],
 )
 def test_gravity(n_tests, rng):
@@ -51,7 +51,7 @@ def test_gravity_single():
     )  # Create causally related series
 
     # Initialize random number generator
-    rng = default_rng(42)
+    rng = default_rng(123)
 
     # Test the single lag function directly
     p_value = gravity_single(ts1, ts2, lag_step=2, n_tests=20, rng=rng)
@@ -59,3 +59,12 @@ def test_gravity_single():
     # Assert that the function returns expected format
     assert isinstance(p_value, float), "Result should be a float"
     assert 0 <= p_value <= 1, "p-value should be between 0 and 1"
+
+
+def test_gravity_identical_series():
+    """When ts2[lag_step:] is constant, all permutations yield identical gravity -> p=0."""
+    rng = default_rng(123)
+    ts1 = rng.normal(0, 1, size=100)
+    ts2 = np.full(100, 5.0)
+    p = gravity_single(ts1, ts2, lag_step=2, n_tests=200, rng=rng)
+    assert p == 0.0

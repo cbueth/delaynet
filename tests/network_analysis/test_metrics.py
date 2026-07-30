@@ -368,41 +368,20 @@ class TestGlobalEfficiency:
             f"Failed for {test_description}"
         )
 
-    def test_global_efficiency_pair_count_zero(self):
-        """Test global efficiency when pair_count is zero.
-
-        This is a special case that's hard to trigger in practice but is handled
-        in the code as a defensive check.
-        """
+    def test_global_efficiency_all_paths_infinite(self):
+        """All-inf distances yield zero efficiency."""
         from unittest.mock import patch, MagicMock
 
         # Create a simple network
         weights = np.array([[0, 1], [1, 0]])
-
-        # We need to mock the entire calculation to ensure pair_count is exactly 0
-        # This requires a more complex approach to bypass the loop that increments pair_count
-
-        # Create a mock for the Graph class
+        # Mock igraph to return all-inf distances (no reachable paths)
         mock_graph = MagicMock()
         mock_graph.distances.return_value = [
             [float("inf"), float("inf")],
             [float("inf"), float("inf")],
         ]
-
-        # Mock the Graph.Weighted_Adjacency constructor to return our mock graph
         with patch("igraph.Graph.Weighted_Adjacency", return_value=mock_graph):
-            # Also patch the loop that increments pair_count to ensure it's 0
-            original_range = range
-
-            def mock_range(*args, **kwargs):
-                # Return an empty range for the specific loop that increments pair_count
-                if len(args) > 0 and args[0] == 2:  # n_nodes = 2
-                    return []
-                return original_range(*args, **kwargs)
-
-            with patch("builtins.range", side_effect=mock_range):
-                efficiency = global_efficiency(weights)
-                assert efficiency == 0.0
+            assert global_efficiency(weights) == 0.0
 
     def test_global_efficiency_input_validation(self):
         """Test input validation for global efficiency."""

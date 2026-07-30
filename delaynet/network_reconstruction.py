@@ -143,6 +143,7 @@ def reconstruct_network(
     if workers is None or workers == 1:
         # Sequential execution
         pairs_processed = 0
+        last_print = 0.0
         for i in range(n_nodes):
             for j in range(n_nodes):
                 if i != j:  # Skip self-connections - perfect correlation (p=0) at lag 0
@@ -158,13 +159,16 @@ def reconstruct_network(
                     weight_matrix[i, j] = result[0]
                     lag_matrix[i, j] = result[1]
                     pairs_processed += 1
-                    print_progress(
-                        pairs_processed,
-                        total_pairs,
-                        start_time,
-                        prefix="Sequential: ",
-                        sphinx_mode=is_sphinx,
-                    )
+                    now = time()
+                    if pairs_processed == total_pairs or now - last_print >= 1.0:
+                        print_progress(
+                            pairs_processed,
+                            total_pairs,
+                            start_time,
+                            prefix="Sequential: ",
+                            sphinx_mode=is_sphinx,
+                        )
+                        last_print = now
     else:
         # Parallel execution using shared memory
         # Create shared memory once
@@ -175,10 +179,11 @@ def reconstruct_network(
         shared_array[:] = time_series[:]  # Copy data to shared memory once
 
         try:
-            # Create a shared counter and lock for progress tracking
+            # Create a shared counter, lock, and last-print time for progress tracking
             with Manager() as manager:
                 counter = manager.Value("i", 0)
                 lock = manager.Lock()
+                last_print = manager.Value("d", 0.0)
 
                 # Prepare jobs: only pass indices and shared memory info
                 jobs = []
@@ -211,6 +216,7 @@ def reconstruct_network(
                             job,
                             counter,
                             lock,
+                            last_print,
                             total_pairs,
                             start_time,
                             sphinx_mode=is_sphinx,
@@ -315,13 +321,14 @@ def update_progress(counter, total, start_time, prefix, sphinx_mode=None):
 
 
 def _compute_with_progress(
-    job, counter, lock, total_pairs, start_time, sphinx_mode=None
+    job, counter, lock, last_print, total_pairs, start_time, sphinx_mode=None
 ):
     """Wrapper function to compute connectivity and update progress.
 
     :param job: Job parameters for connectivity computation
     :param counter: Shared counter for progress tracking
     :param lock: Lock for thread-safe counter updates
+    :param last_print: Shared last-print time for rate-limited progress
     :param total_pairs: Total number of pairs to process
     :param start_time: Start time for ETA calculation
     :param sphinx_mode: How to handle progress in Sphinx documentation
@@ -330,8 +337,10 @@ def _compute_with_progress(
     result = _compute_pair_connectivity_shared(job)
     with lock:
         counter.value += 1
-        # Only update progress inside the lock to prevent race conditions
-        print_progress(
-            counter.value, total_pairs, start_time, "Parallel:   ", sphinx_mode
-        )
+        now = time()
+        if counter.value == total_pairs or now - last_print.value >= 1.0:
+            print_progress(
+                counter.value, total_pairs, start_time, "Parallel:   ", sphinx_mode
+            )
+            last_print.value = now
     return result

@@ -46,6 +46,69 @@ def test_invalid_window_size(window_size):
         detrend(ts, method="delta", window_size=window_size)
 
 
+@pytest.mark.parametrize(
+    "ts,window_size,expected",
+    [
+        (
+            arange(20, dtype=float),
+            3,
+            [
+                -1.0,
+                -0.5,
+                0.0,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                1.0,
+                1.5,
+            ],
+        ),
+        (
+            arange(20, dtype=float),
+            10,
+            [
+                -4.5,
+                -4.0,
+                -3.5,
+                -3.0,
+                -2.5,
+                -2.0,
+                -1.5,
+                -1.0,
+                -0.5,
+                0.0,
+                0.5,
+                1.0,
+                1.5,
+                2.0,
+                2.5,
+                3.0,
+                3.5,
+                4.0,
+                4.5,
+                5.0,
+            ],
+        ),
+    ],
+)
+def test_delta_linear_20(ts, window_size, expected):
+    """Delta detrending of length-20 linear series."""
+    result = detrend(ts, method="delta", window_size=window_size)
+    assert_allclose(result, array(expected), atol=1e-10)
+
+
 def test_window_larger_than_series():
     """Test Delta detrending with window size larger than time series."""
     ts = array([1, 2, 3, 4, 5])
@@ -113,3 +176,37 @@ def test_delta_with_seasonal_data():
     # Check that the seasonal pattern is removed
     # The detrended series should have mean close to 0
     assert -0.2 < mean(ts_detrended) < 0.2
+
+
+@pytest.mark.parametrize(
+    "length,window_size",
+    [
+        (10, 3),
+        (50, 5),
+        (50, 25),
+        (100, 10),
+        (100, 40),
+    ],
+)
+def test_delta_matches_naive_reference(length, window_size):
+    """Compare optimized delta against naive local-mean reference."""
+    rng = default_rng(152)
+    ts = rng.normal(0, 1, length) + arange(length, dtype=float) * 0.1
+
+    result = detrend(ts, method="delta", window_size=window_size)
+
+    expected = ts.copy()
+    for k in range(length):
+        left = max(0, k - window_size)
+        right = min(length, k + window_size)
+        expected[k] = ts[k] - ts[left:right].mean()
+
+    assert_allclose(result, expected, atol=1e-10)
+
+
+@pytest.mark.parametrize("window_size", [1, 2, 5])
+def test_delta_symmetry_constant_series(window_size):
+    """Delta detrending of constant series should yield zero."""
+    ts = array([5.0] * 20)
+    result = detrend(ts, method="delta", window_size=window_size)
+    assert_allclose(result, 0.0, atol=1e-10)

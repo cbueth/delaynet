@@ -1,5 +1,6 @@
 """Tests for the network reconstruction module."""
 
+import numpy as np
 import pytest
 from time import time
 from numpy import (
@@ -26,6 +27,8 @@ from delaynet.network_reconstruction import (
     format_time,
     print_progress,
     update_progress,
+    _compute_pair_connectivity_shared,
+    _compute_with_progress,
 )
 
 
@@ -663,3 +666,55 @@ def test_update_progress(monkeypatch):
     # Verify print_progress was called with explicit parameter
     assert called[0] is True
     assert sphinx_mode_value[0] is True
+
+
+def test_compute_pair_connectivity_shared():
+    """Test the shared-memory worker function directly."""
+    from multiprocessing import shared_memory
+
+    data = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0], [7.0, 8.0]])
+    shm = shared_memory.SharedMemory(create=True, size=data.nbytes)
+    shared_array = ndarray(data.shape, dtype=data.dtype, buffer=shm.buf)
+    shared_array[:] = data
+    try:
+        args = (0, 1, shm.name, data.shape, data.dtype, "linear_correlation", 1, {})
+        i, j, p, lag = _compute_pair_connectivity_shared(args)
+        assert i == 0
+        assert j == 1
+        assert isinstance(p, float)
+        assert isinstance(lag, int)
+    finally:
+        shm.close()
+        shm.unlink()
+
+
+def test_compute_with_progress(monkeypatch):
+    """Test the _compute_with_progress worker wrapper."""
+    from multiprocessing import shared_memory, Manager
+
+    monkeypatch.setattr("sys.stdout.write", lambda x: None)
+    monkeypatch.setattr("sys.stdout.flush", lambda: None)
+
+    data = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0], [7.0, 8.0]])
+    shm = shared_memory.SharedMemory(create=True, size=data.nbytes)
+    shared_array = ndarray(data.shape, dtype=data.dtype, buffer=shm.buf)
+    shared_array[:] = data
+    try:
+        args = (0, 1, shm.name, data.shape, data.dtype, "linear_correlation", 1, {})
+        with Manager() as manager:
+            counter = manager.Value("i", 0)
+            lock = manager.Lock()
+            result = _compute_with_progress(
+                args,
+                counter,
+                lock,
+                total_pairs=1,
+                start_time=time(),
+                sphinx_mode=True,
+            )
+            assert result is not None
+            assert result[0] == 0
+            assert result[1] == 1
+    finally:
+        shm.close()
+        shm.unlink()

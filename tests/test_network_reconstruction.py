@@ -41,6 +41,20 @@ def _simple_metric_for_parallel_test(ts1, ts2, lag_steps=None):
     return abs(corrcoef(ts1, ts2)[0, 1]), 1
 
 
+def _make_shared_worker_data():
+    """Create shared memory holding the worker test data.
+
+    :return: The shared memory object, the data shape, and the data dtype.
+    """
+    from multiprocessing import shared_memory
+
+    data = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0], [7.0, 8.0]])
+    shm = shared_memory.SharedMemory(create=True, size=data.nbytes)
+    shared_array = ndarray(data.shape, dtype=data.dtype, buffer=shm.buf)
+    shared_array[:] = data
+    return shm, data.shape, data.dtype
+
+
 def test_reconstruct_network_basic_functionality(two_time_series):
     """Test basic network reconstruction functionality with simple data."""
     ts1, ts2 = two_time_series
@@ -624,6 +638,32 @@ def test_reconstruct_network_sphinx_mode(monkeypatch, two_time_series):
     assert not print_called[0], "print() should not be called when in Sphinx mode"
 
 
+@pytest.mark.parametrize(
+    ("time_now", "expected_prints"),
+    [
+        pytest.param(0.0, 1, id="only-last-pair-prints"),
+        pytest.param(5.0, 2, id="rate-limit-prints-mid-run"),
+    ],
+)
+def test_reconstruct_network_sequential_throttled(
+    monkeypatch, two_time_series, time_now, expected_prints
+):
+    """Test the sequential progress rate-limit in reconstruct_network."""
+    print_calls = []
+    monkeypatch.setattr(
+        "delaynet.network_reconstruction.print_progress",
+        lambda *args, **kwargs: print_calls.append(args),
+    )
+    monkeypatch.setattr("delaynet.network_reconstruction.time", lambda: time_now)
+
+    ts1, ts2 = two_time_series
+    time_series = column_stack([ts1, ts2])
+
+    reconstruct_network(time_series, "linear_correlation", lag_steps=1)
+
+    assert len(print_calls) == expected_prints
+
+
 def test_update_progress(monkeypatch):
     """Test update_progress function."""
     # Mock print_progress and stdout.flush to avoid actual printing
@@ -670,14 +710,9 @@ def test_update_progress(monkeypatch):
 
 def test_compute_pair_connectivity_shared():
     """Test the shared-memory worker function directly."""
-    from multiprocessing import shared_memory
-
-    data = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0], [7.0, 8.0]])
-    shm = shared_memory.SharedMemory(create=True, size=data.nbytes)
-    shared_array = ndarray(data.shape, dtype=data.dtype, buffer=shm.buf)
-    shared_array[:] = data
+    shm, shape, dtype = _make_shared_worker_data()
     try:
-        args = (0, 1, shm.name, data.shape, data.dtype, "linear_correlation", 1, {})
+        args = (0, 1, shm.name, shape, dtype, "linear_correlation", 1, {})
         i, j, p, lag = _compute_pair_connectivity_shared(args)
         assert i == 0
         assert j == 1
@@ -688,33 +723,48 @@ def test_compute_pair_connectivity_shared():
         shm.unlink()
 
 
-def test_compute_with_progress(monkeypatch):
-    """Test the _compute_with_progress worker wrapper."""
-    from multiprocessing import shared_memory, Manager
+@pytest.mark.parametrize(
+    ("total_pairs", "counter_start", "time_now", "progress_printed"),
+    [
+        pytest.param(1, 0, 0.5, True, id="last-pair-always-prints"),
+        pytest.param(3, 1, 2.0, True, id="rate-limit-threshold-prints"),
+        pytest.param(3, 1, 0.5, False, id="below-threshold-skips"),
+    ],
+)
+def test_compute_with_progress(
+    monkeypatch, total_pairs, counter_start, time_now, progress_printed
+):
+    """Test the _compute_with_progress worker wrapper and its progress rate-limit."""
+    from multiprocessing import Manager
 
-    monkeypatch.setattr("sys.stdout.write", lambda x: None)
-    monkeypatch.setattr("sys.stdout.flush", lambda: None)
+    print_calls = []
+    monkeypatch.setattr(
+        "delaynet.network_reconstruction.print_progress",
+        lambda *args, **kwargs: print_calls.append(args),
+    )
+    monkeypatch.setattr("delaynet.network_reconstruction.time", lambda: time_now)
 
-    data = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0], [7.0, 8.0]])
-    shm = shared_memory.SharedMemory(create=True, size=data.nbytes)
-    shared_array = ndarray(data.shape, dtype=data.dtype, buffer=shm.buf)
-    shared_array[:] = data
+    shm, shape, dtype = _make_shared_worker_data()
     try:
-        args = (0, 1, shm.name, data.shape, data.dtype, "linear_correlation", 1, {})
+        args = (0, 1, shm.name, shape, dtype, "linear_correlation", 1, {})
         with Manager() as manager:
-            counter = manager.Value("i", 0)
+            counter = manager.Value("i", counter_start)
             lock = manager.Lock()
+            last_print = manager.Value("d", 0.0)
             result = _compute_with_progress(
                 args,
                 counter,
                 lock,
-                total_pairs=1,
-                start_time=time(),
-                sphinx_mode=True,
+                last_print,
+                total_pairs=total_pairs,
+                start_time=0.0,
             )
-            assert result is not None
             assert result[0] == 0
             assert result[1] == 1
+            if progress_printed:
+                assert len(print_calls) == 1
+            else:
+                assert print_calls == []
     finally:
         shm.close()
         shm.unlink()

@@ -1,6 +1,6 @@
 """Gravity connectivity metric."""
 
-from numpy import exp, array
+from numpy import exp, array, tile
 from numpy import sum as npsum
 from numpy.random import default_rng, Generator
 
@@ -64,14 +64,14 @@ def gravity_single(
     :return: *p*-value of gravity connectivity.
     :rtype: float
     """
-    gravity = grav(ts1[: -lag_step or None], ts2[lag_step:])
-    gravity_permuted = [
-        grav(ts1[: -lag_step or None], rng.permutation(ts2[lag_step:]))
-        for _ in range(n_tests)
-    ]
-
-    # p_val = num(perm_val > gravity) / n_tests
-    return npsum(array(gravity_permuted) > gravity) / n_tests
+    a = ts1[: -lag_step or None]
+    b = ts2[lag_step:]
+    gravity = grav(a, b)
+    permuted_b = rng.permuted(tile(b, (n_tests, 1)), axis=1)
+    q1 = npsum(exp(a))
+    q2 = npsum(exp(permuted_b), axis=1)
+    gravity_permuted = q1 * q2
+    return npsum(gravity_permuted > gravity) / n_tests
 
 
 def grav(a, b):

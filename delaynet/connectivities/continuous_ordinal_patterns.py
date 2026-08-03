@@ -4,7 +4,10 @@ import numpy as np
 from numba import njit, prange
 
 from ..decorators import connectivity
-from .granger import gt_multi_lag
+from ..utils.lag_steps import find_optimal_lag
+from .granger import gt_multi_lag, gt_single_lag
+
+_SERIAL_THRESHOLD = 200
 
 
 @connectivity
@@ -53,7 +56,9 @@ def random_patterns(
     t_ts2 = pattern_transform(np.copy(ts2), rnd_patterns)
 
     for i in range(num_rnd_patterns):
-        p_v, pv_idx = gt_multi_lag(t_ts1[i, :], t_ts2[i, :], lag_steps=lag_steps)
+        p_v, pv_idx = find_optimal_lag(
+            gt_single_lag, t_ts1[i, :], t_ts2[i, :], lag_steps=lag_steps
+        )
         if best_pv > p_v:
             best_pv = p_v
             best_lag = pv_idx
@@ -99,7 +104,6 @@ def pattern_transform(ts: np.ndarray, patterns: np.ndarray) -> np.ndarray:
     return pattern_transform_2d(ts, patterns).squeeze()
 
 
-@njit(nogil=True, parallel=True)
 def pattern_transform_2d(
     ts: np.ndarray, patterns: np.ndarray
 ) -> np.ndarray:  # pragma: no cover
@@ -128,8 +132,37 @@ def pattern_transform_2d(
     return transformed
 
 
-@njit(nogil=True, parallel=True)
-def norm_windows(ts: np.ndarray, window_size: int) -> np.ndarray:  # pragma: no cover
+@njit(nogil=True, cache=True)
+def _norm_windows_serial(
+    ts: np.ndarray, window_size: int
+) -> np.ndarray:  # pragma: no cover
+    windows = np.lib.stride_tricks.as_strided(
+        x=ts,
+        strides=(ts.strides[0], ts.strides[0]),
+        shape=(ts.shape[0] - window_size + 1, window_size),
+    )
+    normed_windows = np.zeros_like(windows)
+    for i in range(windows.shape[0]):
+        normed_windows[i] = norm_window(windows[i])
+    return normed_windows
+
+
+@njit(nogil=True, parallel=True, cache=True)
+def _norm_windows_parallel(
+    ts: np.ndarray, window_size: int
+) -> np.ndarray:  # pragma: no cover
+    windows = np.lib.stride_tricks.as_strided(
+        x=ts,
+        strides=(ts.strides[0], ts.strides[0]),
+        shape=(ts.shape[0] - window_size + 1, window_size),
+    )
+    normed_windows = np.zeros_like(windows)
+    for i in prange(windows.shape[0]):
+        normed_windows[i] = norm_window(windows[i])
+    return normed_windows
+
+
+def norm_windows(ts: np.ndarray, window_size: int) -> np.ndarray:
     """Normalise sliding windows of a time series to values between -1 and 1.
 
     :param ts: Time series.
@@ -139,23 +172,34 @@ def norm_windows(ts: np.ndarray, window_size: int) -> np.ndarray:  # pragma: no 
     :return: Normalised windows.
     :rtype: numpy.ndarray
     """
-    # Create a sliding window view of the input array
-    # windows = np.lib.stride_tricks.sliding_window_view(
-    #     x=ts, window_shape=window_size, writeable=False
-    # )
-    windows = np.lib.stride_tricks.as_strided(
-        x=ts,
-        strides=(ts.strides[0], ts.strides[0]),
-        shape=(ts.shape[0] - window_size + 1, window_size),
-    )
-    normed_windows = np.zeros_like(windows)
-    # Normalise each window to [-1, 1]
+    n_windows = ts.shape[0] - window_size + 1
+    if n_windows < _SERIAL_THRESHOLD:
+        return _norm_windows_serial(ts, window_size)
+    return _norm_windows_parallel(ts, window_size)
+
+
+@njit(nogil=True, cache=True)
+def _pattern_distance_serial(
+    windows: np.ndarray, pattern: np.ndarray
+) -> np.ndarray:  # pragma: no cover
+    distances = np.zeros(windows.shape[0])
+    for i in range(windows.shape[0]):
+        for j in range(pattern.shape[0]):
+            distances[i] += np.abs(windows[i, j] - pattern[j])
+    return distances / pattern.shape[0] / 2.0
+
+
+@njit(nogil=True, parallel=True, cache=True)
+def _pattern_distance_parallel(
+    windows: np.ndarray, pattern: np.ndarray
+) -> np.ndarray:  # pragma: no cover
+    distances = np.zeros(windows.shape[0])
     for i in prange(windows.shape[0]):
-        normed_windows[i] = norm_window(windows[i])
-    return normed_windows
+        for j in prange(pattern.shape[0]):
+            distances[i] += np.abs(windows[i, j] - pattern[j])
+    return distances / pattern.shape[0] / 2.0
 
 
-@njit(nogil=True, parallel=True)
 def pattern_distance(
     windows: np.ndarray, pattern: np.ndarray
 ) -> np.ndarray:  # pragma: no cover
@@ -168,9 +212,6 @@ def pattern_distance(
     :return: Distance between the windows and the pattern.
     :rtype: numpy.ndarray
     """
-    distances = np.zeros(windows.shape[0])
-    for i in prange(windows.shape[0]):
-        for j in prange(pattern.shape[0]):
-            distances[i] += np.abs(windows[i, j] - pattern[j])
-    return distances / pattern.shape[0] / 2.0
-    # equiv. to np.sum(np.abs(windows - pattern), axis=1) / pattern.shape[0] / 2.0
+    if windows.shape[0] < _SERIAL_THRESHOLD:
+        return _pattern_distance_serial(windows, pattern)
+    return _pattern_distance_parallel(windows, pattern)

@@ -1,16 +1,52 @@
 """Tests for the continuous ordinal patterns connectivity measure."""
 
+import random as _random
+import numpy as np
 import pytest
 from numpy import array, allclose, linspace, random, roll
+from numpy.lib.stride_tricks import as_strided
 
 from delaynet import connectivity
 from delaynet.connectivities.continuous_ordinal_patterns import (
+    _norm_windows_parallel,
+    _norm_windows_serial,
+    _pattern_distance_parallel,
+    _pattern_distance_serial,
     norm_window,
     norm_windows,
     pattern_distance,
     pattern_transform,
     random_patterns,
 )
+
+_SEED = _random.randint(0, 10000)  # deterministic per-session
+
+
+def _norm_windows_expected(ts, window_size):
+    """Pure-numpy reference for sliding window normalisation (no numba)."""
+    windows = as_strided(
+        ts,
+        strides=(ts.strides[0], ts.strides[0]),
+        shape=(ts.shape[0] - window_size + 1, window_size),
+    )
+    result = np.zeros_like(windows)
+    for i in range(windows.shape[0]):
+        w = windows[i]
+        nw = w - w.min()
+        nw = nw / nw.max()
+        nw = (nw - 0.5) * 2.0
+        nw[np.isnan(nw)] = 0.0
+        result[i] = nw
+    return result
+
+
+def _pattern_distance_expected(windows, pattern):
+    """Pure-numpy reference for pattern distance (no numba)."""
+    distances = np.zeros(windows.shape[0])
+    for i in range(windows.shape[0]):
+        for j in range(pattern.shape[0]):
+            distances[i] += np.abs(windows[i, j] - pattern[j])
+    return distances / pattern.shape[0] / 2.0
 
 
 @pytest.mark.parametrize(
@@ -58,6 +94,26 @@ def test_norm_windows(ts, window_size, expected):
     assert allclose(norm_windows(array(ts), window_size), array(expected))
 
 
+@pytest.mark.parametrize("window_size", [2, 5, 10])
+def test_norm_windows_random_noise(window_size):
+    """norm_windows on non-monotonic random data matches independent reference."""
+    rng = np.random.default_rng(_SEED)
+    ts = rng.normal(0, 1, size=200)
+    assert allclose(
+        norm_windows(ts, window_size), _norm_windows_expected(ts, window_size)
+    )
+
+
+def test_norm_windows_serial_parallel_equivalence():
+    """Serial and parallel paths produce identical output on large data."""
+    rng = np.random.default_rng(_SEED + 1)
+    ts = rng.normal(0, 1, size=500)
+    window_size = 2  # 499 windows > _SERIAL_THRESHOLD = 200
+    serial = _norm_windows_serial(ts, window_size)
+    parallel = _norm_windows_parallel(ts, window_size)
+    assert allclose(serial, parallel)
+
+
 @pytest.mark.parametrize(
     "windows, pattern, expected",
     [
@@ -71,6 +127,25 @@ def test_norm_windows(ts, window_size, expected):
 def test_pattern_distance(windows, pattern, expected):
     """Test the computation of the distance between windows and a pattern."""
     assert allclose(pattern_distance(array(windows), array(pattern)), array(expected))
+
+
+def test_pattern_distance_random_noise():
+    """pattern_distance on random data matches independent reference."""
+    rng = np.random.default_rng(_SEED + 2)
+    windows = rng.uniform(-1, 1, (50, 5))
+    pattern = rng.uniform(-1, 1, (5,))
+    expected = _pattern_distance_expected(windows, pattern)
+    assert allclose(pattern_distance(windows, pattern), expected)
+
+
+def test_pattern_distance_serial_parallel_equivalence():
+    """Serial and parallel paths produce identical output on large data."""
+    rng = np.random.default_rng(_SEED + 3)
+    windows = rng.uniform(-1, 1, (500, 3))
+    pattern = rng.uniform(-1, 1, (3,))
+    serial = _pattern_distance_serial(windows, pattern)
+    parallel = _pattern_distance_parallel(windows, pattern)
+    assert allclose(serial, parallel)
 
 
 @pytest.mark.parametrize(

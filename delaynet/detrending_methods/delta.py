@@ -1,6 +1,6 @@
 """Delta detrending."""
 
-from numpy import copy, size, mean, integer
+from numpy import empty, empty_like, integer, cumsum
 
 from ..decorators import detrending_method
 
@@ -27,12 +27,15 @@ def delta(ts, window_size: int = 10):
     if not isinstance(window_size, (int, integer)) or window_size <= 0:
         raise ValueError(f"window_size must be a positive integer, not {window_size}.")
 
-    ts2 = copy(ts)
-    for k in range(size(ts)):
-        off1 = k - window_size
-        off1 = max(off1, 0)
-        sub_ts = ts[off1 : (k + window_size)]
+    n = ts.shape[0]
+    c = empty(n + 1, dtype=ts.dtype)
+    c[0] = 0
+    c[1:] = cumsum(ts)
 
-        ts2[k] = ts[k] - mean(sub_ts)
+    ts2 = empty_like(ts)
+    for k in range(n):
+        left = max(0, k - window_size)
+        right = min(n, k + window_size)
+        ts2[k] = ts[k] - (c[right] - c[left]) / (right - left)
 
     return ts2

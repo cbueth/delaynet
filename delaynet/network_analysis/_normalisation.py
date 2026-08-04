@@ -152,11 +152,25 @@ def normalise_against_random(metric_fn: Callable[..., Any]) -> Callable[..., Any
         x_true = metric_fn(weight_matrix, *args, **kwargs)
 
         # Sample ensemble and compute metric values
+        # Retry if the metric raises ValueError on a random graph (e.g., reciprocity
+        # rejects accidentally symmetric matrices). Cap attempts to avoid infinite loops.
         samples = []
-        for _ in range(n_rand_val):
+        max_attempts = n_rand_val * 10
+        for _ in range(max_attempts):
+            if len(samples) >= n_rand_val:
+                break
             R = _random_directed_gnm_igraph(n, m)
-            x_r = metric_fn(R, *args, **kwargs)
+            try:
+                x_r = metric_fn(R, *args, **kwargs)
+            except ValueError:
+                continue
             samples.append(np.asarray(x_r))
+        else:
+            raise RuntimeError(
+                f"Could not collect {n_rand_val} valid null-distribution samples "
+                f"after {max_attempts} attempts. The metric {metric_fn.__name__!r} "
+                f"raised ValueError on every random graph generated."
+            )
 
         samples_arr = np.stack(samples, axis=0)  # shape: (n_random, ...)
         mu = samples_arr.mean(axis=0)

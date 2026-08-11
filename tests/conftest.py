@@ -77,7 +77,7 @@ def connectivity_metric_kwargs(request):
 
 @pytest.fixture(
     scope="session",
-    params=__all_detrending__,
+    params=sorted(__all_detrending__, key=lambda method: method.__name__),
 )
 def detrending_function(request):
     """Return a detrending function."""

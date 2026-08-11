@@ -618,27 +618,27 @@ requires-dist = [
     { name = "delaynet", extras = ["doc", "lint", "test"], marker = "extra == 'all'" },
     { name = "folium", marker = "extra == 'doc'" },
     { name = "geopandas", marker = "extra == 'doc'" },
-    { name = "igraph" },
-    { name = "infomeasure", specifier = ">=0.5.0" },
+    { name = "igraph", specifier = ">=0.11.5" },
+    { name = "infomeasure", specifier = ">=0.6.2" },
     { name = "mapclassify", marker = "extra == 'doc'" },
     { name = "matplotlib", marker = "extra == 'doc'" },
     { name = "myst-nb", marker = "extra == 'doc'" },
     { name = "networkx", marker = "extra == 'doc'" },
-    { name = "numba" },
-    { name = "numpy" },
+    { name = "numba", specifier = ">=0.59.0" },
+    { name = "numpy", specifier = ">=2.0.1" },
     { name = "pre-commit", marker = "extra == 'lint'" },
     { name = "pytest", marker = "extra == 'test'" },
     { name = "pytest-codspeed", marker = "extra == 'test'" },
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "pytest-xdist", marker = "extra == 'test'" },
     { name = "ruff", marker = "extra == 'lint'" },
-    { name = "scikit-learn" },
-    { name = "scipy" },
+    { name = "scikit-learn", specifier = ">=1.5.0" },
+    { name = "scipy", specifier = ">=1.13.0" },
     { name = "sphinx", marker = "extra == 'doc'" },
     { name = "sphinx-book-theme", marker = "extra == 'doc'" },
     { name = "sphinx-design", marker = "extra == 'doc'" },
     { name = "sphinxcontrib-bibtex", marker = "extra == 'doc'" },
-    { name = "statsmodels" },
+    { name = "statsmodels", specifier = ">=0.13.3" },
     { name = "synthatdelays", specifier = ">=1.0.2" },
 ]
 provides-extras = ["lint", "test", "doc", "all"]
@@ -908,7 +908,7 @@ wheels = [
 
 [[package]]
 name = "infomeasure"
-version = "0.5.1"
+version = "0.6.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numba" },
@@ -916,9 +916,9 @@ dependencies = [
     { name = "scipy" },
     { name = "sparse" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/30/37/123d28e55816552e87b919985ed21dedea4e9e6c5dd260ed649ff5fff9a8/infomeasure-0.5.1.tar.gz", hash = "sha256:7c52b0743b87cd26ce184e05e96ad80d2cd18ec3418f4be020e6b0f87c5adf3a", size = 168394, upload-time = "2026-01-17T20:53:11.082Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5b/5c/850a5821979b666331632e04f310509e4f96f4b08b0c02b1cc8ca38c00bb/infomeasure-0.6.2.tar.gz", hash = "sha256:63110658d2a41817d9a499401e9c39a4137855535f3b91f11db56053529e19fa", size = 175227, upload-time = "2026-07-06T12:17:56.409Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f4/f6/79c0c26adcba6c460422f0a4d2d4a6d6bb53f8bfd3d46405ca435a33b900/infomeasure-0.5.1-py3-none-any.whl", hash = "sha256:1c913e566e717271bc727378573fb27f71855d16db90c75848ab743081e6e4e5", size = 259346, upload-time = "2026-01-17T20:53:09.541Z" },
+    { url = "https://files.pythonhosted.org/packages/90/1c/275520b99485693c6914d7ea7231692d038f0e873663f6ff53a54eb70cd0/infomeasure-0.6.2-py3-none-any.whl", hash = "sha256:16a5b97faf53e23df34dd38f1d89053bef4720c9135f5178eecbc438d50409b5", size = 266259, upload-time = "2026-07-06T12:17:54.979Z" },
 ]
 
 [[package]]

@@ -26,7 +26,8 @@ __all_detrending__ = set(__all_detrending_names__.values())
 
 # Extend named detrending methods with the function name
 # e.g. adds "second_difference": second_difference
-for method in __all_detrending__:
+# Iterate in deterministic order so dict insertion order is stable across processes.
+for method in sorted(__all_detrending__, key=lambda m: m.__name__):
     __all_detrending_names__[method.__name__] = method
 
 # Convenient name dict: "method.__name__": ["method", "method short", ...]

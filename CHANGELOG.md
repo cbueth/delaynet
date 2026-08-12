@@ -2,32 +2,48 @@
 
 ## [0.3.3](https://github.com/cbueth/delaynet/compare/v0.3.2...v0.3.3) (2026-08-12)
 
+- 🚀 **2-4 times faster network reconstruction!**
+  The Granger causality hot path was rewritten from `statsmodels.OLS().f_test()` to a
+  pure numpy/scipy normal-equations F-test with p-values matching to machine precision.
+  Network reconstruction with the `gc` metric measures **~2.1× faster** on CodSpeed,
+  and the isolated Granger F-test is **up to ~8× faster**
+  ([#46](https://github.com/cbueth/delaynet/pull/46),
+  [`d5e4952`](https://github.com/cbueth/delaynet/commit/d5e4952fe672a1fba3e84d95cd65b7e5b1420471)).
 
-### Bug Fixes
+- ⚡ **More performance improvements**
+    - Delta detrending is now O(n) via cumulative sums instead of O(n w)
+      ([`8119494`](https://github.com/cbueth/delaynet/commit/81194940a7954bf392a7c0b4dd12935bd38d8595))
+    - `global_efficiency` inner loop vectorised
+      ([`7d522e7`](https://github.com/cbueth/delaynet/commit/7d522e7f9ab68b7d7348bf2057ca90db479471d2))
+    - Continuous ordinal patterns: serial fast path for small data, decorator overhead
+      bypassed
+      ([`e8f6e0f`](https://github.com/cbueth/delaynet/commit/e8f6e0fac738710ace3ee01a1e04537b161f007d))
+    - Gravity permutation test vectorised with `rng.permuted`
+      ([`5c402c5`](https://github.com/cbueth/delaynet/commit/5c402c59b82ff849fd26c2a32c95e6c0f038df9e))
+    - `print_progress` throttled to 1 Hz instead of printing every pair
+      ([`37cd00d`](https://github.com/cbueth/delaynet/commit/37cd00ddf88ba2c16318197ed6ef50b2d2f9bfbb))
 
-* **ci:** align ruff pre-commit with uv.lock and fix commitlint extends ([a90ac2b](https://github.com/cbueth/delaynet/commit/a90ac2bd180e266c3c030abc59498214e023614f))
-* Directed parameter logic in eigenvector centrality for igraph `1.0.0` ([4b479fe](https://github.com/cbueth/delaynet/commit/4b479fe8ebb6a9c261d643abd3238624080f8b39))
-* **docs:** remove header search button so it stops pushing the navbar on scroll ([f72b29d](https://github.com/cbueth/delaynet/commit/f72b29dcd0edb24feab0235bf28ab0735eedbbe1))
-* Handle directed parameter logic in eigenvector centrality and add warning for symmetric matrices in directed mode ([7675b84](https://github.com/cbueth/delaynet/commit/7675b847ecf7d559d6eb7744f483006d7edb2e06))
-* **normalisation:** retry on ValueError when sampling null ensemble ([07e53d3](https://github.com/cbueth/delaynet/commit/07e53d3e6ac7884f9e5643731f4d1ffe2acec50d))
+- 📊 **Benchmarks**: new CodSpeed benchmark suite with CI workflow
+  ([#45](https://github.com/cbueth/delaynet/issues/45),
+  [`c42071c`](https://github.com/cbueth/delaynet/commit/c42071c50a00526458e0f58108799582dba3935c)) and
+  benchmarks for detrending, network analysis, and gravity
+  ([`e6dfa1a`](https://github.com/cbueth/delaynet/commit/e6dfa1a45efa4a3a6d69c559da5ce9f289419472)).
 
+- 🐛 **Bug fixes**
+    - Normalisation: retry on `ValueError` when sampling the null ensemble, fixing a flaky
+      reciprocity test
+      ([`07e53d3`](https://github.com/cbueth/delaynet/commit/07e53d3e6ac7884f9e5643731f4d1ffe2acec50d))
+    - Eigenvector centrality: correct directed handling for igraph `1.0.0` and warn on
+      symmetric matrices in directed mode
+      ([`7675b84`](https://github.com/cbueth/delaynet/commit/7675b847ecf7d559d6eb7744f483006d7edb2e06),
+      [`4b479fe`](https://github.com/cbueth/delaynet/commit/4b479fe8ebb6a9c261d643abd3238624080f8b39))
+    - CI: align ruff pre-commit with `uv.lock` and fix commitlint `extends`
+      ([`a90ac2b`](https://github.com/cbueth/delaynet/commit/a90ac2bd180e266c3c030abc59498214e023614f))
+    - Docs: remove the header search button that pushed the sticky navbar down on scroll
+      ([`f72b29d`](https://github.com/cbueth/delaynet/commit/f72b29dcd0edb24feab0235bf28ab0735eedbbe1))
 
-### Performance Improvements
-
-* **bench:** add benchmarks for detrending, network analysis, and gravity ([e6dfa1a](https://github.com/cbueth/delaynet/commit/e6dfa1a45efa4a3a6d69c559da5ce9f289419472))
-* **codspeed:** Add benchmark suite with CI workflow ([#45](https://github.com/cbueth/delaynet/issues/45)) ([c42071c](https://github.com/cbueth/delaynet/commit/c42071c50a00526458e0f58108799582dba3935c))
-* **delta:** O(n) cumulative sum instead of O(n w) per-element `np.mean` ([8119494](https://github.com/cbueth/delaynet/commit/81194940a7954bf392a7c0b4dd12935bd38d8595))
-* **granger:** merge fast F-test into granger.py, remove dead code ([ea0a647](https://github.com/cbueth/delaynet/commit/ea0a6470b9ed197b5cbd395df2a0edc3ab5e12e9))
-* **metrics:** vectorize global_efficiency inner loop ([7d522e7](https://github.com/cbueth/delaynet/commit/7d522e7f9ab68b7d7348bf2057ca90db479471d2))
-* **ordinal-patterns:** serial path for small data and bypass decorator overhead ([e8f6e0f](https://github.com/cbueth/delaynet/commit/e8f6e0fac738710ace3ee01a1e04537b161f007d))
-* replace statsmodels OLS+f_test with numpy/scipy in Granger F-test ([d5e4952](https://github.com/cbueth/delaynet/commit/d5e4952fe672a1fba3e84d95cd65b7e5b1420471))
-* throttle print_progress to 1 Hz instead of every pair ([37cd00d](https://github.com/cbueth/delaynet/commit/37cd00ddf88ba2c16318197ed6ef50b2d2f9bfbb))
-* vectorize permutation test in gravity with rng.permuted ([5c402c5](https://github.com/cbueth/delaynet/commit/5c402c59b82ff849fd26c2a32c95e6c0f038df9e))
-
-
-### Documentation
-
-* Add codspeed badge ([0a01312](https://github.com/cbueth/delaynet/commit/0a01312767568cf962793cdb3b359fef4a1602ea))
+- 📖 **Documentation**: CodSpeed badge
+  ([`0a01312`](https://github.com/cbueth/delaynet/commit/0a01312767568cf962793cdb3b359fef4a1602ea))
 
 ## 0.3.2 (2025-08-14)
 

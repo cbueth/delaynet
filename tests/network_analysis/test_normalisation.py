@@ -8,6 +8,8 @@ These tests focus on:
 - Seed reproducibility for z-scores.
 - Sigma==0 branch returns 0.0 without NaN/inf.
 - Output shape/type parity when normalising.
+- Retry when a random graph raises ValueError (e.g. symmetric for reciprocity).
+- RuntimeError when no valid null-distribution samples can be collected.
 """
 
 from __future__ import annotations
@@ -17,6 +19,8 @@ import random as _py_random
 import numpy as np
 import pytest
 from igraph import Graph
+
+import delaynet.network_analysis._normalisation as _normalisation
 
 from delaynet.network_analysis.metrics import (
     link_density,
@@ -302,3 +306,44 @@ def test_example_matrices(network_metric_and_kind, n, m):
             assert not np.isnan(val)
             assert not np.isnan(z)
             assert np.isfinite(z)
+
+
+@pytest.mark.parametrize("n_rejected", [1, 3])
+def test_normalisation_retries_when_random_graph_rejected(monkeypatch, n_rejected):
+    """Samples that raise ValueError (e.g. accidentally symmetric for reciprocity)
+    are resampled until enough valid samples are collected."""
+    # Arrange
+    A = np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]], dtype=int)
+    symmetric = np.array([[0, 1, 1], [1, 0, 0], [1, 0, 0]], dtype=int)
+    partial = np.array([[0, 1, 1], [1, 0, 0], [0, 0, 0]], dtype=int)
+    independent = np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]], dtype=int)
+    generated = iter([symmetric] * n_rejected + [partial, independent])
+    monkeypatch.setattr(
+        _normalisation, "_random_directed_gnm_igraph", lambda n, m: next(generated)
+    )
+
+    # Act
+    z = reciprocity(A, normalise=True, n_random=2)
+
+    # Assert
+    assert isinstance(z, float)
+    assert np.isfinite(z)
+
+
+@pytest.mark.parametrize("n_random", [1, 2])
+def test_normalisation_raises_when_all_random_graphs_rejected(monkeypatch, n_random):
+    """If every sampled graph raises ValueError, a RuntimeError is raised instead of
+    building an incomplete null distribution."""
+    # Arrange
+    A = np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]], dtype=int)
+    symmetric = np.array([[0, 1, 1], [1, 0, 0], [1, 0, 0]], dtype=int)
+    monkeypatch.setattr(
+        _normalisation, "_random_directed_gnm_igraph", lambda n, m: symmetric
+    )
+
+    # Act / Assert
+    with pytest.raises(
+        RuntimeError,
+        match=f"Could not collect {n_random} valid null-distribution samples",
+    ):
+        reciprocity(A, normalise=True, n_random=n_random)

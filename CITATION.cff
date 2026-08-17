@@ -19,7 +19,7 @@ keywords:
     - mutual information
     - transfer entropy
 license: BSD-3-Clause
-version: 0.3.3  # x-release-please-version
+version: 0.3.4  # x-release-please-version
 
 # add when code published
 # doi: 10.5281/zenodo.0000

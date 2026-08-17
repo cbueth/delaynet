@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.4](https://github.com/cbueth/delaynet/compare/v0.3.3...v0.3.4) (2026-08-17)
+
+
+### Bug Fixes
+
+* **benchmarks:** skip benchmark tests without pytest-codspeed ([a127b18](https://github.com/cbueth/delaynet/commit/a127b18ac85f8b6c62be3f7fca129e8b6cd9679a))
+* **ci:** add pypi-publish environment to match trusted publisher ([da07a73](https://github.com/cbueth/delaynet/commit/da07a7390c4a4931e424b1820e07810cb1fa7210))
+* **ci:** allow manual publish and trigger publish.yml from release-please ([3b34d2c](https://github.com/cbueth/delaynet/commit/3b34d2c9f7f4c8c85176b0fb21356f0d9949da43))
+* **ci:** use valid release/v1 ref for pypi publish action ([d706509](https://github.com/cbueth/delaynet/commit/d706509bed78fb1177484bdc81af9c25bec12b1d))
+
 ## [0.3.3](https://github.com/cbueth/delaynet/compare/v0.3.2...v0.3.3) (2026-08-12)
 
 - 🚀 **2-4 times faster network reconstruction!**

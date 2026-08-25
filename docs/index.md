@@ -111,11 +111,10 @@ Furthermore, you can also find the {ref}`API documentation <API Reference>`.
 If you use `delaynet` in your research, find the `CITATION.cff` file
 in [the repository](https://github.com/cbueth/delaynet) and cite it
 accordingly.
-GitLab provides citation metadata from the `CITATION.cff`, and you can also copy an APA
+GitHub provides citation metadata from the `CITATION.cff`, and you can also copy an APA
 or BibTeX entry from the repository.
 
-A preprint is being prepared and will be submitted; arXiv/DOI links will be added upon
-availability.
+Please also cite the [arXiv preprint](https://arxiv.org/abs/2510.05143) (revised after acceptance).
 
 ## Contributing
 

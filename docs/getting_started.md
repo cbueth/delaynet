@@ -7,10 +7,6 @@ kernelspec:
 (getting_started)=
 # Getting Started
 
-```{warning}
-Use {ref}`Development Setup` until public release.
-```
-
 This package can be [installed from PyPI](https://pypi.org/project/delaynet/) using pip:
 
 ```bash

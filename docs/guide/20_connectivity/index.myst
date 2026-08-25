@@ -169,11 +169,11 @@ For details about these connectivity methods, see the next subsections.
 :name: table_of_connectivity
 :caption: Table of Connectivity Measures
 
-granger_causality
-transfer_entropy
-mutual_information
 linear_correlation
 rank_correlation
+granger_causality
+mutual_information
+transfer_entropy
 continuous_ordinal_patterns
 gravity
 ```

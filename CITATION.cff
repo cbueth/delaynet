@@ -21,27 +21,19 @@ keywords:
 license: BSD-3-Clause
 version: 0.3.3  # x-release-please-version
 
-# add when code published
-# doi: 10.5281/zenodo.0000
-# date-released: YYYY-MM-DD
-
-# add when article published
-# preferred-citation:
-#   type: article
-#   authors:
-#     - family-names: "Büth"
-#       given-names: "Carlson Moses"
-#       orcid: "https://orcid.org/0000-0003-2298-8438"
-#     - family-names: "Zanin"
-#       given-names: "Massimiliano"
-#       orcid: "https://orcid.org/0000-0002-5839-0393"
-#   doi: "10.0000/00000"
-#   journal: "JOURNAL"
-#   month: 1
-#   start: 1
-#   end: 2
-#   title: "PROJECTNAME"
-#   issue: 1
-#   volume: 1
-#   year: YYYY
-#   abstract: "ABSTRACT"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Büth"
+      given-names: "Carlson Moses"
+      orcid: "https://orcid.org/0000-0003-2298-8438"
+    - family-names: "Zanin"
+      given-names: "Massimiliano"
+      orcid: "https://orcid.org/0000-0002-5839-0393"
+  doi: "10.1016/j.trip.2026.102187"
+  journal: "Transportation Research Interdisciplinary Perspectives"
+  month: 9
+  start: 102187
+  title: "Functional Connectivity Networks for Transportation Delay Analysis: From Theory to Software"
+  volume: 39
+  year: 2026

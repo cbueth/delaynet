@@ -19,10 +19,10 @@
 
 <div align="center">
 
+<a href="">[![Paper](https://img.shields.io/static/v1?label=Transp.%20Res.%20Interdiscip.%20Perspect.&message=10.1016/j.trip.2026.102187&color=005b96)](https://doi.org/10.1016/j.trip.2026.102187)</a>
 <a href="">[![arXiv](https://img.shields.io/badge/arXiv-2510.05143-b31b1b.svg)](https://arxiv.org/abs/2510.05143)</a>
 <a href="">[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16875272.svg)](https://doi.org/10.5281/zenodo.16875272)</a>
 <a href="">[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)</a>
-<a href="">[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-1.2-4baaaa.svg)](CODE_OF_CONDUCT.md)</a>
 
 </div>
 
@@ -32,6 +32,7 @@
 <a href="">[![Lint](https://github.com/cbueth/delaynet/actions/workflows/lint.yml/badge.svg)](https://github.com/cbueth/delaynet/actions/workflows/lint.yml)</a>
 <a href="">[![CodSpeed Badge](https://img.shields.io/endpoint?url=https://app.codspeed.io//badge.json)](https://app.codspeed.io//cbueth/delaynet?utm_source=badge)</a>
 <a href="">[![codecov](https://codecov.io/gh/cbueth/delaynet/branch/main/graph/badge.svg)](https://codecov.io/gh/cbueth/delaynet)</a>
+<a href="">[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-1.2-4baaaa.svg)](CODE_OF_CONDUCT.md)</a>
 
 </div>
 

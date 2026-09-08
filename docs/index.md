@@ -33,12 +33,6 @@ site:
      <a href="https://pypi.org/project/delaynet/" style="margin: 0 10px; display: inline-block;">
        <img src="https://badge.fury.io/py/delaynet.svg" alt="PyPI version" />
      </a>
-     <a href="https://arxiv.org/abs/2510.05143" style="margin: 0 10px; display: inline-block;">
-       <img src="https://img.shields.io/badge/arXiv-2510.05143-b31b1b.svg" alt="arXiv Pre-print" />
-     </a>
-     <a href="https://doi.org/10.5281/zenodo.16875272" style="margin: 0 10px; display: inline-block;">
-       <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.16875272.svg" alt="Zenodo Project" />
-     </a>
      <a href="https://anaconda.org/conda-forge/delaynet" style="margin: 0 10px; display: inline-block;">
        <img src="https://img.shields.io/conda/vn/conda-forge/delaynet.svg" alt="Conda version" />
      </a>
@@ -48,7 +42,19 @@ site:
      <a href="https://pypi.org/project/delaynet/" style="margin: 0 10px; display: inline-block;">
        <img src="https://img.shields.io/pypi/l/delaynet" alt="License" />
      </a>
-    </div>
+   </div>
+   <div style="height: 10px;"></div>
+   <div style="text-align: center;">
+     <a href="https://doi.org/10.1016/j.trip.2026.102187" style="margin: 0 10px; display: inline-block;">
+       <img src="https://img.shields.io/static/v1?label=Transp.%20Res.%20Interdiscip.%20Perspect.&message=10.1016/j.trip.2026.102187&color=005b96" alt="Transportation Research Interdisciplinary Perspectives" />
+     </a>
+     <a href="https://arxiv.org/abs/2510.05143" style="margin: 0 10px; display: inline-block;">
+       <img src="https://img.shields.io/badge/arXiv-2510.05143-b31b1b.svg" alt="arXiv Pre-print" />
+     </a>
+     <a href="https://doi.org/10.5281/zenodo.16875272" style="margin: 0 10px; display: inline-block;">
+       <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.16875272.svg" alt="Zenodo Project" />
+     </a>
+   </div>
    <div style="height: 20px;"></div>
 
 ```
@@ -108,13 +114,17 @@ Furthermore, you can also find the {ref}`API documentation <API Reference>`.
 
 ## How to cite
 
-If you use `delaynet` in your research, find the `CITATION.cff` file
+If you use `delaynet` in your research, please cite the associated publication:
+
+> Büth, C. M., & Zanin, M. (2026). **Functional connectivity networks for transportation
+> delay analysis: from theory to software.** *Transportation Research Interdisciplinary
+> Perspectives*, 39, 102187. doi:[10.1016/j.trip.2026.102187](https://doi.org/10.1016/j.trip.2026.102187).
+
+You can also find the `CITATION.cff` file
 in [the repository](https://github.com/cbueth/delaynet) and cite it
 accordingly.
 GitHub provides citation metadata from the `CITATION.cff`, and you can also copy an APA
 or BibTeX entry from the repository.
-
-Please also cite the [arXiv preprint](https://arxiv.org/abs/2510.05143) (revised after acceptance).
 
 ## Contributing
 
